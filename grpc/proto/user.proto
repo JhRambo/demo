@@ -1,0 +1,32 @@
+syntax = "proto3";
+option go_package = "./user";
+
+// 添加数据结构体参数
+message AddUserData {
+	string name = 1;
+	int32 age = 2;
+    repeated string hobby = 3;  //切片
+	string sex = 4;
+	string addr = 5;
+}
+
+// 获取数据结构体参数
+message GetUserData {
+    int32 id = 1;
+}
+
+// 响应结构体
+message Res {
+	bool success = 1;
+	string message = 2;
+}
+
+//定义接口
+service User {
+    rpc AddUser(AddUserData) returns (Res);
+    rpc GetUser(GetUserData) returns (Res);
+}
+
+//切到当前文件所在的目录下执行  
+//方式1（普通的rpc）：protoc --go_out=./ user.proto
+//方式2（grpc）：protoc --go_out=plugins=grpc:./ user.proto		需要安装：go install github.com/golang/protobuf/protoc-gen-go@latest
