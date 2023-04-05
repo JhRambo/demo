@@ -13,12 +13,14 @@ type handle struct {
 	host string
 	port string
 }
+
+// 服务种类
 type Service struct {
 	auth *handle
 	user *handle
 }
 
-// 反向代理
+// 反向代理，路由转发
 func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var remote *url.URL
 	if strings.Contains(r.RequestURI, "api/auth") {
@@ -33,12 +35,13 @@ func (this *Service) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	proxy.ServeHTTP(w, r)
 }
 func startServer() {
+	log.Println("服务启动中...")
 	// 注册被代理的服务器 (host， port)
 	service := &Service{
 		auth: &handle{host: "127.0.0.1", port: "8081"},
 		user: &handle{host: "127.0.0.1", port: "8082"},
 	}
-	err := http.ListenAndServe(":8888", service)
+	err := http.ListenAndServe(":8088", service)
 	if err != nil {
 		log.Fatalln("ListenAndServe: ", err)
 	}
