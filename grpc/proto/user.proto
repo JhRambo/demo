@@ -28,5 +28,11 @@ service User {
 }
 
 //切到当前文件所在的目录下执行  
-//方式1（普通的rpc）：protoc --go_out=./ user.proto
-//方式2（grpc）：protoc --go_out=plugins=grpc:./ user.proto		需要安装：go install github.com/golang/protobuf/protoc-gen-go@latest
+//方式1（rpc） ：protoc --go_out=./ user.proto					生成：user.pb.go	（忽略）
+//方式2（grpc）：protoc --go_out=plugins=grpc:./ user.proto		生成：user.pb.go
+//方式3（grpc）: protoc --go-grpc_out=./ user.proto				生成：user_grpc.pb.go
+//方式4（grpc）: protoc --grpc-gateway_out=./ user.proto		生成：user.pb.gw.go
+
+// --go_out 		  生成 .pb.go			需要安装：go install github.com/golang/protobuf/protoc-gen-go@latest
+// --go-grpc_out 	  生成 _grpc.pb.go		需要安装：go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
+// --grpc-gateway_out 生成 pb.gw.go			需要安装：go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2
