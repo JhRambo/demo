@@ -9,7 +9,7 @@ service Greeter {
   // 具体的远程服务方法
   rpc SayHello (HelloRequest) returns (HelloReply) {
     option (google.api.http) = {
-      post: "/hello"
+      post: "/hello"  //http协议调用时，用http://127.0.0.1:8088/hello
       body: "*"
     };
   }

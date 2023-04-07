@@ -22,7 +22,7 @@ type server struct {
 }
 
 // 实际处理业务逻辑的地方
-// 业务代码在此写，客户端远程调用SayHello时，
+// 业务代码在这里写，客户端远程tcp协议调用SayHello
 // 会执行这里的代码
 func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
 	// 打印请求参数
