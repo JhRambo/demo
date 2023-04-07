@@ -1,28 +1,24 @@
+// 协议类型
 syntax = "proto3";
- 
-package sum;
-option go_package="./hello";
- 
+
+option go_package = "./hello";
+
 import "google/api/annotations.proto";
- 
-message Numbers {
-    int64 a = 1;
-    int64 b = 2;
+// 定义的服务名
+service Greeter {
+  // 具体的远程服务方法
+  rpc SayHello (HelloRequest) returns (HelloReply) {
+    option (google.api.http) = {
+      post: "/hello"
+      body: "*"
+    };
+  }
 }
- 
-message SumRequest {
-    Numbers numbers =1;
+// SayHello方法的入参，只有一个字符串字段
+message HelloRequest {
+  string name = 1;
 }
- 
-message SumResponse {
-    int64 result = 1;
-}
- 
-service Sum {
-    rpc Add(SumRequest) returns (SumResponse) {
-        option (google.api.http) = {
-            post: "/v1/sum"
-            body: "*"
-        };
-    }
+// SayHello方法的返回值，只有一个字符串字段
+message HelloReply {
+  string message = 1;
 }

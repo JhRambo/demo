@@ -20,60 +20,7 @@
 系统触发：运行时自行根据内置的条件，检查、发现到，则进行 GC 处理，维护整个应用程序的可用性。
 手动触发：开发者在业务代码中自行调用 runtime.GC 方法来触发 GC 行为。
 
-5.监控线程
-答：实质上在 Go 运行时（runtime）初始化时，会启动一个 goroutine，用于处理 GC 机制的相关事项。
-
-代码如下：
-
-func init() {
- go forcegchelper()
-}
- 
-func forcegchelper() {
- forcegc.g = getg()
- lockInit(&forcegc.lock, lockRankForcegc)
- for {
-  lock(&forcegc.lock)
-  if forcegc.idle != 0 {
-   throw("forcegc: phase error")
-  }
-  atomic.Store(&forcegc.idle, 1)
-  goparkunlock(&forcegc.lock, waitReasonForceGCIdle, traceEvGoBlock, 1)
-    // this goroutine is explicitly resumed by sysmon
-  if debug.gctrace > 0 {
-   println("GC forced")
-  }
- 
-  gcStart(gcTrigger{kind: gcTriggerTime, now: nanotime()})
- }
-}
-注：在这段程序中，需要特别关注的是在 forcegchelper 方法中，会调用 goparkunlock 方法让该 goroutine 陷入休眠等待状态，以减少不必要的资源开销。
-在休眠后，会由 sysmon 这一个系统监控线程来进行监控、唤醒等行为：
-
-func sysmon() {
- ...
- for {
-  ...
-  // check if we need to force a GC
-  if t := (gcTrigger{kind: gcTriggerTime, now: now}); t.test() && atomic.Load(&forcegc.idle) != 0 {
-   lock(&forcegc.lock)
-   forcegc.idle = 0
-   var list gList
-   list.push(forcegc.g)
-   injectglist(&list)
-   unlock(&forcegc.lock)
-  }
-  if debug.schedtrace > 0 && lasttrace+int64(debug.schedtrace)*1000000 <= now {
-   lasttrace = now
-   schedtrace(debug.scheddetail > 0)
-  }
-  unlock(&sched.sysmonlock)
- }
-}
-注：这段代码核心的行为就是不断地在 for 循环中，对 gcTriggerTime 和 now 变量进行比较，判断是否达到一定的时间（默认为 2 分钟）。
-若达到意味着满足条件，会将 forcegc.g 放到全局队列中接受新的一轮调度，再进行对上面 forcegchelper 的唤醒。
-
-6.能介绍下 rune 类型吗？
+5.能介绍下 rune 类型吗？
 相当int32
 golang中的字符串底层实现是通过byte类型实现的，中文字符在unicode下占2个字节，在utf-8编码下占3个字节，而golang默认编码正好是utf-8
 byte 等同于int8，常用来处理ascii字符
@@ -84,3 +31,14 @@ ASCII码的值如下
 97～122号为26个小写英文字母.
 所以应该写：
 数字、大写英文字母、小写英文字母
+
+6.proto
+切到当前文件所在的目录下执行
+方式1（rpc） ：protoc --go_out=./ hello.proto									            生成：hello.pb.go	  （忽略）
+方式3（grpc）: protoc --go-grpc_out=./ hello.proto								            生成：hello_grpc.pb.go
+方式2（grpc）：protoc --go_out=plugins=grpc:./ hello.proto						            生成：hello.pb.go
+方式4（grpc）: protoc --grpc-gateway_out=logtostderr=true:./ hello.proto		            生成：hello.pb.gw.go
+
+--go-grpc_out 	        生成 _grpc.pb.go		需要安装：go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
+--go_out 		        生成 .pb.go			    需要安装：go install github.com/golang/protobuf/protoc-gen-go@latest
+--grpc-gateway_out      生成 pb.gw.go			需要安装：go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2
