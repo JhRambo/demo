@@ -61,10 +61,10 @@ func TSSHandler(port int) gin.HandlerFunc {
 
 func main() {
 	r := gin.Default()
-	// r.Use(TSSHandler(8080))
+	// r.Use(TSSHandler(8088))
 	r.POST("/auth", authHandler)
 	r.GET("/home", middleware.Auth{}.JwtAuthMiddleware(), homeHandler) //中间件鉴权
 	fmt.Println("ser is running")
 	r.Run(":8088") // http
-	// r.RunTLS(":8080","cert.pem", "key.pem") // https
+	// r.RunTLS(":8080", "key/cert.pem", "key/key.pem") // https
 }
