@@ -14,6 +14,7 @@ func main() {
 	// openssl证书 TODO
 	// credentials.NewClientTLSFromFile()
 	// 1.建立连接
+	// 这里是通过tcp协议调用
 	grpcClient, err := grpc.Dial("127.0.0.1:8081", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		fmt.Println(err)

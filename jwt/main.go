@@ -40,6 +40,15 @@ func homeHandler(c *gin.Context) {
 	})
 }
 
+// 删除token
+func deleteToken(c *gin.Context) {
+	//TODO
+	c.JSON(http.StatusOK, gin.H{
+		"code": 200,
+		"msg":  "success",
+	})
+}
+
 // ssh加密验证
 func TSSHandler(port int) gin.HandlerFunc {
 	return func(c *gin.Context) {

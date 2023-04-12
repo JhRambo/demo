@@ -2,7 +2,6 @@ package token
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -29,7 +28,7 @@ func GetToken(username string) (string, error) {
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, cla)
-	fmt.Println("Token = ", token)
+	// fmt.Println("Token = ", token)
 	return token.SignedString(secret) // 进行签名生成对应的token
 }
 

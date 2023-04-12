@@ -2,10 +2,8 @@ package middleware
 
 import (
 	"demo/jwt/token"
-	"encoding/base64"
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,16 +19,16 @@ func (c Auth) JwtAuthMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		jwt := strings.Split(authHandler, ".")
-		cnt := 0
-		for _, val := range jwt {
-			cnt++
-			if cnt == 3 {
-				break
-			}
-			msg, _ := base64.StdEncoding.DecodeString(val)
-			fmt.Println("val ->", string(msg))
-		}
+		// jwt := strings.Split(authHandler, ".")
+		// cnt := 0
+		// for _, val := range jwt {
+		// 	cnt++
+		// 	if cnt == 3 {
+		// 		break
+		// 	}
+		// 	msg, _ := base64.StdEncoding.DecodeString(val)
+		// 	fmt.Println("val ->", string(msg))
+		// }
 		// 我们使用之前定义好的解析JWT的函数来解析它,并且在内部解析时判断了token是否过期
 		mc, err := token.ParseToken(authHandler)
 		if err != nil {
