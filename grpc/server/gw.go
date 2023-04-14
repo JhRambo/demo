@@ -21,7 +21,7 @@ func run() error {
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-	mux := runtime.NewServeMux()
+	mux := runtime.NewServeMux() //多路复用器，它将根据 JSON/Restful 请求的路径将请求路由到各种注册服务
 	opts := []grpc.DialOption{grpc.WithInsecure()}
 	// 调用了自动生成代码中的RegisterGreeterHandlerFromEndpoint方法完成上下游调用的绑定
 	err := gw.RegisterGreeterHandlerFromEndpoint(ctx, mux, *echoEndpoint, opts)

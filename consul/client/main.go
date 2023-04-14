@@ -8,8 +8,6 @@ import (
 	"fmt"
 	"log"
 	"time"
-
-	_ "github.com/mbobakov/grpc-consul-resolver"
 )
 
 func main() {

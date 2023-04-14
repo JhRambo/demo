@@ -7,6 +7,7 @@ import (
 /* 定义结构体 */
 type Circle struct {
 	radius float64
+	a, b   string
 }
 
 // 该 方法 属于 Circle 结构体中的方法

@@ -3,22 +3,14 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"strings"
 )
 
 // 空结构体
 type HelloHandler struct{}
 
-// 需要手动实现ServeHTTP接口
+// Handle需要手动实现ServeHTTP接口
 func (h *HelloHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	uri := r.RequestURI // /hello1?id=1&name=xxxx
-	index := strings.Index(uri, "hello1")
-	fmt.Println("index=", index)
-	if index > 0 {
-		fmt.Fprintf(w, "Hello Handler!")
-	} else {
-		fmt.Fprintf(w, "error Handler!")
-	}
+	fmt.Fprintf(w, "Hello Handler!")
 }
 
 func helloHandleFunc(w http.ResponseWriter, r *http.Request) {
@@ -30,6 +22,7 @@ func main() {
 		Addr: "127.0.0.1:8088",
 	}
 	helloHandler := &HelloHandler{}
+	//hello1和hello3都是调用HelloHandler.ServeHTTP这个方法
 	http.Handle("/hello1", helloHandler)
 	http.Handle("/hello3", helloHandler)
 	http.HandleFunc("/hello2", helloHandleFunc)
