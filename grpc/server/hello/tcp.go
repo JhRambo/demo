@@ -30,6 +30,7 @@ func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloRe
 	// 实例化结构体HelloReply，作为返回值
 	return &pb.HelloReply{Message: "Hello " + in.GetName()}, nil
 }
+
 func main() {
 	// 要监听的协议和端口
 	lis, err := net.Listen("tcp", port)

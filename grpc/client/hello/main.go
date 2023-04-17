@@ -21,6 +21,6 @@ func main() {
 	}
 	// 2.注册客户端
 	client := hello.NewGreeterClient(grpcClient)
-	res, err := client.SayHello(context.Background(), &hello.HelloRequest{Name: "张三"})
+	res, err := client.SayHello(context.Background(), &hello.HelloRequest{Name: "张三疯"})
 	fmt.Printf("%#v", res)
 }
