@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	proto "demo/consul/proto/hello"
+	pb "demo/consul/proto/hello"
 	"flag"
 	"fmt"
 	"log"
@@ -20,15 +20,27 @@ import (
 	"google.golang.org/grpc/health/grpc_health_v1"
 )
 
-type Server struct{}
+// 定义结构体，在调用注册api的时候作为入参，
+// 该结构体会带上SayHello方法，里面是业务代码
+// 这样远程调用时就执行了业务代码了
+type server struct {
+	// pb.go中自动生成的，是个空结构体
+	pb.UnimplementedGreeterServer
+}
 
 var (
 	Port *int
 	IP   *string
 )
 
-func (s Server) SayHello(ctx context.Context, request *proto.HelloRequest) (*proto.HelloReply, error) {
-	return &proto.HelloReply{Message: fmt.Sprintf("hello %s from %s:%d", request.Name, *IP, *Port)}, nil
+// 实际处理业务逻辑的地方
+// 业务代码在这里写，客户端远程tcp协议调用SayHello
+// 会执行这里的代码
+func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
+	// 打印请求参数
+	log.Printf("Received: %v", in.GetName())
+	// 实例化结构体HelloReply，作为返回值
+	return &pb.HelloReply{Message: fmt.Sprintf("hello %s from %s:%d", in.Name, *IP, *Port)}, nil
 }
 
 func main() {
@@ -41,14 +53,14 @@ func main() {
 	flag.Parse()
 
 	g := grpc.NewServer()
-
-	proto.RegisterGreeterServer(g, &Server{})
+	pb.RegisterGreeterServer(g, &server{})
 	tcpAddr := fmt.Sprintf("%s:%d", *IP, *Port)
 	log.Printf("service listen:%s", tcpAddr)
 	lis, err := net.Listen("tcp", tcpAddr)
 	if err != nil {
 		log.Panicln("failed to listen:" + err.Error())
 	}
+
 	// 注册健康检查
 	grpc_health_v1.RegisterHealthServer(g, health.NewServer())
 	// 将当前grpc服务注册到consul

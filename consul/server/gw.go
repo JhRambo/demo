@@ -1,13 +1,13 @@
 package main
 
 import (
-	gw "demo/grpc/proto/hello"
+	gw "demo/consul/proto/hello"
 	"flag"
 	"fmt"
 	"log"
 	"net/http"
 
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
@@ -34,7 +34,7 @@ func run() error {
 	return http.ListenAndServe(":8088", mux) //这是对外提供RESTful服务的端口
 }
 
-// 网关
+// 网关入口
 func main() {
 	log.Println("反向代理网关启动中...")
 	if err := run(); err != nil {
