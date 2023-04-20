@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	pb "demo/grpc/proto/hello"
+	"fmt"
 	"log"
 	"net"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
 const (
@@ -25,6 +27,8 @@ type server struct {
 // 业务代码在这里写，客户端远程tcp协议调用SayHello
 // 会执行这里的代码
 func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
+	md, _ := metadata.FromIncomingContext(ctx)
+	fmt.Printf("%#v\n", md["auth"])
 	// 打印请求参数
 	log.Printf("Received: %v", in.GetName())
 	// 实例化结构体HelloReply，作为返回值

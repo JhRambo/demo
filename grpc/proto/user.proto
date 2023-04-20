@@ -1,0 +1,11 @@
+// 协议类型
+syntax = "proto3";
+
+option go_package = "./user";
+
+message CurUser {
+  string username = 1;
+  string uid = 2;
+  string eid = 3;
+  string token = 4;
+}
