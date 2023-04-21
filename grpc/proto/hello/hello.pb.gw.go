@@ -33,7 +33,7 @@ var _ = utilities.NewDoubleArray
 var _ = descriptor.ForMessage
 var _ = metadata.Join
 
-func request_Greeter_SayHello_0(ctx context.Context, marshaler runtime.Marshaler, client GreeterClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_HelloHttp_SayHello_0(ctx context.Context, marshaler runtime.Marshaler, client HelloHttpClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq HelloRequest
 	var metadata runtime.ServerMetadata
 
@@ -50,7 +50,7 @@ func request_Greeter_SayHello_0(ctx context.Context, marshaler runtime.Marshaler
 
 }
 
-func local_request_Greeter_SayHello_0(ctx context.Context, marshaler runtime.Marshaler, server GreeterServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_HelloHttp_SayHello_0(ctx context.Context, marshaler runtime.Marshaler, server HelloHttpServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq HelloRequest
 	var metadata runtime.ServerMetadata
 
@@ -67,13 +67,13 @@ func local_request_Greeter_SayHello_0(ctx context.Context, marshaler runtime.Mar
 
 }
 
-// RegisterGreeterHandlerServer registers the http handlers for service Greeter to "mux".
-// UnaryRPC     :call GreeterServer directly.
+// RegisterHelloHttpHandlerServer registers the http handlers for service HelloHttp to "mux".
+// UnaryRPC     :call HelloHttpServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
-// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterGreeterHandlerFromEndpoint instead.
-func RegisterGreeterHandlerServer(ctx context.Context, mux *runtime.ServeMux, server GreeterServer) error {
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterHelloHttpHandlerFromEndpoint instead.
+func RegisterHelloHttpHandlerServer(ctx context.Context, mux *runtime.ServeMux, server HelloHttpServer) error {
 
-	mux.Handle("POST", pattern_Greeter_SayHello_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_HelloHttp_SayHello_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -84,7 +84,7 @@ func RegisterGreeterHandlerServer(ctx context.Context, mux *runtime.ServeMux, se
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_Greeter_SayHello_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_HelloHttp_SayHello_0(rctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
@@ -92,16 +92,16 @@ func RegisterGreeterHandlerServer(ctx context.Context, mux *runtime.ServeMux, se
 			return
 		}
 
-		forward_Greeter_SayHello_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_HelloHttp_SayHello_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
 	return nil
 }
 
-// RegisterGreeterHandlerFromEndpoint is same as RegisterGreeterHandler but
+// RegisterHelloHttpHandlerFromEndpoint is same as RegisterHelloHttpHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
-func RegisterGreeterHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+func RegisterHelloHttpHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
 	conn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {
 		return err
@@ -121,23 +121,23 @@ func RegisterGreeterHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeM
 		}()
 	}()
 
-	return RegisterGreeterHandler(ctx, mux, conn)
+	return RegisterHelloHttpHandler(ctx, mux, conn)
 }
 
-// RegisterGreeterHandler registers the http handlers for service Greeter to "mux".
+// RegisterHelloHttpHandler registers the http handlers for service HelloHttp to "mux".
 // The handlers forward requests to the grpc endpoint over "conn".
-func RegisterGreeterHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	return RegisterGreeterHandlerClient(ctx, mux, NewGreeterClient(conn))
+func RegisterHelloHttpHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterHelloHttpHandlerClient(ctx, mux, NewHelloHttpClient(conn))
 }
 
-// RegisterGreeterHandlerClient registers the http handlers for service Greeter
-// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "GreeterClient".
-// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "GreeterClient"
+// RegisterHelloHttpHandlerClient registers the http handlers for service HelloHttp
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "HelloHttpClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "HelloHttpClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "GreeterClient" to call the correct interceptors.
-func RegisterGreeterHandlerClient(ctx context.Context, mux *runtime.ServeMux, client GreeterClient) error {
+// "HelloHttpClient" to call the correct interceptors.
+func RegisterHelloHttpHandlerClient(ctx context.Context, mux *runtime.ServeMux, client HelloHttpClient) error {
 
-	mux.Handle("POST", pattern_Greeter_SayHello_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_HelloHttp_SayHello_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -146,14 +146,14 @@ func RegisterGreeterHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_Greeter_SayHello_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_HelloHttp_SayHello_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_Greeter_SayHello_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_HelloHttp_SayHello_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -161,9 +161,9 @@ func RegisterGreeterHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 }
 
 var (
-	pattern_Greeter_SayHello_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"hello"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_HelloHttp_SayHello_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"hello"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
-	forward_Greeter_SayHello_0 = runtime.ForwardResponseMessage
+	forward_HelloHttp_SayHello_0 = runtime.ForwardResponseMessage
 )

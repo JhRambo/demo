@@ -4,12 +4,12 @@ syntax = "proto3";
 option go_package = "./hello";
 
 import "google/api/annotations.proto";
-// 定义的服务名
-service Greeter {
+// 对外提供http协议的接口 restful
+service HelloHttp {
   // 具体的远程服务方法
   rpc SayHello (HelloRequest) returns (HelloReply) {
     option (google.api.http) = {
-      post: "/hello"  //http协议调用时，用http://127.0.0.1:8088/hello
+      post: "/hello"  //http协议调用时，用http://IP+PORT/hello
       body: "*"
     };
   }

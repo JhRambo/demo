@@ -18,29 +18,37 @@ var (
 	echoEndpoint = flag.String("echo_endpoint", "127.0.0.1:8081", "endpoint of YourService")
 )
 
+var gg string
+
+// 自定义metadata
+func SetMetaData(str string) runtime.ServeMuxOption {
+	gg = "hello golang"
+	return runtime.WithMetadata(func(ctx context.Context, r *http.Request) metadata.MD {
+		md := metadata.Pairs(str, gg)
+		return md
+	})
+}
+
 func run() error {
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	// mux := runtime.NewServeMux() //多路复用器，它将根据 JSON/Restful 请求的路径将请求路由到各种注册服务
-
-	mux := runtime.NewServeMux(
-		runtime.WithMetadata(func(ctx context.Context, request *http.Request) metadata.MD {
-			header := request.Header.Get("Authorization")
-			md := metadata.Pairs("auth", header)
-			return md
-		}))
-
+	mux := runtime.NewServeMux(SetMetaData("gg"))
 	opts := []grpc.DialOption{grpc.WithInsecure()}
-	// 调用了自动生成代码中的RegisterGreeterHandlerFromEndpoint方法完成上下游调用的绑定
-	err := gw.RegisterGreeterHandlerFromEndpoint(ctx, mux, *echoEndpoint, opts)
+	// 调用了自动生成代码中的RegisterHelloHttpHandlerFromEndpoint方法完成上下游调用的绑定
+	err := gw.RegisterHelloHttpHandlerFromEndpoint(ctx, mux, *echoEndpoint, opts)
 	if err != nil {
 		return err
 	}
 	return http.ListenAndServe(":8088", mux) //这是对外提供RESTful服务的端口
 }
 
-// 网关入口
+/*
+	网关入口
+
+HTTP GRPC监听不同的端口
+*/
 func main() {
 	log.Println("反向代理网关启动中...")
 	if err := run(); err != nil {

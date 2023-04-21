@@ -3,6 +3,42 @@ syntax = "proto3";
 
 option go_package = "./user";
 
+import "google/api/annotations.proto";
+
+// 提供grpc内部通信使用的接口
+service UserDB {
+  rpc AddUser(AddUserRequest) returns (AddUserResponse){}
+}
+
+message AddUserRequest {
+  string name = 1;
+}
+
+message AddUserResponse {
+  int32 code = 1;
+  string message = 2;
+  int32 userid = 3;
+}
+
+// 提供http服务的服务名
+service UserHttp {
+  // 具体的远程服务方法
+  rpc info (UserInfoRequest) returns (UserInfoResponse) {
+    option (google.api.http) = {
+      post: "/info"  //http协议调用时，用http://IP+PORT/info
+      body: "*"
+    };
+  }
+}
+
+message UserInfoRequest {
+   
+}
+
+message UserInfoResponse {
+  string name = 1;
+}
+
 message CurUser {
   string username = 1;
   string uid = 2;

@@ -21,7 +21,7 @@ func main() {
 		fmt.Println(err)
 	}
 	// 2.注册客户端
-	client := hello.NewGreeterClient(grpcClient)
+	client := hello.NewHelloHttpClient(grpcClient)
 	ctx := context.Background()
 	//客户端自定义metadata数据
 	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("token", "1234567890"))

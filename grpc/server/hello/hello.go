@@ -1,4 +1,4 @@
-package main
+package hello
 
 import (
 	"context"
@@ -20,7 +20,7 @@ const (
 // 这样远程调用时就执行了业务代码了
 type server struct {
 	// pb.go中自动生成的，是个空结构体
-	pb.UnimplementedGreeterServer
+	pb.UnimplementedHelloHttpServer
 }
 
 // 实际处理业务逻辑的地方
@@ -28,7 +28,7 @@ type server struct {
 // 会执行这里的代码
 func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
 	md, _ := metadata.FromIncomingContext(ctx)
-	fmt.Printf("%#v\n", md["auth"])
+	fmt.Printf("%#v\n", md)
 	// 打印请求参数
 	log.Printf("Received: %v", in.GetName())
 	// 实例化结构体HelloReply，作为返回值
@@ -44,7 +44,7 @@ func main() {
 	// 实例化gRPC server结构体
 	s := grpc.NewServer()
 	// 服务注册
-	pb.RegisterGreeterServer(s, &server{})
+	pb.RegisterHelloHttpServer(s, &server{})
 	log.Println("开始监听，等待远程调用...")
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
