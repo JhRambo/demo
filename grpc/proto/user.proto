@@ -23,7 +23,7 @@ message AddUserResponse {
 // 提供http服务的服务名
 service UserHttp {
   // 具体的远程服务方法
-  rpc info (UserInfoRequest) returns (UserInfoResponse) {
+  rpc Info (UserInfoRequest) returns (UserInfoResponse) {
     option (google.api.http) = {
       post: "/info"  //http协议调用时，用http://IP+PORT/info
       body: "*"

@@ -118,7 +118,7 @@ func NewUserHttpClient(cc grpc.ClientConnInterface) UserHttpClient {
 
 func (c *userHttpClient) Info(ctx context.Context, in *UserInfoRequest, opts ...grpc.CallOption) (*UserInfoResponse, error) {
 	out := new(UserInfoResponse)
-	err := c.cc.Invoke(ctx, "/UserHttp/info", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/UserHttp/Info", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -164,7 +164,7 @@ func _UserHttp_Info_Handler(srv interface{}, ctx context.Context, dec func(inter
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/UserHttp/info",
+		FullMethod: "/UserHttp/Info",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserHttpServer).Info(ctx, req.(*UserInfoRequest))
@@ -180,7 +180,7 @@ var UserHttp_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*UserHttpServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "info",
+			MethodName: "Info",
 			Handler:    _UserHttp_Info_Handler,
 		},
 	},

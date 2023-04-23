@@ -19,7 +19,7 @@ import (
 // 定义结构体，在调用注册api的时候作为入参，
 // 该结构体会带上SayHello方法，里面是业务代码
 // 这样远程调用时就执行了业务代码了
-type server struct {
+type Server struct {
 	// pb.go中自动生成的，是个空结构体
 	hello.UnimplementedHelloHttpServer
 }
@@ -27,11 +27,11 @@ type server struct {
 const IP = "127.0.0.1"
 const PORT = ":9099"
 
-func NewServer() *server {
-	return &server{}
+func NewServer() *Server {
+	return &Server{}
 }
 
-func (s *server) SayHello(ctx context.Context, in *hello.HelloRequest) (*hello.HelloReply, error) {
+func (s *Server) SayHello(ctx context.Context, in *hello.HelloRequest) (*hello.HelloReply, error) {
 	return &hello.HelloReply{Message: in.Name + "hello world"}, nil
 }
 
@@ -46,7 +46,7 @@ func main() {
 	// 创建一个gRPC server对象
 	s := grpc.NewServer()
 	// 注册HelloHttp service到server
-	hello.RegisterHelloHttpServer(s, &server{})
+	hello.RegisterHelloHttpServer(s, &Server{})
 
 	// gRPC-Gateway mux
 	gwmux := runtime.NewServeMux()
