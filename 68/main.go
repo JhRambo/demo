@@ -20,7 +20,7 @@ func SayHello(writer http.ResponseWriter, request *http.Request) {
 				fmt.Println("request is outgoing")
 				return
 			default:
-				fmt.Println("Current request is in progress") ////如果没有引入context，这里在2s后还会一直打印
+				fmt.Println("Current request is in progress") //如果没有引入context，这里在2s后还会一直打印
 			}
 		}
 	}()

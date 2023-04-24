@@ -6,5 +6,5 @@ import (
 )
 
 func main() {
-	fmt.Println(time.Duration(125 * time.Second))
+	fmt.Println(time.Duration(125 * time.Second)) //2m5s
 }

@@ -13,6 +13,7 @@ type Student struct {
 	Age  int
 }
 
+// switch 语句执行的过程从上至下，直到找到匹配项，匹配项后面也不需要再加 break。
 func reflectValue(x interface{}) {
 	v := reflect.ValueOf(x)
 	// fmt.Printf("值：%v 值类型种类：%v\n", v, v.Kind())
@@ -49,7 +50,7 @@ func main() {
 	reflectValue(e)
 	reflectValue(f)
 	reflectValue(g)
-	reflectValue(&h)	//指针类型
+	reflectValue(&h) //指针类型
 	reflectValue(i)
 	reflectValue(j)
 }

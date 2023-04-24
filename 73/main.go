@@ -1,46 +1,19 @@
 package main
 
-import (
-	"context"
-	"demo/73/options"
-)
-
-type config struct {
-	needSwitch     bool
-	needWatchLater bool
-}
-
-type Option func(*config)
-
-func NeedSwitch(in bool) Option {
-	return func(cfg *config) {
-		cfg.needSwitch = in
-	}
-}
-
-func (cfg *config) Apply(opts ...Option) {
-	for _, opt := range opts {
-		opt(cfg)
-	}
-}
-
-func constructThreePoint(ctx context.Context, opts ...Option) {
-	cfg := &config{}
-	cfg.Apply(opts...)
-	// 直接使用
-}
-
-//调用
-// constructThreePoint(ctx, NeedSwitch(true))
+import "fmt"
 
 func main() {
-	svc := options.NewService()
-	cfg := svc.DefaultDemoConfigCreater()()
-	opts := []options.Option{
-		options.DemoInt(27),
+	/* 定义局部变量 */
+	var a int = 10
+
+	/* for 循环 */
+	for a < 20 {
+		if a == 15 {
+			/* 跳过此次循环 */
+			a = a + 1
+			continue
+		}
+		fmt.Printf("a 的值为 : %d\n", a)
+		a++
 	}
-	cfg.Apply(opts...)
-	ctx := context.Background()
-	ctx = options.WithContext(ctx, cfg) //赋值到context
-	svc.Demo(ctx)
 }

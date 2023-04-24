@@ -14,7 +14,7 @@ func Get(ctx context.Context, k key) {
 }
 
 func main() {
-	ctx := context.WithValue(context.Background(), key("lineshen"), "tencent")
-	Get(ctx, key("lineshen"))
-	Get(ctx, key("line"))
+	ctx := context.WithValue(context.Background(), key("what"), "tencent")
+	Get(ctx, key("what")) //tencent
+	Get(ctx, key("why"))
 }

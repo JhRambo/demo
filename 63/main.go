@@ -22,9 +22,9 @@ func main() {
 		Addr: "127.0.0.1:8088",
 	}
 	helloHandler := &HelloHandler{}
-	//hello1和hello3都是调用HelloHandler.ServeHTTP这个方法
+	//hello1和hello2都是调用HelloHandler.ServeHTTP这个方法
 	http.Handle("/hello1", helloHandler)
-	http.Handle("/hello3", helloHandler)
-	http.HandleFunc("/hello2", helloHandleFunc)
+	http.Handle("/hello2", helloHandler)
+	http.HandleFunc("/hello3", helloHandleFunc)
 	server.ListenAndServe()
 }

@@ -28,7 +28,6 @@ func GetURL(r *http.Request) (Url string) {
 func main() {
 	fmt.Println("服务启动中...")
 	http.HandleFunc("/index", index)
-
 	err := http.ListenAndServe(":8088", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)

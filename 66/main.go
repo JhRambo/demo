@@ -7,5 +7,5 @@ import (
 
 func main() {
 	e := errors.New("SigningMethodError")
-	fmt.Println(e)
+	fmt.Println(e) //SigningMethodErro
 }
