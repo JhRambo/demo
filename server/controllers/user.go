@@ -1,12 +1,9 @@
 package controllers
 
 import (
-	"bytes"
 	"demo/server/models"
 	"demo/server/tools"
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 )
@@ -21,12 +18,6 @@ type Res struct {
 
 // 查询指定id的数据
 func (this User) GetById(w http.ResponseWriter, r *http.Request) {
-	data := make(map[string]interface{})
-	data["token"] = "11111111111111111111111111111111111111111111111111111111111111111"
-	newData, _ := json.Marshal(data)
-	r.Body = ioutil.NopCloser(bytes.NewBuffer(newData))
-	fmt.Printf("%+v", r.Body)
-
 	user := models.User{}
 	id, _ := strconv.Atoi(r.URL.Query().Get("id"))
 	tools.DB.First(&user, id)

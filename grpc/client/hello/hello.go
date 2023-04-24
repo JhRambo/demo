@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	// openssl证书 TODO
+	// openssl证书
 	// credentials.NewClientTLSFromFile()
 	// 1.建立连接
 	// 这里是通过tcp协议调用

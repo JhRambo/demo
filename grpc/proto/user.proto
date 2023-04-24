@@ -5,7 +5,7 @@ option go_package = "./user";
 
 import "google/api/annotations.proto";
 
-// 提供grpc内部通信使用的接口
+// 提供grpc内部通信的接口服务名
 service UserDB {
   rpc AddUser(AddUserRequest) returns (AddUserResponse){}
 }
@@ -20,9 +20,9 @@ message AddUserResponse {
   int32 userid = 3;
 }
 
-// 提供http服务的服务名
+// 对外暴露的http协议的接口服务名 restful
 service UserHttp {
-  // 具体的远程服务方法
+  // 具体接口名称
   rpc Info (UserInfoRequest) returns (UserInfoResponse) {
     option (google.api.http) = {
       post: "/info"  //http协议调用时，用http://IP+PORT/info

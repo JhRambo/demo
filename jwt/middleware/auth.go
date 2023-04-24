@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"demo/jwt/token"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -11,30 +10,19 @@ import (
 type Auth struct{}
 
 // 中间件,认证token合法性
-func (c Auth) JwtAuthMiddleware() gin.HandlerFunc {
+func (c *Auth) JwtAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHandler := c.Request.Header.Get("authorization")
 		if authHandler == "" {
-			c.JSON(200, gin.H{"code": 2003, "msg": "请求头部auth为空"})
+			c.JSON(200, gin.H{"code": 10001, "msg": "header authorization 为空"})
 			c.Abort()
 			return
 		}
-		// jwt := strings.Split(authHandler, ".")
-		// cnt := 0
-		// for _, val := range jwt {
-		// 	cnt++
-		// 	if cnt == 3 {
-		// 		break
-		// 	}
-		// 	msg, _ := base64.StdEncoding.DecodeString(val)
-		// 	fmt.Println("val ->", string(msg))
-		// }
 		// 我们使用之前定义好的解析JWT的函数来解析它,并且在内部解析时判断了token是否过期
 		mc, err := token.ParseToken(authHandler)
 		if err != nil {
-			fmt.Println("err = ", err.Error())
 			c.JSON(http.StatusOK, gin.H{
-				"code": 2005,
+				"code": 10002,
 				"msg":  "无效的Token",
 			})
 			c.Abort()
