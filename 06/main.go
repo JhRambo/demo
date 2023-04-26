@@ -17,4 +17,7 @@ func main() {
 	arr3[2] = 1
 	arr3 = append(arr3, 4)
 	fmt.Println(arr3) //[0 0 1 0 4]
+
+	arr4 := []interface{}{1, 3, 4, 5, "zs"}
+	fmt.Println(arr4) //[0 0 1 0 4]
 }
