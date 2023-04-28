@@ -23,7 +23,7 @@ func main() {
 	// c.Student = make([]Student, 0)	//先分配内存空间
 	var c = Class{
 		Title:   "001班",
-		Student: make([]Student, 0), //先分配内存空间
+		Student: make([]Student, 0), //先分配内存空间，后续使用append追加数据
 	}
 	for i := 1; i <= 3; i++ {
 		s := Student{
