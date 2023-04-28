@@ -45,3 +45,13 @@ message CurUser {
   string eid = 3;
   string token = 4;
 }
+
+enum MetaDataType {
+  userinfo = 0;  //用户登录缓存的token信息
+  testinfo = 1;   //test TODO
+}
+
+message TestData {
+  string name = 1;
+  MetaDataType type = 2;
+}

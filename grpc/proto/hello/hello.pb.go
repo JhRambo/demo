@@ -23,7 +23,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// SayHello方法的入参，只有一个字符串字段
 type HelloRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -71,7 +70,6 @@ func (x *HelloRequest) GetName() string {
 	return ""
 }
 
-// SayHello方法的返回值，只有一个字符串字段
 type HelloReply struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

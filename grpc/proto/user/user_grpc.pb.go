@@ -104,7 +104,7 @@ var UserDB_ServiceDesc = grpc.ServiceDesc{
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserHttpClient interface {
-	// 具体的远程服务方法
+	// 具体接口名称
 	Info(ctx context.Context, in *UserInfoRequest, opts ...grpc.CallOption) (*UserInfoResponse, error)
 }
 
@@ -129,7 +129,7 @@ func (c *userHttpClient) Info(ctx context.Context, in *UserInfoRequest, opts ...
 // All implementations must embed UnimplementedUserHttpServer
 // for forward compatibility
 type UserHttpServer interface {
-	// 具体的远程服务方法
+	// 具体接口名称
 	Info(context.Context, *UserInfoRequest) (*UserInfoResponse, error)
 	mustEmbedUnimplementedUserHttpServer()
 }
