@@ -20,15 +20,20 @@ func main() {
 	// receive over
 	// 222222
 	// 111111
-	ch1 := make(chan int, 1)
+	ch1 := make(chan int, 2)
 	go func() {
 		time.Sleep(time.Second * 3)
 		fmt.Println("receive over")
 		fmt.Println("222222")
-		<-ch1
+		a := <-ch1
+		b := <-ch1
+		fmt.Println("a=======", a)
+		fmt.Println("b=======", b)
 	}()
 	ch1 <- 1
+	ch1 <- 2
 	fmt.Println("send over")
+	fmt.Printf("ch1==========%#v\n", &ch1)
 	time.Sleep(time.Second * 5)
 	fmt.Println("111111")
 
