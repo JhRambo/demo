@@ -32,7 +32,7 @@ func NewServer() *Server {
 }
 
 func (s *Server) SayHello(ctx context.Context, in *hello.HelloRequest) (*hello.HelloReply, error) {
-	return &hello.HelloReply{Message: in.Name + "hello world"}, nil
+	return &hello.HelloReply{Message: in.Name + "，hello world"}, nil
 }
 
 // http grpc监听同一个端口

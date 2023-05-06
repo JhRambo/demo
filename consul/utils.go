@@ -12,11 +12,11 @@ import (
 const (
 	consulConfig     = "mysvr-config"
 	consulIp         = "192.168.10.103"
-	consulPort       = "38500"
+	consulPort       = 38500
 	consulToken      = "123456"
 	serverIp         = "127.0.0.1"
 	serverPort       = 9099
-	serverName       = "mysvr-grpc" //服务名称
+	serverName       = "mysvr-grpc" //Services服务名称
 	ServerCancelTime = 5
 )
 
@@ -34,6 +34,7 @@ func init() {
 	client = cl
 }
 
+// 生成随机字符串
 func RandomStr(len int) string {
 	nUid := uuid.NewV4().String()
 	str := strings.Replace(nUid, "-", "", -1)

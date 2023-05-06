@@ -4,15 +4,21 @@ import (
 	"fmt"
 	"log"
 	"testing"
-	"time"
 
 	"github.com/hashicorp/consul/api"
 )
 
-func TestClient(t *testing.T) {
-	//设置key/value
+// 设置key/Value
+func TestSetKV(t *testing.T) {
 	kv := client.KV()
-	p := &api.KVPair{Key: consulConfig, Value: []byte("111111111111"), Flags: 32}
+	p := &api.KVPair{
+		Key: consulConfig,
+		Value: []byte(`{
+			"name":"golang",
+			"age":"99"
+		}`),
+		Flags: 32,
+	}
 	_, err := kv.Put(p, nil)
 	if err != nil {
 		log.Fatalln(err)
@@ -26,16 +32,15 @@ func TestClient(t *testing.T) {
 
 // 测试服务注册
 func TestServerRegister(t *testing.T) {
-	svrID := ServerRegister(serverName, serverIp, serverPort)
-	log.Printf("服务注册成功，服务ID：%v\n", svrID)
-	for true {
-		// 制定一个定时器，模拟30s后注销服务
-		t := time.NewTicker(ServerCancelTime * time.Second)
-		select {
-		case tt := <-t.C:
-			ServerCancel(svrID) //服务注销
-			log.Printf("服务注销，tt:%v\n", tt)
-			return
-		}
-	}
+	ServerRegister(serverName, serverIp, serverPort)
+	// for true {
+	// 	// 制定一个定时器，模拟30s后注销服务
+	// 	t := time.NewTicker(ServerCancelTime * time.Second)
+	// 	select {
+	// 	case tt := <-t.C:
+	// 		ServerCancel(svrID) //服务注销
+	// 		log.Printf("服务注销，tt:%v\n", tt)
+	// 		return
+	// 	}
+	// }
 }

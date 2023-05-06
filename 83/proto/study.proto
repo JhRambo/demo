@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+option go_package = "./study";
+
+message StudyInfo {
+  int64              id       = 1; //id
+  string             name     = 2; //学习的科目名称
+  int32              duration = 3; //学习的时长 单位秒
+  map<string,InfoData> info    = 4; //详细信息
+}
+
+message InfoData {
+  map<string,string> obj1 = 1;
+}

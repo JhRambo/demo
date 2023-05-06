@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	// 将外部RESTful请求转发到tcp.go提供gRPC服务的入口处
+	// 将外部RESTful请求转发到GRPC服务的入口处
 	echoEndpoint = flag.String("echo_endpoint", "127.0.0.1:8081", "endpoint of YourService")
 )
 
