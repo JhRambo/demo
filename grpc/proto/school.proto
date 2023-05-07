@@ -1,8 +1,7 @@
-//指定版本
 syntax = "proto3";
  
 option go_package = "./school";
- 
+
 //性别
 //枚举类型第一个字段必须为0
 enum Sex {
@@ -10,16 +9,16 @@ enum Sex {
     female = 1;
     other = 2;
 }
- 
+
 //学生
 message Student {
     Sex sex = 1;
-    string Name = 2;
-    int32 Age = 3;
+    string name = 2;
+    int32 age = 3;
 }
- 
+
 //班级
 message Class{
-    repeated Student Students = 1;
-    string Name = 2;
+    repeated Student students = 1;
+    string name = 2;
 }

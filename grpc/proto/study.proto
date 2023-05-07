@@ -1,0 +1,37 @@
+// 协议类型
+syntax = "proto3";
+
+option go_package = "./study";
+
+import "google/api/annotations.proto";
+
+// 对外暴露的http协议的接口的服务名 restful
+service StudyHttp {
+  // 具体接口名称
+  rpc SayStudy (StudyRequest) returns (StudyResponse) {
+    option (google.api.http) = {
+      post: "/study"  //http协议调用时，用http://IP+PORT/study
+      body: "*"
+    };
+  }
+}
+
+message StudyRequest {
+  string token = 1;
+}
+
+message StudyResponse {
+  int32 code = 1;
+  string message = 2;
+  repeated Info list = 3;
+}
+
+message Info {
+  repeated SubInfo devId = 1;
+}
+
+message SubInfo{
+  string deviceId = 1;
+  string date = 2;
+  string time = 3;
+}

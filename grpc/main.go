@@ -9,7 +9,7 @@ import (
 
 	"demo/grpc/proto/hello"
 
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 	"google.golang.org/grpc"
@@ -31,8 +31,8 @@ func NewServer() *Server {
 	return &Server{}
 }
 
-func (s *Server) SayHello(ctx context.Context, in *hello.HelloRequest) (*hello.HelloReply, error) {
-	return &hello.HelloReply{Message: in.Name + "，hello world"}, nil
+func (s *Server) SayHello(ctx context.Context, in *hello.HelloRequest) (*hello.HelloResponse, error) {
+	return &hello.HelloResponse{}, nil
 }
 
 // http grpc监听同一个端口

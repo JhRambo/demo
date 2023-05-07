@@ -53,11 +53,11 @@ Value：   从 context.Context 中获取键对应的值，对于同一个上下�
 
 99.proto
 切到当前文件所在的目录下执行
-方式1（rpc） ：protoc --go_out=./ hello.proto									            生成：hello.pb.go	  （忽略）
+方式2（二选一）：protoc --go_out=plugins=grpc:./ hello.proto						         生成：hello.pb.go（忽略，有问题）
+方式1（二选一）：protoc --go_out=./ hello.proto									             生成：hello.pb.go
 方式3（grpc）: protoc --go-grpc_out=./ hello.proto								            生成：hello_grpc.pb.go
-方式2（grpc）：protoc --go_out=plugins=grpc:./ hello.proto						            生成：hello.pb.go
 方式4（grpc）: protoc --grpc-gateway_out=logtostderr=true:./ hello.proto		            生成：hello.pb.gw.go
 
---go-grpc_out 	        生成 _grpc.pb.go		需要安装：go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
 --go_out 		        生成 .pb.go			    需要安装：go install github.com/golang/protobuf/protoc-gen-go@latest
+--go-grpc_out 	        生成 _grpc.pb.go		需要安装：go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
 --grpc-gateway_out      生成 pb.gw.go			需要安装：go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2

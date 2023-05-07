@@ -1,4 +1,4 @@
-package hello
+package main
 
 import (
 	"context"
@@ -8,7 +8,6 @@ import (
 	"net"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
 )
 
 const (
@@ -23,16 +22,56 @@ type server struct {
 	pb.UnimplementedHelloHttpServer
 }
 
-// 实际处理业务逻辑的地方
-// 业务代码在这里写，客户端远程tcp协议调用SayHello
-// 会执行这里的代码
-func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
-	md, _ := metadata.FromIncomingContext(ctx)
-	fmt.Printf("%#v\n", md)
-	// 打印请求参数
-	log.Printf("Received: %v", in.GetName())
-	// 实例化结构体HelloReply，作为返回值
-	return &pb.HelloReply{Message: "Hello " + in.GetName()}, nil
+// 定义切片[]类型的map：
+// var ms = make(map[string][]map[string]string)
+// uu := []map[string]string{}
+//
+//	u1 := map[string]string{
+//		"date": "2023-05-07",
+//		"time": "07:07:07",
+//	}
+//
+//	u2 := map[string]string{
+//		"date": "2023-05-07",
+//		"time": "07:07:07",
+//	}
+//
+// uu = append(uu, u1, u2)
+// ms["dev1"] = uu
+// ms["dev2"] = uu
+func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloResponse, error) {
+	var ms = make(map[string]*pb.Info)
+	dd := []*pb.SubInfo{}
+	d := &pb.SubInfo{
+		D2: map[string]string{
+			"devId": fmt.Sprintf("dev_%d", 1),
+			"date":  "2023-05-05",
+			"time":  "01:01:01",
+		},
+	}
+	dd = append(dd, d)
+
+	for i := 0; i < 3; i++ {
+		d := &pb.SubInfo{
+			D2: map[string]string{
+				"devId": fmt.Sprintf("dev_%d", i),
+				"date":  "2023-05-05",
+				"time":  "01:01:01",
+			},
+		}
+		dd = append(dd, d)
+	}
+	uu := &pb.Info{
+		D1: dd,
+	}
+	ms["data"] = uu
+
+	res := &pb.HelloResponse{
+		Code:    200,
+		Message: "成功",
+		List:    ms,
+	}
+	return res, nil
 }
 
 func main() {
