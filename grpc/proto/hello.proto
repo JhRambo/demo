@@ -20,10 +20,11 @@ message HelloRequest {
   string token = 1;
 }
 
+//定义 map[string][]map[string]string 类型
 message HelloResponse {
   int32 code = 1;
   string message = 2;
-  map<string,Info> list = 3;
+  map<string,Info> list = 3;  //TODO  map[string][]*pb.SubInfo
 }
 
 message Info{

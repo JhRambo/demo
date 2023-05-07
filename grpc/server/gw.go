@@ -49,7 +49,7 @@ func run() error {
 
 HTTP GRPC监听不同的端口
 */
-func main() {
+func main99() {
 	log.Println("反向代理网关启动中...")
 	if err := run(); err != nil {
 		fmt.Print(err.Error())

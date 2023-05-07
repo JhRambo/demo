@@ -27,11 +27,7 @@ message StudyResponse {
 }
 
 message Info {
-  repeated SubInfo devId = 1;
-}
-
-message SubInfo{
-  string deviceId = 1;
+  string devId = 1;
   string date = 2;
   string time = 3;
 }

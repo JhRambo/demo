@@ -2,12 +2,13 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net"
 	"net/http"
 	"strings"
 
-	"demo/grpc/proto/hello"
+	"demo/grpc/proto/study"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"golang.org/x/net/http2"
@@ -16,12 +17,9 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-// 定义结构体，在调用注册api的时候作为入参，
-// 该结构体会带上SayHello方法，里面是业务代码
-// 这样远程调用时就执行了业务代码了
 type Server struct {
 	// pb.go中自动生成的，是个空结构体
-	hello.UnimplementedHelloHttpServer
+	study.UnimplementedStudyHttpServer
 }
 
 const IP = "127.0.0.1"
@@ -31,27 +29,51 @@ func NewServer() *Server {
 	return &Server{}
 }
 
-func (s *Server) SayHello(ctx context.Context, in *hello.HelloRequest) (*hello.HelloResponse, error) {
-	return &hello.HelloResponse{}, nil
+func (s *Server) SayStudy(ctx context.Context, in *study.StudyRequest) (*study.StudyResponse, error) {
+	var infos []*study.Info
+	info1 := &study.Info{
+		DevId: "111",
+		Date:  "2026-03-01",
+		Time:  "01:01:01",
+	}
+	info2 := &study.Info{
+		DevId: "111",
+		Date:  "2026-03-01",
+		Time:  "01:02:02",
+	}
+	info3 := &study.Info{
+		DevId: "222",
+		Date:  "2026-03-01",
+		Time:  "01:01:01",
+	}
+	infos = append(infos, info1, info2, info3)
+
+	ss := make(map[string][]*study.Info)
+	for _, v := range infos {
+		ss[v.DevId] = append(ss[v.DevId], v) //同一个key，append
+	}
+	fmt.Println("==============", ss)
+	return &study.StudyResponse{
+		Code:    200,
+		Message: "成功",
+		List:    infos,
+	}, nil
 }
 
 // http grpc监听同一个端口
-func main() {
-	// Create a listener on TCP port
+func main2() {
 	lis, err := net.Listen("tcp", PORT)
 	if err != nil {
 		log.Fatalln("Failed to listen:", err)
 	}
-
 	// 创建一个gRPC server对象
 	s := grpc.NewServer()
-	// 注册HelloHttp service到server
-	hello.RegisterHelloHttpServer(s, &Server{})
-
+	// 注册StudyHttp service到server
+	study.RegisterStudyHttpServer(s, &Server{})
 	// gRPC-Gateway mux
 	gwmux := runtime.NewServeMux()
 	dops := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-	err = hello.RegisterHelloHttpHandlerFromEndpoint(context.Background(), gwmux, IP+PORT, dops)
+	err = study.RegisterStudyHttpHandlerFromEndpoint(context.Background(), gwmux, IP+PORT, dops)
 	if err != nil {
 		log.Fatalln("Failed to register gwmux:", err)
 	}

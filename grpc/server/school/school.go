@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func main() {
+func main3() {
 	//创建学生信息
 	var students []*school.Student
 	for i := 0; i < 3; i++ {
