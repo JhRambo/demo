@@ -24,13 +24,14 @@ message HelloRequest {
 message HelloResponse {
   int32 code = 1;
   string message = 2;
-  map<string,Info> list = 3;  //TODO  map[string][]*pb.SubInfo
+  map<string,Info> list = 3;  //map[string]*pb.Info   map[string][]*pb.SubInfo
 }
 
+//cannot use ss (variable of type map[string][]*hello.SubInfo) as map[string]*hello.Info value in struct
 message Info{
-  repeated SubInfo d1 = 1;
+  repeated SubInfo d1 = 1;  //切片类型 []*pb.SubInfo
 }
 
 message SubInfo{
-  map<string,string> d2 = 1;
+  map<string,string> d2 = 1;  //map类型的切片 map[string]string
 }

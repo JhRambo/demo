@@ -1,33 +1,14 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
+	"time"
 )
 
-type User struct {
-	Name string `json:"name"`
-	Age  int
-}
-
+// 计算两个日期的相差天数
 func main() {
-	// s := User{
-	// 	Name: "张三",
-	// 	Age:  10,
-	// }
-
-	// s := []string{"a", "b", "c"}
-
-	s := map[string]interface{}{
-		"name": "张三",
-		"age":  10,
-	}
-
-	v := StringData(s)
-	fmt.Println(v)
-}
-
-func StringData(s interface{}) string {
-	u, _ := json.Marshal(s)
-	return string(u)
+	start, _ := time.Parse("2006-01-02", "2016-02-27")
+	end, _ := time.Parse("2006-01-02", "2016-03-01")
+	d := end.Sub(start)
+	fmt.Println(d.Hours() / 24)
 }

@@ -70,14 +70,7 @@ func (x *HelloRequest) GetToken() string {
 	return ""
 }
 
-// 定义切片[]类型的map：
-// var ms = make(map[string][]map[string]string)
-// uu := []map[string]string{}
-//
-//	u1 := map[string]string{
-//	  "date": "2023-05-07",
-//	  "time": "07:07:07",
-//	}
+// 定义 map[string][]map[string]string 类型
 type HelloResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -85,7 +78,7 @@ type HelloResponse struct {
 
 	Code    int32            `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
 	Message string           `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
-	List    map[string]*Info `protobuf:"bytes,3,rep,name=list,proto3" json:"list,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	List    map[string]*Info `protobuf:"bytes,3,rep,name=list,proto3" json:"list,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"` //map[string]*pb.Info   map[string][]*pb.SubInfo
 }
 
 func (x *HelloResponse) Reset() {
@@ -146,7 +139,7 @@ type Info struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	D1 []*SubInfo `protobuf:"bytes,1,rep,name=d1,proto3" json:"d1,omitempty"`
+	D1 []*SubInfo `protobuf:"bytes,1,rep,name=d1,proto3" json:"d1,omitempty"` //切片类型 []*pb.SubInfo
 }
 
 func (x *Info) Reset() {
@@ -193,7 +186,7 @@ type SubInfo struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	D2 map[string]string `protobuf:"bytes,1,rep,name=d2,proto3" json:"d2,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	D2 map[string]string `protobuf:"bytes,1,rep,name=d2,proto3" json:"d2,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"` //map类型的切片 map[string]string
 }
 
 func (x *SubInfo) Reset() {

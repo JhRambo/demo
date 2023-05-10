@@ -35,7 +35,6 @@ func NewServer() *Server {
 }
 
 func (s *Server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloResponse, error) {
-	var ms = make(map[string]*pb.Info)
 	dd := []*pb.SubInfo{}
 	d := &pb.SubInfo{
 		D2: map[string]string{
@@ -54,25 +53,20 @@ func (s *Server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloRe
 				"time":  "01:02:03",
 			},
 		}
-		dd = append(dd, d)
+		dd = append(dd, d) //查询出来的每一条数据
 	}
-	uu := &pb.Info{
-		D1: dd,
-	}
-	ms["data"] = uu
 
 	ss := make(map[string][]*pb.SubInfo)
 	for _, v := range dd {
 		ss[v.D2["devId"]] = append(ss[v.D2["devId"]], v) //同一个key，append
 	}
-
 	v, _ := json.Marshal(ss)
 	fmt.Println("ss========================", string(v))
 
 	res := &pb.HelloResponse{
 		Code:    200,
 		Message: "成功",
-		// list：map[string]*pb.Info
+		// list：map[string]*pb.Info 期望
 		// List: ss, //map[string][]*pb.SubInfo
 	}
 	return res, nil

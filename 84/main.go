@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	r := GetDurationFormatBySecond(4004)
+	r := GetDurationFormatBySecond(8150)
 	fmt.Println(r)
 }
 
