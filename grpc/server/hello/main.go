@@ -12,7 +12,7 @@ import (
 	"demo/grpc/proto/hello"
 	pb "demo/grpc/proto/hello"
 
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 	"google.golang.org/grpc"

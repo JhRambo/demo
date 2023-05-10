@@ -1,0 +1,10 @@
+syntax = "proto3";
+ 
+option go_package = "./logs";
+
+//行为枚举类型
+enum ActionType {
+    register = 0;
+    login = 1;
+    logout = 2;
+}

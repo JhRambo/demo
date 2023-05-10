@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -18,13 +18,13 @@ var (
 	echoEndpoint = flag.String("echo_endpoint", "127.0.0.1:8081", "endpoint of YourService")
 )
 
-var gg string
+var x string
 
 // 自定义metadata
 func SetMetaData(str string) runtime.ServeMuxOption {
-	gg = "hello golang"
+	x = "hello golang"
 	return runtime.WithMetadata(func(ctx context.Context, r *http.Request) metadata.MD {
-		md := metadata.Pairs(str, gg)
+		md := metadata.Pairs(str, x)
 		return md
 	})
 }
@@ -34,7 +34,7 @@ func run() error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	// mux := runtime.NewServeMux() //多路复用器，它将根据 JSON/Restful 请求的路径将请求路由到各种注册服务
-	mux := runtime.NewServeMux(SetMetaData("gg"))
+	mux := runtime.NewServeMux(SetMetaData("x1"))
 	opts := []grpc.DialOption{grpc.WithInsecure()}
 	// 调用了自动生成代码中的RegisterHelloHttpHandlerFromEndpoint方法完成上下游调用的绑定
 	err := gw.RegisterHelloHttpHandlerFromEndpoint(ctx, mux, *echoEndpoint, opts)
