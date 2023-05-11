@@ -14,12 +14,97 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
+// HelloDBClient is the client API for HelloDB service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type HelloDBClient interface {
+	SayHello(ctx context.Context, in *HelloDBRequest, opts ...grpc.CallOption) (*HelloDBResponse, error)
+}
+
+type helloDBClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewHelloDBClient(cc grpc.ClientConnInterface) HelloDBClient {
+	return &helloDBClient{cc}
+}
+
+func (c *helloDBClient) SayHello(ctx context.Context, in *HelloDBRequest, opts ...grpc.CallOption) (*HelloDBResponse, error) {
+	out := new(HelloDBResponse)
+	err := c.cc.Invoke(ctx, "/HelloDB/SayHello", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// HelloDBServer is the server API for HelloDB service.
+// All implementations must embed UnimplementedHelloDBServer
+// for forward compatibility
+type HelloDBServer interface {
+	SayHello(context.Context, *HelloDBRequest) (*HelloDBResponse, error)
+	mustEmbedUnimplementedHelloDBServer()
+}
+
+// UnimplementedHelloDBServer must be embedded to have forward compatible implementations.
+type UnimplementedHelloDBServer struct {
+}
+
+func (UnimplementedHelloDBServer) SayHello(context.Context, *HelloDBRequest) (*HelloDBResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SayHello not implemented")
+}
+func (UnimplementedHelloDBServer) mustEmbedUnimplementedHelloDBServer() {}
+
+// UnsafeHelloDBServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to HelloDBServer will
+// result in compilation errors.
+type UnsafeHelloDBServer interface {
+	mustEmbedUnimplementedHelloDBServer()
+}
+
+func RegisterHelloDBServer(s grpc.ServiceRegistrar, srv HelloDBServer) {
+	s.RegisterService(&HelloDB_ServiceDesc, srv)
+}
+
+func _HelloDB_SayHello_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(HelloDBRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HelloDBServer).SayHello(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/HelloDB/SayHello",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HelloDBServer).SayHello(ctx, req.(*HelloDBRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// HelloDB_ServiceDesc is the grpc.ServiceDesc for HelloDB service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var HelloDB_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "HelloDB",
+	HandlerType: (*HelloDBServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "SayHello",
+			Handler:    _HelloDB_SayHello_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "hello.proto",
+}
+
 // HelloHttpClient is the client API for HelloHttp service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type HelloHttpClient interface {
-	// 具体接口名称
-	SayHello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloResponse, error)
+	SayHello(ctx context.Context, in *HelloHttpRequest, opts ...grpc.CallOption) (*HelloHttpResponse, error)
 }
 
 type helloHttpClient struct {
@@ -30,8 +115,8 @@ func NewHelloHttpClient(cc grpc.ClientConnInterface) HelloHttpClient {
 	return &helloHttpClient{cc}
 }
 
-func (c *helloHttpClient) SayHello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloResponse, error) {
-	out := new(HelloResponse)
+func (c *helloHttpClient) SayHello(ctx context.Context, in *HelloHttpRequest, opts ...grpc.CallOption) (*HelloHttpResponse, error) {
+	out := new(HelloHttpResponse)
 	err := c.cc.Invoke(ctx, "/HelloHttp/SayHello", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -43,8 +128,7 @@ func (c *helloHttpClient) SayHello(ctx context.Context, in *HelloRequest, opts .
 // All implementations must embed UnimplementedHelloHttpServer
 // for forward compatibility
 type HelloHttpServer interface {
-	// 具体接口名称
-	SayHello(context.Context, *HelloRequest) (*HelloResponse, error)
+	SayHello(context.Context, *HelloHttpRequest) (*HelloHttpResponse, error)
 	mustEmbedUnimplementedHelloHttpServer()
 }
 
@@ -52,7 +136,7 @@ type HelloHttpServer interface {
 type UnimplementedHelloHttpServer struct {
 }
 
-func (UnimplementedHelloHttpServer) SayHello(context.Context, *HelloRequest) (*HelloResponse, error) {
+func (UnimplementedHelloHttpServer) SayHello(context.Context, *HelloHttpRequest) (*HelloHttpResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SayHello not implemented")
 }
 func (UnimplementedHelloHttpServer) mustEmbedUnimplementedHelloHttpServer() {}
@@ -69,7 +153,7 @@ func RegisterHelloHttpServer(s grpc.ServiceRegistrar, srv HelloHttpServer) {
 }
 
 func _HelloHttp_SayHello_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(HelloRequest)
+	in := new(HelloHttpRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -81,7 +165,7 @@ func _HelloHttp_SayHello_Handler(srv interface{}, ctx context.Context, dec func(
 		FullMethod: "/HelloHttp/SayHello",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(HelloHttpServer).SayHello(ctx, req.(*HelloRequest))
+		return srv.(HelloHttpServer).SayHello(ctx, req.(*HelloHttpRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

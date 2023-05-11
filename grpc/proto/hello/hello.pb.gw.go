@@ -34,7 +34,7 @@ var _ = descriptor.ForMessage
 var _ = metadata.Join
 
 func request_HelloHttp_SayHello_0(ctx context.Context, marshaler runtime.Marshaler, client HelloHttpClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq HelloRequest
+	var protoReq HelloHttpRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -51,7 +51,7 @@ func request_HelloHttp_SayHello_0(ctx context.Context, marshaler runtime.Marshal
 }
 
 func local_request_HelloHttp_SayHello_0(ctx context.Context, marshaler runtime.Marshaler, server HelloHttpServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq HelloRequest
+	var protoReq HelloHttpRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)

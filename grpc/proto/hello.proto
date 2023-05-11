@@ -5,33 +5,28 @@ option go_package = "./hello";
 
 import "google/api/annotations.proto";
 
-// 对外暴露的http协议的接口的服务名 restful
+// 内部通信的grpc协议服务名
+service HelloDB {
+  rpc SayHello(HelloDBRequest) returns (HelloDBResponse){}
+}
+message HelloDBRequest {
+}
+message HelloDBResponse {
+  string name = 1;
+}
+
+// 对外暴露的http协议的接口的服务 restful风格
 service HelloHttp {
-  // 具体接口名称
-  rpc SayHello (HelloRequest) returns (HelloResponse) {
+  rpc SayHello (HelloHttpRequest) returns (HelloHttpResponse) {
     option (google.api.http) = {
-      post: "/hello"  //http协议调用时，用http://IP+PORT/hello
+      post: "/hello"
       body: "*"
     };
   }
 }
-
-message HelloRequest {
+message HelloHttpRequest {
   string token = 1;
 }
-
-//定义 map[string][]map[string]string 类型
-message HelloResponse {
-  int32 code = 1;
-  string message = 2;
-  map<string,Info> list = 3;  //map[string]*pb.Info   map[string][]*pb.SubInfo
-}
-
-//cannot use ss (variable of type map[string][]*hello.SubInfo) as map[string]*hello.Info value in struct
-message Info{
-  repeated SubInfo d1 = 1;  //切片类型 []*pb.SubInfo
-}
-
-message SubInfo{
-  map<string,string> d2 = 1;  //map类型的切片 map[string]string
+message HelloHttpResponse {
+  string name = 1;
 }

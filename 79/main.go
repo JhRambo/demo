@@ -14,7 +14,6 @@ import (
 func main() {
 	NewRedis()
 	fu1()
-
 	time.Sleep(100 * time.Second)
 }
 
@@ -88,13 +87,11 @@ func fu1() error {
 			case <-ticker.C:
 				Expire("lock_key")
 				fmt.Println(time.Now())
-
 				//收到执行完的 channel 就关闭time定时任务
 			case <-ch:
 				ticker.Stop()
 				return nil
 			}
-
 		}
 	})
 	//等待信号量

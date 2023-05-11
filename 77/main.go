@@ -12,6 +12,7 @@ func main() {
 	g = a + b
 	fmt.Println("main g==========================", g)
 	f1()
+	//保持不退出
 	for {
 
 	}

@@ -35,9 +35,9 @@ func TestServerRegister(t *testing.T) {
 	ServerRegister(serverName, serverIp, serverPort)
 	// for true {
 	// 	// 制定一个定时器，模拟30s后注销服务
-	// 	t := time.NewTicker(ServerCancelTime * time.Second)
+	// 	ticker := time.NewTicker(ServerCancelTime * time.Second)
 	// 	select {
-	// 	case tt := <-t.C:
+	// 	case tt := <-ticker.C:
 	// 		ServerCancel(svrID) //服务注销
 	// 		log.Printf("服务注销，tt:%v\n", tt)
 	// 		return

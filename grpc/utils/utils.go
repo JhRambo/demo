@@ -17,7 +17,7 @@ func Logs(actionType pb.ActionType, uid int64, eid int64, spaceId int64, devId s
 }
 
 // 创建表，每个月创建一张表，每月执行一次即可
-func CreateTable() error {
+func CreateTable() (string, error) {
 	ym := ""
 	year := time.Now().Format("2006")
 	month := time.Now().Format("1")
@@ -30,17 +30,18 @@ func CreateTable() error {
 		m += 1
 		ym = fmt.Sprintf("%d-%02d", y, m)
 	}
-	sql := fmt.Sprintf("CREATE TABLE `t_logs_%s` ("+
-		"`id` int NOT NULL AUTO_INCREMENT,"+
-		"`action_type` int NOT NULL,"+
-		"`uid` bigint DEFAULT '0',"+
-		"`eid` bigint DEFAULT '0',"+
-		"`space_id` bigint NOT NULL DEFAULT '0',"+
-		"`dev_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '',"+
-		"`create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,"+
-		"`bak1` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,"+
-		"PRIMARY KEY (`id`)"+
-		") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci", ym)
+	table := fmt.Sprintf("t_logs_%s", ym)
+	sql := "CREATE TABLE `" + table + "` (" +
+		"`id` int NOT NULL AUTO_INCREMENT," +
+		"`action_type` int NOT NULL," +
+		"`uid` bigint DEFAULT '0'," +
+		"`eid` bigint DEFAULT '0'," +
+		"`space_id` bigint NOT NULL DEFAULT '0'," +
+		"`dev_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT ''," +
+		"`create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP," +
+		"`bak1` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL," +
+		"PRIMARY KEY (`id`)" +
+		") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci"
 	err := tools.DB.Exec(sql)
-	return err.Error
+	return table, err.Error
 }
