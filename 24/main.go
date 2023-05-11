@@ -18,24 +18,21 @@ type Class struct {
 }
 
 func main() {
-	// var c Class
-	// c.Title = "001班"
-	// c.Student = make([]Student, 0)	//先分配内存空间
-	var c = Class{
+	var c = &Class{
 		Title:   "001班",
-		Student: make([]Student, 0), //先分配内存空间，后续使用append追加数据
+		Student: make([]Student, 0),
 	}
 	for i := 1; i <= 3; i++ {
 		s := Student{
 			Id:   i,
-			Name: fmt.Sprintf("stu_%v", i), //参考demo 33
+			Name: fmt.Sprintf("stu_%v", i),
 			sex:  "男",
 		}
 		c.Student = append(c.Student, s)
 	}
 	v, _ := json.Marshal(c) //json序列化
 	str := string(v)
-	fmt.Printf("值：%v-----类型：%T\n", str, str)
+	fmt.Println(str)
 
 	err := json.Unmarshal([]byte(str), &c) //json反序列化
 	if err == nil {
