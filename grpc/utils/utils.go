@@ -16,7 +16,12 @@ func Logs(actionType pb.ActionType, uid int64, eid int64, spaceId int64, devId s
 	return err.Error
 }
 
-// 创建表，每个月创建一张表，每月执行一次即可
+/*
+	创建表，每个月创建一张表
+
+每次创建的是下个月的表结构
+每月执行一次即可
+*/
 func CreateTable() (string, error) {
 	ym := ""
 	year := time.Now().Format("2006")
@@ -38,9 +43,12 @@ func CreateTable() (string, error) {
 		"`eid` bigint DEFAULT '0'," +
 		"`space_id` bigint NOT NULL DEFAULT '0'," +
 		"`dev_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT ''," +
+		"`bak1` VARCHAR(255) COLLATE utf8mb4_general_ci NOT NULL DEFAULT ''," +
+		"`bak2` varchar(255) COLLATE utf8mb4_general_ci NOT NULL DEFAULT ''," +
+		"`bak3` varchar(255) COLLATE utf8mb4_general_ci NOT NULL DEFAULT ''," +
 		"`create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP," +
-		"`bak1` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL," +
-		"PRIMARY KEY (`id`)" +
+		"PRIMARY KEY (`id`)," +
+		"KEY `action_type` (`action_type`)" +
 		") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci"
 	err := tools.DB.Exec(sql)
 	return table, err.Error

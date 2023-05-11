@@ -8,7 +8,8 @@ import (
 
 // 定时任务每月执行一次
 func main() {
-	ticker := time.NewTicker(time.Hour * 24 * 31)
+	ticker := time.NewTicker(time.Hour * 1)
+	// ticker := time.NewTicker(time.Hour * 24 * 31)
 	for range ticker.C {
 		table, err := utils.CreateTable()
 		if err != nil {
