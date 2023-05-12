@@ -7,12 +7,14 @@ import (
 )
 
 func main() {
-	actionType := pb.ActionType_login
-	eid := int64(1000)
-	uid := int64(2000)
-	spaceId := int64(123)
-	devId := "222222222222"
-	err := utils.Logs(actionType, eid, uid, spaceId, devId)
+	mp := map[string]interface{}{
+		"action_type": pb.ActionType_login,
+		"eid":         int64(1000),
+		"uid":         int64(2000),
+		"space_id":    int64(666),
+		"device_id":   "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+	}
+	err := utils.Logs(mp)
 	if err != nil {
 		log.Fatalln(err)
 	}

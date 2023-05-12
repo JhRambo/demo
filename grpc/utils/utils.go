@@ -1,7 +1,6 @@
 package utils
 
 import (
-	pb "demo/grpc/proto/logs"
 	"demo/grpc/tools"
 	"fmt"
 	"strconv"
@@ -9,10 +8,10 @@ import (
 )
 
 // 日志统计 原生SQL
-func Logs(actionType pb.ActionType, uid int64, eid int64, spaceId int64, devId string) error {
+func Logs(mp map[string]interface{}) error {
 	ym := time.Now().Format("2006-01") //当前年月
-	sql := fmt.Sprintf("insert into `t_logs_%s` (`action_type`,`uid`,`eid`,`space_id`,`dev_id`) values(?,?,?,?,?)", ym)
-	err := tools.DB.Exec(sql, actionType, uid, eid, spaceId, devId)
+	sql := fmt.Sprintf("insert into `t_logs_%s` (`action_type`,`uid`,`eid`,`space_id`,`device_id`) values(?,?,?,?,?)", ym)
+	err := tools.DB.Exec(sql, mp["action_type"], mp["uid"], mp["eid"], mp["space_id"], mp["device_id"])
 	return err.Error
 }
 
@@ -42,7 +41,7 @@ func CreateTable() (string, error) {
 		"`uid` bigint DEFAULT '0'," +
 		"`eid` bigint DEFAULT '0'," +
 		"`space_id` bigint NOT NULL DEFAULT '0'," +
-		"`dev_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT ''," +
+		"`device_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT ''," +
 		"`bak1` VARCHAR(255) COLLATE utf8mb4_general_ci NOT NULL DEFAULT ''," +
 		"`bak2` varchar(255) COLLATE utf8mb4_general_ci NOT NULL DEFAULT ''," +
 		"`bak3` varchar(255) COLLATE utf8mb4_general_ci NOT NULL DEFAULT ''," +
