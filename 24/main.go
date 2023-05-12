@@ -9,7 +9,7 @@ import (
 type Student struct {
 	Id   int    `json:"id"`
 	Name string `json:"name"`
-	sex  string `json:"sex"` //私有属性，不可以转换成json格式
+	Sex  string `json:"sex"` //私有属性，不会转换成json格式
 }
 
 type Class struct {
@@ -26,16 +26,16 @@ func main() {
 		s := Student{
 			Id:   i,
 			Name: fmt.Sprintf("stu_%v", i),
-			sex:  "男",
+			Sex:  "男",
 		}
 		c.Student = append(c.Student, s)
 	}
 	v, _ := json.Marshal(c) //json序列化
 	str := string(v)
-	fmt.Println(str)
+	fmt.Printf("%#v\n", str)
 
-	err := json.Unmarshal([]byte(str), &c) //json反序列化
-	if err == nil {
-		fmt.Printf("%#v\n", c)
-	}
+	var cc = &Class{} //返回空结构体
+	fmt.Printf("%#v\n", cc)
+	json.Unmarshal([]byte(str), cc) //json反序列化
+	fmt.Printf("%#v\n", cc)
 }
