@@ -25,6 +25,6 @@ func main() {
 	ctx := context.Background()
 	//客户端自定义metadata数据
 	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("token", "1234567890"))
-	res, err := client.SayHello(ctx, &hello.HelloRequest{})
+	res, err := client.SayHello(ctx, &hello.HelloHttpRequest{})
 	fmt.Printf("%#v", res)
 }
