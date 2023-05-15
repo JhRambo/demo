@@ -30,12 +30,13 @@ func main() {
 		}
 		c.Student = append(c.Student, s)
 	}
-	v, _ := json.Marshal(c) //json序列化
+	v, _ := json.Marshal(c) //json序列化：结构体转成二进制流
+	fmt.Printf("%#v\n", v)
 	str := string(v)
 	fmt.Printf("%#v\n", str)
 
 	var cc = &Class{} //返回空结构体
 	fmt.Printf("%#v\n", cc)
-	json.Unmarshal([]byte(str), cc) //json反序列化
+	json.Unmarshal([]byte(str), cc) //json反序列化：二进制流转成结构体
 	fmt.Printf("%#v\n", cc)
 }

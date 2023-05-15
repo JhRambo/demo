@@ -3,17 +3,22 @@ package main
 //开启http服务方式1
 import (
 	"demo/server/controllers"
+	"fmt"
 	"log"
 	"net/http"
 )
 
+const port = 8088
+
 func main() {
-	http.HandleFunc("/user/add", controllers.User{}.Add)
-	http.HandleFunc("/user/del", controllers.User{}.Del)
-	http.HandleFunc("/user/upd", controllers.User{}.Upd)
-	http.HandleFunc("/user/list", controllers.User{}.List)
-	http.HandleFunc("/user/getById", controllers.User{}.GetById)
-	if err := http.ListenAndServe("localhost:8088", nil); err != nil {
+	c := &controllers.User{}
+	http.HandleFunc("/user/add", c.Add)
+	http.HandleFunc("/user/del", c.Del)
+	http.HandleFunc("/user/upd", c.Upd)
+	http.HandleFunc("/user/list", c.List)
+	http.HandleFunc("/user/getById", c.GetById)
+	log.Println(fmt.Sprintf("server启动中，监听%d端口...", port))
+	if err := http.ListenAndServe("localhost:"+fmt.Sprintf("%d", port), nil); err != nil {
 		log.Println("启动服务失败", err)
 		return
 	}
