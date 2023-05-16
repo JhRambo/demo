@@ -25,8 +25,15 @@ service HelloHttp {
   }
 }
 message HelloHttpRequest {
-  string token = 1;
+  string name = 1;
+  int32 age = 2;
 }
 message HelloHttpResponse {
   string name = 1;
+  int32 age = 2;
+}
+
+message BinaryData {
+  string key = 1;
+  bytes val = 2;
 }

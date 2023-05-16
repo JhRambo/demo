@@ -18,6 +18,10 @@ var (
 	port         = 8088
 )
 
+type Token struct {
+	Token string
+}
+
 func run() error {
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)

@@ -7,15 +7,28 @@ import (
 	"github.com/vmihailenco/msgpack/v5"
 )
 
+// type User struct {
+// 	TypeId         int32
+// 	PageSize       int32
+// 	PageIndex      int32
+// 	EnterpriseName string
+// }
+
 type User struct {
-	Phone string
-	Code  string
+	Name string
+	Age  int32
 }
 
 func writeMsg(filename string) (err error) {
+	// var user = &User{
+	// 	TypeId:         0,
+	// 	PageSize:       10,
+	// 	PageIndex:      1,
+	// 	EnterpriseName: "GGGGGGG",
+	// }
 	var user = &User{
-		Phone: "17611112222",
-		Code:  "123456",
+		Name: "张三李四王五老六",
+		Age:  int32(10),
 	}
 	data, err := msgpack.Marshal(user)
 	fmt.Printf("%#v\n", data)
@@ -57,7 +70,7 @@ func main() {
 	       可读性差
 	   用于API通信
 	*/
-	filename := "D:/code/demo/doc/msgpack.dat"
-	// writeMsg(filename)
+	filename := "D:/code/demo/doc/hello-user.dat"
+	writeMsg(filename)
 	readMsg(filename)
 }

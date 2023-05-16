@@ -17,17 +17,16 @@ service StudyHttp {
 }
 
 message StudyRequest {
-  string token = 1;
+  string name = 1;
 }
 
 message StudyResponse {
   int32 code = 1;
   string message = 2;
-  repeated Info list = 3;
+  string name = 3;
 }
 
-message Info {
-  string devId = 1;
-  string date = 2;
-  string time = 3;
+message BinaryData {
+  string key = 1;
+  bytes val = 2;
 }

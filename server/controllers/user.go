@@ -4,8 +4,13 @@ import (
 	"demo/server/models"
 	"demo/server/tools"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/vmihailenco/msgpack/v5"
 )
 
 type User struct {
@@ -16,10 +21,33 @@ type Res struct {
 	Message string
 }
 
-// 查询指定id的数据
-func (this User) GetById(w http.ResponseWriter, r *http.Request) {
+type Cmd struct {
+	Id    int
+	Phone string
+	Code  string
+}
+
+/*
+	结合 msgpack json
+
+查询指定id的数据
+*/
+func (this *User) GetById(w http.ResponseWriter, r *http.Request) {
+	b, err := ioutil.ReadAll(r.Body)
+	fmt.Println("b===========", b)
+	if err != nil {
+		log.Println("Read failed:", err)
+	}
+	defer r.Body.Close()
+	cmd := &Cmd{}
+	err = msgpack.Unmarshal(b, cmd)
+	fmt.Println("cmd===========", cmd)
+	if err != nil {
+		log.Println("json format error:", err)
+	}
 	user := models.User{}
-	id, _ := strconv.Atoi(r.URL.Query().Get("id"))
+	// id, _ := strconv.Atoi(r.URL.Query().Get("id"))
+	id := cmd.Id
 	tools.DB.First(&user, id)
 	json, _ := json.Marshal(user)
 	w.Write(json)
@@ -34,8 +62,16 @@ func (this User) List(w http.ResponseWriter, r *http.Request) {
 }
 
 // 删除
-func (this User) Del(w http.ResponseWriter, r *http.Request) {
-	id, _ := strconv.Atoi(r.PostFormValue("id"))
+func (this *User) Del(w http.ResponseWriter, r *http.Request) {
+	b, err := ioutil.ReadAll(r.Body) //数据流
+	if err != nil {
+		log.Println("err=>", err)
+	}
+	defer r.Body.Close()
+	cmd := &Cmd{}
+	json.Unmarshal(b, cmd)
+	// id, _ := strconv.Atoi(r.PostFormValue("id"))
+	id := cmd.Id
 	if id == 0 {
 		res := &Res{
 			Success: false,

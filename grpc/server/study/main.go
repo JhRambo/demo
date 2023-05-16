@@ -2,13 +2,14 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
 	"strings"
 
 	"demo/grpc/proto/study"
+	pb "demo/grpc/proto/study"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"golang.org/x/net/http2"
@@ -19,7 +20,7 @@ import (
 
 type Server struct {
 	// pb.go中自动生成的，是个空结构体
-	study.UnimplementedStudyHttpServer
+	pb.UnimplementedStudyHttpServer
 }
 
 const IP = "127.0.0.1"
@@ -29,57 +30,37 @@ func NewServer() *Server {
 	return &Server{}
 }
 
-func (s *Server) SayStudy(ctx context.Context, in *study.StudyRequest) (*study.StudyResponse, error) {
-	var infos []*study.Info
-	info1 := &study.Info{
-		DevId: "111",
-		Date:  "2026-03-01",
-		Time:  "01:01:01",
-	}
-	info2 := &study.Info{
-		DevId: "111",
-		Date:  "2026-03-01",
-		Time:  "01:02:02",
-	}
-	info3 := &study.Info{
-		DevId: "222",
-		Date:  "2026-03-01",
-		Time:  "01:01:01",
-	}
-	infos = append(infos, info1, info2, info3)
-
-	ss := make(map[string][]*study.Info)
-	for _, v := range infos {
-		ss[v.DevId] = append(ss[v.DevId], v) //同一个key，append
-	}
-	fmt.Println("==============", ss)
-	return &study.StudyResponse{
+func (s *Server) SayStudy(ctx context.Context, req *study.StudyRequest) (*study.StudyResponse, error) {
+	// md, _ := metadata.FromIncomingContext(ctx)
+	log.Println("server===============================")
+	return &pb.StudyResponse{
 		Code:    200,
 		Message: "成功",
-		List:    infos,
+		Name:    req.Name,
 	}, nil
 }
 
 // http grpc监听同一个端口
-func main2() {
+func main() {
 	lis, err := net.Listen("tcp", PORT)
 	if err != nil {
 		log.Fatalln("Failed to listen:", err)
 	}
 	// 创建一个gRPC server对象
 	s := grpc.NewServer()
-	// 注册StudyHttp service到server
-	study.RegisterStudyHttpServer(s, &Server{})
-	// gRPC-Gateway mux
+	// 注册StudyHttp服务到server层
+	pb.RegisterStudyHttpServer(s, &Server{})
+
 	gwmux := runtime.NewServeMux()
 	dops := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-	err = study.RegisterStudyHttpHandlerFromEndpoint(context.Background(), gwmux, IP+PORT, dops)
+	// http转grpc	通过context去连接, 注册在runtime.NewServeMux()上面
+	err = pb.RegisterStudyHttpHandlerFromEndpoint(context.Background(), gwmux, IP+PORT, dops)
 	if err != nil {
 		log.Fatalln("Failed to register gwmux:", err)
 	}
 
 	mux := http.NewServeMux()
-	mux.Handle("/", gwmux)
+	mux.Handle("/", middleware(gwmux))
 
 	// 定义HTTP server配置
 	gwServer := &http.Server{
@@ -88,6 +69,26 @@ func main2() {
 	}
 	log.Println("Serving on http://" + IP + PORT)
 	log.Fatalln(gwServer.Serve(lis)) // 启动HTTP服务
+}
+
+// 自定义中间件
+func middleware(next http.Handler) http.Handler {
+	log.Println("middleware========================")
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		b, err := ioutil.ReadAll(r.Body) //获取二进制流
+		log.Println("b=======================", b)
+		if err != nil {
+			log.Println("Read failed:", err)
+		}
+		defer r.Body.Close()
+		binaryData := &pb.BinaryData{
+			Key: r.RequestURI,
+			Val: b,
+		}
+		log.Println("binaryData==============", binaryData)
+
+		next.ServeHTTP(w, r)
+	})
 }
 
 // grpcHandlerFunc 将gRPC请求和HTTP请求分别调用不同的handler处理
