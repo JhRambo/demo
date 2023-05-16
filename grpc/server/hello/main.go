@@ -45,7 +45,7 @@ func (s *Server) SayHello(ctx context.Context, req *pb.HelloHttpRequest) (*pb.He
 // gw server 监听不同端口
 func main() {
 	ctx := context.Background()
-	log.Println(fmt.Sprintf("server服务启动中，监听%d端口...", port))
+	log.Println(fmt.Sprintf("server 监听%d端口...", port))
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
 		log.Fatalln("Failed to listen:", err)
@@ -59,11 +59,11 @@ func main() {
 		log.Fatalln(s.Serve(lis))
 	}()
 
-	// 创建一个连接到我们刚刚启动的 gRPC 服务器的客户端连接
+	// 创建一个连接到我们刚刚启动的gRPC服务器的，客户端连接
 	// gRPC-Gateway 就是通过它来代理请求（将HTTP请求转为RPC请求）
 	conn, err := grpc.DialContext(
 		ctx,
-		"localhost:8081",
+		":8081",
 		grpc.WithInsecure(),
 	)
 	if err != nil {
@@ -72,7 +72,7 @@ func main() {
 
 	gwmux := runtime.NewServeMux(SetMetaData())
 	// 注册HelloHttp
-	err = pb.RegisterHelloHttpHandler(ctx, gwmux, conn)
+	err = pb.RegisterHelloHttpHandler(ctx, gwmux, conn) //handler
 	if err != nil {
 		log.Fatalln("Failed to register gateway:", err)
 	}
@@ -86,7 +86,7 @@ func main() {
 		Handler: grpcHandlerFunc(s, mux), // 请求的统一入口
 	}
 	// 8090端口提供gRPC-Gateway服务
-	log.Println("Serving gRPC-Gateway on http://0.0.0.0:8088")
+	log.Println("gw gRPC-Gateway on http://0.0.0.0:8088")
 	log.Fatalln(gwServer.ListenAndServe())
 }
 
@@ -118,7 +118,7 @@ func SetMetaData() runtime.ServeMuxOption {
 // 获取context metadata 数据
 func GetMetaData(ctx context.Context) (*NodeRoot, error) {
 	md, _ := metadata.FromIncomingContext(ctx)
-	log.Println("md================", md)
+	// log.Println("md================", md)
 	nodeRoot := GetNodeRoot()
 	strinfo := md[CTXINFO][0]
 	json.Unmarshal([]byte(strinfo), &nodeRoot)
@@ -137,10 +137,6 @@ func middleware(next http.Handler) http.Handler {
 		nodes.N3.Key = r.RequestURI
 		nodes.N3.Val = b
 		MapNodeData(nodes)
-		// binaryData := &pb.BinaryData{
-		// 	Key: r.RequestURI,
-		// 	Val: b,
-		// }
 		next.ServeHTTP(w, r)
 	})
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -31,8 +30,6 @@ func NewServer() *Server {
 }
 
 func (s *Server) SayStudy(ctx context.Context, req *study.StudyRequest) (*study.StudyResponse, error) {
-	// md, _ := metadata.FromIncomingContext(ctx)
-	log.Println("server===============================")
 	return &pb.StudyResponse{
 		Code:    200,
 		Message: "成功",
@@ -60,7 +57,7 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-	mux.Handle("/", middleware(gwmux))
+	mux.Handle("/", gwmux)
 
 	// 定义HTTP server配置
 	gwServer := &http.Server{
@@ -69,26 +66,6 @@ func main() {
 	}
 	log.Println("Serving on http://" + IP + PORT)
 	log.Fatalln(gwServer.Serve(lis)) // 启动HTTP服务
-}
-
-// 自定义中间件
-func middleware(next http.Handler) http.Handler {
-	log.Println("middleware========================")
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		b, err := ioutil.ReadAll(r.Body) //获取二进制流
-		log.Println("b=======================", b)
-		if err != nil {
-			log.Println("Read failed:", err)
-		}
-		defer r.Body.Close()
-		binaryData := &pb.BinaryData{
-			Key: r.RequestURI,
-			Val: b,
-		}
-		log.Println("binaryData==============", binaryData)
-
-		next.ServeHTTP(w, r)
-	})
 }
 
 // grpcHandlerFunc 将gRPC请求和HTTP请求分别调用不同的handler处理
