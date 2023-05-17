@@ -170,12 +170,13 @@ func middleware(ctx context.Context, next http.Handler, conn *grpc.ClientConn) h
 		re_msgpack := regexp.MustCompile(pattern_msgpack)
 		match_msgpack := re_msgpack.MatchString(uri)
 		if match_msgpack {
+			// 注册grpc客户端
 			client := pb.NewHelloHttpClient(conn) //这里改成动态即可 TODO
 			byRequest := &pb.BinaryRequest{
 				Key: r.RequestURI,
 				Val: bys,
 			}
-			resp, err := client.SayBinary(ctx, byRequest)
+			resp, err := client.BinaryInfo(ctx, byRequest)
 			if err != nil {
 				log.Fatalln("err:", err.Error())
 			}

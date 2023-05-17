@@ -29,7 +29,7 @@ service HelloHttp {
       body: "*"
     };
   }
-  rpc SayBinary (BinaryRequest) returns (BinaryResponse) {
+  rpc BinaryInfo (BinaryRequest) returns (BinaryResponse) {
     option (google.api.http) = {
       post: "/binary"
       body: "*"

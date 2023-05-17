@@ -106,7 +106,7 @@ var HelloDB_ServiceDesc = grpc.ServiceDesc{
 type HelloHttpClient interface {
 	SayHello(ctx context.Context, in *HelloHttpRequest, opts ...grpc.CallOption) (*HelloHttpResponse, error)
 	SayGoodBye(ctx context.Context, in *GoodByeHttpRequest, opts ...grpc.CallOption) (*GoodByeHttpResponse, error)
-	SayBinary(ctx context.Context, in *BinaryRequest, opts ...grpc.CallOption) (*BinaryResponse, error)
+	BinaryInfo(ctx context.Context, in *BinaryRequest, opts ...grpc.CallOption) (*BinaryResponse, error)
 }
 
 type helloHttpClient struct {
@@ -135,9 +135,9 @@ func (c *helloHttpClient) SayGoodBye(ctx context.Context, in *GoodByeHttpRequest
 	return out, nil
 }
 
-func (c *helloHttpClient) SayBinary(ctx context.Context, in *BinaryRequest, opts ...grpc.CallOption) (*BinaryResponse, error) {
+func (c *helloHttpClient) BinaryInfo(ctx context.Context, in *BinaryRequest, opts ...grpc.CallOption) (*BinaryResponse, error) {
 	out := new(BinaryResponse)
-	err := c.cc.Invoke(ctx, "/HelloHttp/SayBinary", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/HelloHttp/BinaryInfo", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +150,7 @@ func (c *helloHttpClient) SayBinary(ctx context.Context, in *BinaryRequest, opts
 type HelloHttpServer interface {
 	SayHello(context.Context, *HelloHttpRequest) (*HelloHttpResponse, error)
 	SayGoodBye(context.Context, *GoodByeHttpRequest) (*GoodByeHttpResponse, error)
-	SayBinary(context.Context, *BinaryRequest) (*BinaryResponse, error)
+	BinaryInfo(context.Context, *BinaryRequest) (*BinaryResponse, error)
 	mustEmbedUnimplementedHelloHttpServer()
 }
 
@@ -164,8 +164,8 @@ func (UnimplementedHelloHttpServer) SayHello(context.Context, *HelloHttpRequest)
 func (UnimplementedHelloHttpServer) SayGoodBye(context.Context, *GoodByeHttpRequest) (*GoodByeHttpResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SayGoodBye not implemented")
 }
-func (UnimplementedHelloHttpServer) SayBinary(context.Context, *BinaryRequest) (*BinaryResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SayBinary not implemented")
+func (UnimplementedHelloHttpServer) BinaryInfo(context.Context, *BinaryRequest) (*BinaryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BinaryInfo not implemented")
 }
 func (UnimplementedHelloHttpServer) mustEmbedUnimplementedHelloHttpServer() {}
 
@@ -216,20 +216,20 @@ func _HelloHttp_SayGoodBye_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
-func _HelloHttp_SayBinary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _HelloHttp_BinaryInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(BinaryRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(HelloHttpServer).SayBinary(ctx, in)
+		return srv.(HelloHttpServer).BinaryInfo(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/HelloHttp/SayBinary",
+		FullMethod: "/HelloHttp/BinaryInfo",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(HelloHttpServer).SayBinary(ctx, req.(*BinaryRequest))
+		return srv.(HelloHttpServer).BinaryInfo(ctx, req.(*BinaryRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -250,8 +250,8 @@ var HelloHttp_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _HelloHttp_SayGoodBye_Handler,
 		},
 		{
-			MethodName: "SayBinary",
-			Handler:    _HelloHttp_SayBinary_Handler,
+			MethodName: "BinaryInfo",
+			Handler:    _HelloHttp_BinaryInfo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
