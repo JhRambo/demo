@@ -29,6 +29,7 @@ service HelloHttp {
       body: "*"
     };
   }
+  //通用msgpack接口
   rpc BinaryInfo (BinaryRequest) returns (BinaryResponse) {
     option (google.api.http) = {
       post: "/binary"

@@ -21,7 +21,7 @@ import (
 )
 
 const port = 8081
-const pattern_msgpack = "HELLO" //这里追加使用msgpack协议的URI
+const pattern_msgpack = "HELLO|GOODBYE" //这里追加使用msgpack协议的URI
 const CTXINFO = "ctx_info"
 
 var MapNode = map[string]string{}
@@ -35,6 +35,8 @@ func NewServer() *Server {
 }
 
 func (s *Server) SayHello(ctx context.Context, req *pb.HelloHttpRequest) (*pb.HelloHttpResponse, error) {
+	d, _ := GetMetaData(ctx)
+	log.Println("d====================", d) //打印了两次 TODO
 	return &pb.HelloHttpResponse{
 		Name: req.Name,
 		Age:  req.Age,
@@ -42,13 +44,12 @@ func (s *Server) SayHello(ctx context.Context, req *pb.HelloHttpRequest) (*pb.He
 }
 
 // 使用msgpack协议
-func (s *Server) SayBinary(ctx context.Context, req *pb.BinaryRequest) (*pb.BinaryResponse, error) {
+func (s *Server) BinaryInfo(ctx context.Context, req *pb.BinaryRequest) (*pb.BinaryResponse, error) {
 	var bys []byte
 	if req.Key == "/hello" {
-		resp := &pb.HelloHttpResponse{}
-		// msgpack.Unmarshal(req.Val, resp)
-		resp.Age = 2000
-		resp.Name = "玉皇大帝元始天尊女娲娘娘"
+		r := &pb.HelloHttpRequest{}
+		msgpack.Unmarshal(req.Val, r)
+		resp, _ := s.SayHello(ctx, r) //跳转到指定的服务去执行
 		bys, _ = msgpack.Marshal(resp)
 	}
 	return &pb.BinaryResponse{
@@ -58,6 +59,7 @@ func (s *Server) SayBinary(ctx context.Context, req *pb.BinaryRequest) (*pb.Bina
 
 func (s *Server) SayGoodBye(ctx context.Context, req *pb.GoodByeHttpRequest) (*pb.GoodByeHttpResponse, error) {
 	d, _ := GetMetaData(ctx)
+	log.Println("d====================", d) //打印了一次 正常
 	obj := &pb.GoodByeHttpRequest{}
 	msgpack.Unmarshal(d.N3.Val, obj)
 	return &pb.GoodByeHttpResponse{
@@ -96,8 +98,9 @@ func main() {
 		log.Fatalln("Failed to dial server:", err)
 	}
 
-	gwmux := runtime.NewServeMux(SetMetaData())
-	// 注册HelloHttp
+	gwmux := runtime.NewServeMux(SetMetaData()) //这里是重点，手动创建的grpc客户端没有这个操作，导致没有往context里塞数据
+	// gwmux := runtime.NewServeMux() //这里是重点，手动创建的grpc客户端没有这个操作，导致没有往context里塞数据
+	// 注册HelloHttp	这里注册了，下面右手动注册了grpc服务，导致binary方法执行了两次 TOOD
 	err = pb.RegisterHelloHttpHandler(ctx, gwmux, conn) //handler
 	if err != nil {
 		log.Fatalln("Failed to register gateway:", err)
@@ -114,6 +117,53 @@ func main() {
 	// 8088端口提供gRPC-Gateway服务
 	log.Println("gw gRPC-Gateway on http://0.0.0.0:8088")
 	log.Fatalln(gwServer.ListenAndServe())
+}
+
+// 自定义中间件
+func middleware(ctx context.Context, next http.Handler, conn *grpc.ClientConn) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		bys, err := ioutil.ReadAll(r.Body) //获取二进制流
+		if err != nil {
+			log.Println("Read failed:", err)
+		}
+		uri := strings.ToUpper(r.RequestURI)
+		re_msgpack := regexp.MustCompile(pattern_msgpack)
+		match_msgpack := re_msgpack.MatchString(uri)
+
+		if match_msgpack {
+			//1.context请求（方案1）
+			nodes := GetNodeRoot()
+			nodes.N3.Key = uri
+			nodes.N3.Val = bys
+			MapNodeData(nodes)
+
+			//2.模拟grpc客户端直接发起grpc请求（方案2）
+			// 手动注册grpc客户端
+			if uri == "/HELLO" {
+				client := pb.NewHelloHttpClient(conn) //这里改成动态即可 TODO
+				byRequest := &pb.BinaryRequest{
+					Key: r.RequestURI,
+					Val: bys,
+				}
+				ctx := metadata.NewOutgoingContext(ctx, metadata.Pairs(CTXINFO, MapNode[CTXINFO]))
+				resp, err := client.BinaryInfo(ctx, byRequest)
+				if err != nil {
+					log.Fatalln("err1:", err.Error())
+				}
+				v, err := msgpack.Marshal(resp.Val)
+				if err != nil {
+					log.Fatalln("err2:", err.Error())
+				}
+				w.Write(v)
+			}
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+func ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	log.Println("ServeHTTP====================")
 }
 
 // 定义一个Root结构体内嵌自定义结构体
@@ -148,47 +198,6 @@ func GetMetaData(ctx context.Context) (*NodeRoot, error) {
 	strinfo := md[CTXINFO][0]
 	json.Unmarshal([]byte(strinfo), &nodeRoot)
 	return nodeRoot, nil
-}
-
-// 自定义中间件
-func middleware(ctx context.Context, next http.Handler, conn *grpc.ClientConn) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		bys, err := ioutil.ReadAll(r.Body) //获取二进制流
-		if err != nil {
-			log.Println("Read failed:", err)
-		}
-
-		uri := strings.ToUpper(r.RequestURI)
-
-		//1.context请求（方案1）
-		nodes := GetNodeRoot()
-		nodes.N3.Key = uri
-		nodes.N3.Val = bys
-		MapNodeData(nodes)
-
-		//2.模拟grpc客户端直接发起grpc请求（方案2）
-		re_msgpack := regexp.MustCompile(pattern_msgpack)
-		match_msgpack := re_msgpack.MatchString(uri)
-		if match_msgpack {
-			// 注册grpc客户端
-			client := pb.NewHelloHttpClient(conn) //这里改成动态即可 TODO
-			byRequest := &pb.BinaryRequest{
-				Key: r.RequestURI,
-				Val: bys,
-			}
-			resp, err := client.BinaryInfo(ctx, byRequest)
-			if err != nil {
-				log.Fatalln("err:", err.Error())
-			}
-			v, err := msgpack.Marshal(resp.Val)
-			if err != nil {
-				log.Fatalln("err:", err.Error())
-			}
-			w.Write(v)
-		}
-
-		next.ServeHTTP(w, r)
-	})
 }
 
 // grpcHandlerFunc 将gRPC请求和HTTP请求分别调用不同的handler处理
