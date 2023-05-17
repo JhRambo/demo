@@ -5,7 +5,7 @@ option go_package = "./hello";
 
 import "google/api/annotations.proto";
 
-// 内部通信的grpc协议服务名
+// DB连接
 service HelloDB {
   rpc SayHello(HelloDBRequest) returns (HelloDBResponse){}
 }
@@ -23,6 +23,18 @@ service HelloHttp {
       body: "*"
     };
   }
+  rpc SayGoodBye (GoodByeHttpRequest) returns (GoodByeHttpResponse) {
+    option (google.api.http) = {
+      post: "/goodbye"
+      body: "*"
+    };
+  }
+  rpc SayBinary (BinaryRequest) returns (BinaryResponse) {
+    option (google.api.http) = {
+      post: "/binary"
+      body: "*"
+    };
+  }
 }
 message HelloHttpRequest {
   string name = 1;
@@ -33,7 +45,19 @@ message HelloHttpResponse {
   int32 age = 2;
 }
 
-message BinaryData {
+message GoodByeHttpRequest {
+  string token = 1;
+}
+message GoodByeHttpResponse {
+  int32 code = 1;
+  string token = 2;
+}
+
+message BinaryRequest {
   string key = 1;
   bytes val = 2;
+}
+
+message BinaryResponse {
+  bytes val = 1;
 }

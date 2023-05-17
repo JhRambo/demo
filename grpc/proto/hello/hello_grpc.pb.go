@@ -105,6 +105,8 @@ var HelloDB_ServiceDesc = grpc.ServiceDesc{
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type HelloHttpClient interface {
 	SayHello(ctx context.Context, in *HelloHttpRequest, opts ...grpc.CallOption) (*HelloHttpResponse, error)
+	SayGoodBye(ctx context.Context, in *GoodByeHttpRequest, opts ...grpc.CallOption) (*GoodByeHttpResponse, error)
+	SayBinary(ctx context.Context, in *BinaryRequest, opts ...grpc.CallOption) (*BinaryResponse, error)
 }
 
 type helloHttpClient struct {
@@ -124,11 +126,31 @@ func (c *helloHttpClient) SayHello(ctx context.Context, in *HelloHttpRequest, op
 	return out, nil
 }
 
+func (c *helloHttpClient) SayGoodBye(ctx context.Context, in *GoodByeHttpRequest, opts ...grpc.CallOption) (*GoodByeHttpResponse, error) {
+	out := new(GoodByeHttpResponse)
+	err := c.cc.Invoke(ctx, "/HelloHttp/SayGoodBye", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *helloHttpClient) SayBinary(ctx context.Context, in *BinaryRequest, opts ...grpc.CallOption) (*BinaryResponse, error) {
+	out := new(BinaryResponse)
+	err := c.cc.Invoke(ctx, "/HelloHttp/SayBinary", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // HelloHttpServer is the server API for HelloHttp service.
 // All implementations must embed UnimplementedHelloHttpServer
 // for forward compatibility
 type HelloHttpServer interface {
 	SayHello(context.Context, *HelloHttpRequest) (*HelloHttpResponse, error)
+	SayGoodBye(context.Context, *GoodByeHttpRequest) (*GoodByeHttpResponse, error)
+	SayBinary(context.Context, *BinaryRequest) (*BinaryResponse, error)
 	mustEmbedUnimplementedHelloHttpServer()
 }
 
@@ -138,6 +160,12 @@ type UnimplementedHelloHttpServer struct {
 
 func (UnimplementedHelloHttpServer) SayHello(context.Context, *HelloHttpRequest) (*HelloHttpResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SayHello not implemented")
+}
+func (UnimplementedHelloHttpServer) SayGoodBye(context.Context, *GoodByeHttpRequest) (*GoodByeHttpResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SayGoodBye not implemented")
+}
+func (UnimplementedHelloHttpServer) SayBinary(context.Context, *BinaryRequest) (*BinaryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SayBinary not implemented")
 }
 func (UnimplementedHelloHttpServer) mustEmbedUnimplementedHelloHttpServer() {}
 
@@ -170,6 +198,42 @@ func _HelloHttp_SayHello_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _HelloHttp_SayGoodBye_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GoodByeHttpRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HelloHttpServer).SayGoodBye(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/HelloHttp/SayGoodBye",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HelloHttpServer).SayGoodBye(ctx, req.(*GoodByeHttpRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HelloHttp_SayBinary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BinaryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HelloHttpServer).SayBinary(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/HelloHttp/SayBinary",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HelloHttpServer).SayBinary(ctx, req.(*BinaryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // HelloHttp_ServiceDesc is the grpc.ServiceDesc for HelloHttp service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -180,6 +244,14 @@ var HelloHttp_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SayHello",
 			Handler:    _HelloHttp_SayHello_Handler,
+		},
+		{
+			MethodName: "SayGoodBye",
+			Handler:    _HelloHttp_SayGoodBye_Handler,
+		},
+		{
+			MethodName: "SayBinary",
+			Handler:    _HelloHttp_SayBinary_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

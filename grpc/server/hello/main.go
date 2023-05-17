@@ -9,6 +9,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"regexp"
 	"strings"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -20,6 +21,7 @@ import (
 )
 
 const port = 8081
+const pattern_msgpack = "HELLO" //这里追加使用msgpack协议的URI
 const CTXINFO = "ctx_info"
 
 var MapNode = map[string]string{}
@@ -33,12 +35,34 @@ func NewServer() *Server {
 }
 
 func (s *Server) SayHello(ctx context.Context, req *pb.HelloHttpRequest) (*pb.HelloHttpResponse, error) {
-	u, _ := GetMetaData(ctx)
-	obj := &pb.HelloHttpRequest{}
-	msgpack.Unmarshal(u.N3.Val, obj) //二进制流数据转结构体
 	return &pb.HelloHttpResponse{
-		Name: obj.Name,
-		Age:  obj.Age,
+		Name: req.Name,
+		Age:  req.Age,
+	}, nil
+}
+
+// 使用msgpack协议
+func (s *Server) SayBinary(ctx context.Context, req *pb.BinaryRequest) (*pb.BinaryResponse, error) {
+	var bys []byte
+	if req.Key == "/hello" {
+		resp := &pb.HelloHttpResponse{}
+		// msgpack.Unmarshal(req.Val, resp)
+		resp.Age = 2000
+		resp.Name = "玉皇大帝元始天尊女娲娘娘"
+		bys, _ = msgpack.Marshal(resp)
+	}
+	return &pb.BinaryResponse{
+		Val: bys,
+	}, nil
+}
+
+func (s *Server) SayGoodBye(ctx context.Context, req *pb.GoodByeHttpRequest) (*pb.GoodByeHttpResponse, error) {
+	d, _ := GetMetaData(ctx)
+	obj := &pb.GoodByeHttpRequest{}
+	msgpack.Unmarshal(d.N3.Val, obj)
+	return &pb.GoodByeHttpResponse{
+		Code:  200,
+		Token: obj.Token,
 	}, nil
 }
 
@@ -56,10 +80,12 @@ func main() {
 	pb.RegisterHelloHttpServer(s, &Server{})
 	// 启动gRPC Server
 	go func() {
-		log.Fatalln(s.Serve(lis))
+		if err := s.Serve(lis); err != nil {
+			log.Fatalf("failed to serve: %v", err)
+		}
 	}()
 
-	// 创建一个连接到我们刚刚启动的gRPC服务器的，客户端连接
+	// 创建一个gRPC客户端连接
 	// gRPC-Gateway 就是通过它来代理请求（将HTTP请求转为RPC请求）
 	conn, err := grpc.DialContext(
 		ctx,
@@ -78,14 +104,14 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-	mux.Handle("/", middleware(gwmux))
+	mux.Handle("/", middleware(ctx, gwmux, conn))
 
 	gwServer := &http.Server{
 		Addr: ":8088",
 		// Handler: gwmux,
 		Handler: grpcHandlerFunc(s, mux), // 请求的统一入口
 	}
-	// 8090端口提供gRPC-Gateway服务
+	// 8088端口提供gRPC-Gateway服务
 	log.Println("gw gRPC-Gateway on http://0.0.0.0:8088")
 	log.Fatalln(gwServer.ListenAndServe())
 }
@@ -93,7 +119,7 @@ func main() {
 // 定义一个Root结构体内嵌自定义结构体
 type NodeRoot struct {
 	//这里追加自定义proto===============TODO
-	N3 pb.BinaryData
+	N3 pb.BinaryRequest
 }
 
 func GetNodeRoot() *NodeRoot {
@@ -118,7 +144,6 @@ func SetMetaData() runtime.ServeMuxOption {
 // 获取context metadata 数据
 func GetMetaData(ctx context.Context) (*NodeRoot, error) {
 	md, _ := metadata.FromIncomingContext(ctx)
-	// log.Println("md================", md)
 	nodeRoot := GetNodeRoot()
 	strinfo := md[CTXINFO][0]
 	json.Unmarshal([]byte(strinfo), &nodeRoot)
@@ -126,17 +151,41 @@ func GetMetaData(ctx context.Context) (*NodeRoot, error) {
 }
 
 // 自定义中间件
-func middleware(next http.Handler) http.Handler {
+func middleware(ctx context.Context, next http.Handler, conn *grpc.ClientConn) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		b, err := ioutil.ReadAll(r.Body) //获取二进制流
+		bys, err := ioutil.ReadAll(r.Body) //获取二进制流
 		if err != nil {
 			log.Println("Read failed:", err)
 		}
-		defer r.Body.Close()
+
+		uri := strings.ToUpper(r.RequestURI)
+
+		//1.context请求（方案1）
 		nodes := GetNodeRoot()
-		nodes.N3.Key = r.RequestURI
-		nodes.N3.Val = b
+		nodes.N3.Key = uri
+		nodes.N3.Val = bys
 		MapNodeData(nodes)
+
+		//2.模拟grpc客户端直接发起grpc请求（方案2）
+		re_msgpack := regexp.MustCompile(pattern_msgpack)
+		match_msgpack := re_msgpack.MatchString(uri)
+		if match_msgpack {
+			client := pb.NewHelloHttpClient(conn) //这里改成动态即可 TODO
+			byRequest := &pb.BinaryRequest{
+				Key: r.RequestURI,
+				Val: bys,
+			}
+			resp, err := client.SayBinary(ctx, byRequest)
+			if err != nil {
+				log.Fatalln("err:", err.Error())
+			}
+			v, err := msgpack.Marshal(resp.Val)
+			if err != nil {
+				log.Fatalln("err:", err.Error())
+			}
+			w.Write(v)
+		}
+
 		next.ServeHTTP(w, r)
 	})
 }
