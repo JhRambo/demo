@@ -20,7 +20,8 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-const port = 8081
+const server_port = 8081                //server端口
+const gw_port = 8088                    //gw网关端口
 const pattern_msgpack = "HELLO|GOODBYE" //这里追加使用msgpack协议的URI
 const CTXINFO = "ctx_info"
 
@@ -35,8 +36,6 @@ func NewServer() *Server {
 }
 
 func (s *Server) SayHello(ctx context.Context, req *pb.HelloHttpRequest) (*pb.HelloHttpResponse, error) {
-	d, _ := GetMetaData(ctx)
-	log.Println("d====================", d) //打印了两次 TODO
 	return &pb.HelloHttpResponse{
 		Name: req.Name,
 		Age:  req.Age,
@@ -46,7 +45,7 @@ func (s *Server) SayHello(ctx context.Context, req *pb.HelloHttpRequest) (*pb.He
 // 使用msgpack协议
 func (s *Server) BinaryInfo(ctx context.Context, req *pb.BinaryRequest) (*pb.BinaryResponse, error) {
 	var bys []byte
-	if req.Key == "/hello" {
+	if req.Key == "/HELLO" {
 		r := &pb.HelloHttpRequest{}
 		msgpack.Unmarshal(req.Val, r)
 		resp, _ := s.SayHello(ctx, r) //跳转到指定的服务去执行
@@ -59,7 +58,6 @@ func (s *Server) BinaryInfo(ctx context.Context, req *pb.BinaryRequest) (*pb.Bin
 
 func (s *Server) SayGoodBye(ctx context.Context, req *pb.GoodByeHttpRequest) (*pb.GoodByeHttpResponse, error) {
 	d, _ := GetMetaData(ctx)
-	log.Println("d====================", d) //打印了一次 正常
 	obj := &pb.GoodByeHttpRequest{}
 	msgpack.Unmarshal(d.N3.Val, obj)
 	return &pb.GoodByeHttpResponse{
@@ -71,8 +69,8 @@ func (s *Server) SayGoodBye(ctx context.Context, req *pb.GoodByeHttpRequest) (*p
 // gw server 监听不同端口
 func main() {
 	ctx := context.Background()
-	log.Println(fmt.Sprintf("server 监听%d端口...", port))
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+	log.Println(fmt.Sprintf("server 监听%d端口...", server_port))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", server_port))
 	if err != nil {
 		log.Fatalln("Failed to listen:", err)
 	}
@@ -91,17 +89,16 @@ func main() {
 	// gRPC-Gateway 就是通过它来代理请求（将HTTP请求转为RPC请求）
 	conn, err := grpc.DialContext(
 		ctx,
-		":8081",
+		fmt.Sprintf(":%d", server_port),
 		grpc.WithInsecure(),
 	)
 	if err != nil {
 		log.Fatalln("Failed to dial server:", err)
 	}
 
-	gwmux := runtime.NewServeMux(SetMetaData()) //这里是重点，手动创建的grpc客户端没有这个操作，导致没有往context里塞数据
-	// gwmux := runtime.NewServeMux() //这里是重点，手动创建的grpc客户端没有这个操作，导致没有往context里塞数据
-	// 注册HelloHttp	这里注册了，下面右手动注册了grpc服务，导致binary方法执行了两次 TOOD
-	err = pb.RegisterHelloHttpHandler(ctx, gwmux, conn) //handler
+	gwmux := runtime.NewServeMux(SetMetaData()) //这里是重点，手动创建的grpc客户端没有这个操作，导致没有往context里塞数据，所有手动创建的grpc客户端也需要设置
+	// 注册HelloHttp，这里注册了，下面如果手动注册了grpc服务，导致同一个方法会被执行两次，需要注意
+	err = pb.RegisterHelloHttpHandler(ctx, gwmux, conn)
 	if err != nil {
 		log.Fatalln("Failed to register gateway:", err)
 	}
@@ -110,11 +107,10 @@ func main() {
 	mux.Handle("/", middleware(ctx, gwmux, conn))
 
 	gwServer := &http.Server{
-		Addr: ":8088",
-		// Handler: gwmux,
+		Addr:    fmt.Sprintf(":%d", gw_port),
 		Handler: grpcHandlerFunc(s, mux), // 请求的统一入口
 	}
-	// 8088端口提供gRPC-Gateway服务
+	// 8088端口提供GRPC-Gateway服务
 	log.Println("gw gRPC-Gateway on http://0.0.0.0:8088")
 	log.Fatalln(gwServer.ListenAndServe())
 }
@@ -124,7 +120,7 @@ func middleware(ctx context.Context, next http.Handler, conn *grpc.ClientConn) h
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		bys, err := ioutil.ReadAll(r.Body) //获取二进制流
 		if err != nil {
-			log.Println("Read failed:", err)
+			log.Fatalln("Read failed:", err)
 		}
 		uri := strings.ToUpper(r.RequestURI)
 		re_msgpack := regexp.MustCompile(pattern_msgpack)
@@ -142,7 +138,7 @@ func middleware(ctx context.Context, next http.Handler, conn *grpc.ClientConn) h
 			if uri == "/HELLO" {
 				client := pb.NewHelloHttpClient(conn) //这里改成动态即可 TODO
 				byRequest := &pb.BinaryRequest{
-					Key: r.RequestURI,
+					Key: uri,
 					Val: bys,
 				}
 				ctx := metadata.NewOutgoingContext(ctx, metadata.Pairs(CTXINFO, MapNode[CTXINFO]))
@@ -155,15 +151,11 @@ func middleware(ctx context.Context, next http.Handler, conn *grpc.ClientConn) h
 					log.Fatalln("err2:", err.Error())
 				}
 				w.Write(v)
+				return
 			}
 		}
-
-		next.ServeHTTP(w, r)
+		// next.ServeHTTP(w, r)
 	})
-}
-
-func ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Println("ServeHTTP====================")
 }
 
 // 定义一个Root结构体内嵌自定义结构体

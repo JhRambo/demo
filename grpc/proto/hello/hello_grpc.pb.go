@@ -106,6 +106,7 @@ var HelloDB_ServiceDesc = grpc.ServiceDesc{
 type HelloHttpClient interface {
 	SayHello(ctx context.Context, in *HelloHttpRequest, opts ...grpc.CallOption) (*HelloHttpResponse, error)
 	SayGoodBye(ctx context.Context, in *GoodByeHttpRequest, opts ...grpc.CallOption) (*GoodByeHttpResponse, error)
+	//通用msgpack接口
 	BinaryInfo(ctx context.Context, in *BinaryRequest, opts ...grpc.CallOption) (*BinaryResponse, error)
 }
 
@@ -150,6 +151,7 @@ func (c *helloHttpClient) BinaryInfo(ctx context.Context, in *BinaryRequest, opt
 type HelloHttpServer interface {
 	SayHello(context.Context, *HelloHttpRequest) (*HelloHttpResponse, error)
 	SayGoodBye(context.Context, *GoodByeHttpRequest) (*GoodByeHttpResponse, error)
+	//通用msgpack接口
 	BinaryInfo(context.Context, *BinaryRequest) (*BinaryResponse, error)
 	mustEmbedUnimplementedHelloHttpServer()
 }
