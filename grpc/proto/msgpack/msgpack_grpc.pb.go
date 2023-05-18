@@ -19,7 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MsgpackHttpClient interface {
 	//通用msgpack接口
-	Binary(ctx context.Context, in *MsgpackRequest, opts ...grpc.CallOption) (*MsgpackResponse, error)
+	Binary(ctx context.Context, in *MsgpackHttpRequest, opts ...grpc.CallOption) (*MsgpackHttpResponse, error)
 }
 
 type msgpackHttpClient struct {
@@ -30,8 +30,8 @@ func NewMsgpackHttpClient(cc grpc.ClientConnInterface) MsgpackHttpClient {
 	return &msgpackHttpClient{cc}
 }
 
-func (c *msgpackHttpClient) Binary(ctx context.Context, in *MsgpackRequest, opts ...grpc.CallOption) (*MsgpackResponse, error) {
-	out := new(MsgpackResponse)
+func (c *msgpackHttpClient) Binary(ctx context.Context, in *MsgpackHttpRequest, opts ...grpc.CallOption) (*MsgpackHttpResponse, error) {
+	out := new(MsgpackHttpResponse)
 	err := c.cc.Invoke(ctx, "/MsgpackHttp/Binary", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -44,7 +44,7 @@ func (c *msgpackHttpClient) Binary(ctx context.Context, in *MsgpackRequest, opts
 // for forward compatibility
 type MsgpackHttpServer interface {
 	//通用msgpack接口
-	Binary(context.Context, *MsgpackRequest) (*MsgpackResponse, error)
+	Binary(context.Context, *MsgpackHttpRequest) (*MsgpackHttpResponse, error)
 	mustEmbedUnimplementedMsgpackHttpServer()
 }
 
@@ -52,7 +52,7 @@ type MsgpackHttpServer interface {
 type UnimplementedMsgpackHttpServer struct {
 }
 
-func (UnimplementedMsgpackHttpServer) Binary(context.Context, *MsgpackRequest) (*MsgpackResponse, error) {
+func (UnimplementedMsgpackHttpServer) Binary(context.Context, *MsgpackHttpRequest) (*MsgpackHttpResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Binary not implemented")
 }
 func (UnimplementedMsgpackHttpServer) mustEmbedUnimplementedMsgpackHttpServer() {}
@@ -69,7 +69,7 @@ func RegisterMsgpackHttpServer(s grpc.ServiceRegistrar, srv MsgpackHttpServer) {
 }
 
 func _MsgpackHttp_Binary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgpackRequest)
+	in := new(MsgpackHttpRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func _MsgpackHttp_Binary_Handler(srv interface{}, ctx context.Context, dec func(
 		FullMethod: "/MsgpackHttp/Binary",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgpackHttpServer).Binary(ctx, req.(*MsgpackRequest))
+		return srv.(MsgpackHttpServer).Binary(ctx, req.(*MsgpackHttpRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

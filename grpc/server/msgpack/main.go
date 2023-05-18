@@ -5,7 +5,6 @@ import (
 	pbhello "demo/grpc/proto/hello"
 	pb "demo/grpc/proto/msgpack"
 	svrhello "demo/grpc/server/hello"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -25,9 +24,6 @@ import (
 const server_port = 8081                //server端口
 const gw_port = 8088                    //gw网关端口
 const pattern_msgpack = "HELLO|GOODBYE" //这里追加使用msgpack协议的URI
-const CTXINFO = "ctx_info"
-
-var MapNode = map[string]string{}
 
 type Server struct {
 	pb.UnimplementedMsgpackHttpServer
@@ -38,7 +34,7 @@ func NewServer() *Server {
 }
 
 // 使用msgpack协议
-func (s *Server) Binary(ctx context.Context, req *pb.MsgpackRequest) (*pb.MsgpackResponse, error) {
+func (s *Server) Binary(ctx context.Context, req *pb.MsgpackHttpRequest) (*pb.MsgpackHttpResponse, error) {
 	var bys []byte
 	switch req.Key {
 	case "/HELLO":
@@ -48,7 +44,7 @@ func (s *Server) Binary(ctx context.Context, req *pb.MsgpackRequest) (*pb.Msgpac
 		resp, _ := s.SayHello(ctx, r) //跳转到指定的服务去执行
 		bys, _ = msgpack.Marshal(resp)
 	}
-	return &pb.MsgpackResponse{
+	return &pb.MsgpackHttpResponse{
 		Val: bys,
 	}, nil
 }
@@ -83,8 +79,8 @@ func main() {
 		log.Fatalln("Failed to dial server:", err)
 	}
 
-	gwmux := runtime.NewServeMux(SetMetaData()) //这里是重点，手动创建的grpc客户端没有这个操作，导致没有往context里塞数据，所以手动创建的grpc客户端也需要设置
-	// 注册HelloHttpHandler，这里注册了，下面如果手动注册了grpc客户端，导致同一个方法会被执行两次，需要注意
+	gwmux := runtime.NewServeMux() //这里是重点，手动创建的grpc客户端没有这个操作，导致没有往context里塞数据，所以手动创建的grpc客户端也需要设置
+	// 注册HelloHttpHandler，这里注册了，下面如果手动注册了grpc客户端，导致同一个方法会被执行两次，需要注意，二选一即可
 	err = pb.RegisterMsgpackHttpHandler(ctx, gwmux, conn)
 	if err != nil {
 		log.Fatalln("Failed to register gateway:", err)
@@ -112,71 +108,29 @@ func middleware(ctx context.Context, next http.Handler, conn *grpc.ClientConn) h
 		uri := strings.ToUpper(r.RequestURI)
 		re_msgpack := regexp.MustCompile(pattern_msgpack)
 		match_msgpack := re_msgpack.MatchString(uri)
-
 		if match_msgpack {
-			//1.context请求（方案1）
-			nodes := GetNodeRoot()
-			nodes.N3.Key = uri
-			nodes.N3.Val = bys
-			MapNodeData(nodes)
-
-			//2.模拟grpc客户端直接发起grpc请求（方案2）
+			//模拟grpc客户端直接发起grpc请求（方案2）
 			// 手动注册grpc客户端
 			if uri == "/HELLO" {
-				client := pb.NewMsgpackHttpClient(conn) //这里改成动态即可 TODO
-				byRequest := &pb.MsgpackRequest{
+				client := pb.NewMsgpackHttpClient(conn)
+				byRequest := &pb.MsgpackHttpRequest{
 					Key: uri,
 					Val: bys,
 				}
-				ctx := metadata.NewOutgoingContext(ctx, metadata.Pairs(CTXINFO, MapNode[CTXINFO]))
+				ctx := metadata.NewOutgoingContext(ctx, metadata.Pairs("key", "val"))
 				resp, err := client.Binary(ctx, byRequest)
 				if err != nil {
-					log.Fatalln("err1:", err.Error())
+					w.Write([]byte(err.Error()))
 				}
 				v, err := msgpack.Marshal(resp.Val)
 				if err != nil {
-					log.Fatalln("err2:", err.Error())
+					w.Write([]byte(err.Error()))
 				}
 				w.Write(v)
 				return
 			}
 		}
-		// next.ServeHTTP(w, r)
 	})
-}
-
-// 定义一个Root结构体内嵌自定义结构体
-type NodeRoot struct {
-	//这里追加自定义proto===============TODO
-	N3 pb.MsgpackRequest
-}
-
-func GetNodeRoot() *NodeRoot {
-	return &NodeRoot{}
-}
-
-// 设置自定义key-value
-func MapNodeData(x *NodeRoot) map[string]string {
-	u, _ := json.Marshal(x)
-	MapNode[CTXINFO] = string(u)
-	return MapNode
-}
-
-// 自定义metadata
-func SetMetaData() runtime.ServeMuxOption {
-	return runtime.WithMetadata(func(ctx context.Context, r *http.Request) metadata.MD {
-		md := metadata.Pairs(CTXINFO, MapNode[CTXINFO])
-		return md
-	})
-}
-
-// 获取context metadata 数据
-func GetMetaData(ctx context.Context) (*NodeRoot, error) {
-	md, _ := metadata.FromIncomingContext(ctx)
-	nodeRoot := GetNodeRoot()
-	strinfo := md[CTXINFO][0]
-	json.Unmarshal([]byte(strinfo), &nodeRoot)
-	return nodeRoot, nil
 }
 
 // grpcHandlerFunc 将gRPC请求和HTTP请求分别调用不同的handler处理

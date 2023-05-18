@@ -34,7 +34,7 @@ var _ = descriptor.ForMessage
 var _ = metadata.Join
 
 func request_MsgpackHttp_Binary_0(ctx context.Context, marshaler runtime.Marshaler, client MsgpackHttpClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq MsgpackRequest
+	var protoReq MsgpackHttpRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -51,7 +51,7 @@ func request_MsgpackHttp_Binary_0(ctx context.Context, marshaler runtime.Marshal
 }
 
 func local_request_MsgpackHttp_Binary_0(ctx context.Context, marshaler runtime.Marshaler, server MsgpackHttpServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq MsgpackRequest
+	var protoReq MsgpackHttpRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)

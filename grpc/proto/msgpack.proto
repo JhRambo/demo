@@ -8,7 +8,7 @@ import "google/api/annotations.proto";
 // 对外暴露的http协议的接口的服务 restful风格
 service MsgpackHttp {
   //通用msgpack接口
-  rpc Binary (MsgpackRequest) returns (MsgpackResponse) {
+  rpc Binary (MsgpackHttpRequest) returns (MsgpackHttpResponse) {
     option (google.api.http) = {
       post: "/binary"
       body: "*"
@@ -16,11 +16,11 @@ service MsgpackHttp {
   }
 }
 
-message MsgpackRequest {
+message MsgpackHttpRequest {
   string key = 1;
   bytes val = 2;
 }
 
-message MsgpackResponse {
+message MsgpackHttpResponse {
   bytes val = 1;
 }
