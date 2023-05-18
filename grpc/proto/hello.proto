@@ -10,9 +10,12 @@ service HelloDB {
   rpc SayHello(HelloDBRequest) returns (HelloDBResponse){}
 }
 message HelloDBRequest {
+  string name = 1;
+  int32 age = 2;
 }
 message HelloDBResponse {
   string name = 1;
+  int32 age = 2;
 }
 
 // 对外暴露的http协议的接口的服务 restful风格
@@ -30,7 +33,7 @@ service HelloHttp {
     };
   }
   //通用msgpack接口
-  rpc BinaryInfo (BinaryRequest) returns (BinaryResponse) {
+  rpc Binary (MsgpackRequest) returns (MsgpackResponse) {
     option (google.api.http) = {
       post: "/binary"
       body: "*"
@@ -54,11 +57,11 @@ message GoodByeHttpResponse {
   string token = 2;
 }
 
-message BinaryRequest {
+message MsgpackRequest {
   string key = 1;
   bytes val = 2;
 }
 
-message BinaryResponse {
+message MsgpackResponse {
   bytes val = 1;
 }

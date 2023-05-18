@@ -1,0 +1,26 @@
+// 协议类型
+syntax = "proto3";
+
+option go_package = "./msgpack";
+
+import "google/api/annotations.proto";
+
+// 对外暴露的http协议的接口的服务 restful风格
+service MsgpackHttp {
+  //通用msgpack接口
+  rpc Binary (MsgpackRequest) returns (MsgpackResponse) {
+    option (google.api.http) = {
+      post: "/binary"
+      body: "*"
+    };
+  }
+}
+
+message MsgpackRequest {
+  string key = 1;
+  bytes val = 2;
+}
+
+message MsgpackResponse {
+  bytes val = 1;
+}

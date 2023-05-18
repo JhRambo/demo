@@ -101,8 +101,8 @@ func local_request_HelloHttp_SayGoodBye_0(ctx context.Context, marshaler runtime
 
 }
 
-func request_HelloHttp_BinaryInfo_0(ctx context.Context, marshaler runtime.Marshaler, client HelloHttpClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq BinaryRequest
+func request_HelloHttp_Binary_0(ctx context.Context, marshaler runtime.Marshaler, client HelloHttpClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq MsgpackRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -113,13 +113,13 @@ func request_HelloHttp_BinaryInfo_0(ctx context.Context, marshaler runtime.Marsh
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.BinaryInfo(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.Binary(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
 
-func local_request_HelloHttp_BinaryInfo_0(ctx context.Context, marshaler runtime.Marshaler, server HelloHttpServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq BinaryRequest
+func local_request_HelloHttp_Binary_0(ctx context.Context, marshaler runtime.Marshaler, server HelloHttpServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq MsgpackRequest
 	var metadata runtime.ServerMetadata
 
 	newReader, berr := utilities.IOReaderFactory(req.Body)
@@ -130,7 +130,7 @@ func local_request_HelloHttp_BinaryInfo_0(ctx context.Context, marshaler runtime
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := server.BinaryInfo(ctx, &protoReq)
+	msg, err := server.Binary(ctx, &protoReq)
 	return msg, metadata, err
 
 }
@@ -187,7 +187,7 @@ func RegisterHelloHttpHandlerServer(ctx context.Context, mux *runtime.ServeMux, 
 
 	})
 
-	mux.Handle("POST", pattern_HelloHttp_BinaryInfo_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_HelloHttp_Binary_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -198,7 +198,7 @@ func RegisterHelloHttpHandlerServer(ctx context.Context, mux *runtime.ServeMux, 
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_HelloHttp_BinaryInfo_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_HelloHttp_Binary_0(rctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
@@ -206,7 +206,7 @@ func RegisterHelloHttpHandlerServer(ctx context.Context, mux *runtime.ServeMux, 
 			return
 		}
 
-		forward_HelloHttp_BinaryInfo_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_HelloHttp_Binary_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -291,7 +291,7 @@ func RegisterHelloHttpHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 
 	})
 
-	mux.Handle("POST", pattern_HelloHttp_BinaryInfo_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_HelloHttp_Binary_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -300,14 +300,14 @@ func RegisterHelloHttpHandlerClient(ctx context.Context, mux *runtime.ServeMux, 
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_HelloHttp_BinaryInfo_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_HelloHttp_Binary_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_HelloHttp_BinaryInfo_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_HelloHttp_Binary_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -319,7 +319,7 @@ var (
 
 	pattern_HelloHttp_SayGoodBye_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"goodbye"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_HelloHttp_BinaryInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"binary"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_HelloHttp_Binary_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"binary"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
@@ -327,5 +327,5 @@ var (
 
 	forward_HelloHttp_SayGoodBye_0 = runtime.ForwardResponseMessage
 
-	forward_HelloHttp_BinaryInfo_0 = runtime.ForwardResponseMessage
+	forward_HelloHttp_Binary_0 = runtime.ForwardResponseMessage
 )
