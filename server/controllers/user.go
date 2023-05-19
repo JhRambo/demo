@@ -4,7 +4,6 @@ import (
 	"demo/server/models"
 	"demo/server/tools"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -34,14 +33,11 @@ type Cmd struct {
 */
 func (this *User) GetById(w http.ResponseWriter, r *http.Request) {
 	b, err := ioutil.ReadAll(r.Body)
-	fmt.Println("b===========", b)
 	if err != nil {
 		log.Println("Read failed:", err)
 	}
-	defer r.Body.Close()
 	cmd := &Cmd{}
 	err = msgpack.Unmarshal(b, cmd)
-	fmt.Println("cmd===========", cmd)
 	if err != nil {
 		log.Println("json format error:", err)
 	}

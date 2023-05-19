@@ -1,74 +1,27 @@
 package main
 
-import (
-	"fmt"
-	"io/ioutil"
+type S struct{}
 
-	"github.com/vmihailenco/msgpack/v5"
-)
-
-type Person struct {
-	Id       int    `json:"id"`
-	Name     string `json:"name"`
-	Phone    string `json:"phone"`
-	Password string `json:"password"`
-	Age      int    `json:"age"`
-	Sex      string `json:"sex"`
+// 定义A接口包含两个方法
+// f1 f2 两个方法属于 S 这个结构体的
+type A interface {
+	f1() string
+	f2() string
 }
 
-func writeMsg(filename string) (err error) {
-	var persons []*Person
-	for i := 0; i < 20; i++ {
-		p := &Person{
-			Id:   i + 1,
-			Name: fmt.Sprintf("msgpack_%d", i),
-			Age:  i,
-			Sex:  "male",
-		}
-		persons = append(persons, p)
-	}
-	data, err := msgpack.Marshal(persons)
-	fmt.Printf("%#v\n", data)
-	if err != nil {
-		fmt.Printf("Marshal failed err:%v\n", err)
-		return
-	}
-	err = ioutil.WriteFile(filename, data, 0755)
-	if err != nil {
-		fmt.Printf("WriteFile failed err:%v\n", err)
-	}
-	return
+func (S) f1() string {
+	return "f1"
 }
 
-func readMsg(filename string) (err error) {
-	var persons []*Person
-	data, err := ioutil.ReadFile(filename)
-	if err != nil {
-		fmt.Printf("ReadFile failed err:%v\n", err)
-		return
-	}
-	err = msgpack.Unmarshal(data, &persons)
-	if err != nil {
-		fmt.Printf("Unmarshal failed err:%v\n", err)
-		return
-	}
-	for _, v := range persons {
-		fmt.Printf("%#v\n", v)
-	}
-	return
+func (S) f2() string {
+	return "f2"
+}
+
+// 这里返回接口A，但实际上返回了S这个结构体
+func ff() A {
+	return &S{}
 }
 
 func main() {
-	/*
-	   二进制json协议
-	   优点：
-	       性能更快
-	       更省空间
-	   缺点：
-	       可读性差
-	   用于API通信
-	*/
-	filename := "D:/code/demo/doc/msgpack.txt"
-	writeMsg(filename)
-	readMsg(filename)
+
 }

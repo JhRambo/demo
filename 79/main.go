@@ -77,7 +77,6 @@ func fu1() error {
 		ch <- true
 		return nil
 	})
-
 	//锁续期
 	g.Go(func() error {
 		ticker := time.NewTicker(time.Second * 1)

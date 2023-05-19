@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 )
 
 const CTX = "ctx"
@@ -54,5 +54,5 @@ func main() {
 	nodes := GetNodes() //返回空结构体
 	strinfo := MapNode[CTX]
 	json.Unmarshal([]byte(strinfo), nodes)
-	fmt.Printf("%#v\n", nodes)
+	log.Printf("%#v\n", nodes)
 }
