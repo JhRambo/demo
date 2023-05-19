@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 )
 
 func main() {
@@ -26,9 +27,11 @@ func readNum(ch chan int) {
 	for {
 		if num, ok := <-ch; !ok {
 			fmt.Println("Channel is closed") //管道关闭时输出
-			return
+			break
 		} else {
 			fmt.Println("num：", num)
 		}
 	}
+	a := "golang"
+	log.Println("a=", a)
 }

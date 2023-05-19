@@ -1,0 +1,25 @@
+// 协议类型
+syntax = "proto3";
+
+option go_package = "./file";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+// 对外暴露的http协议的接口的服务 restful风格
+service FileHttp {
+  rpc UploadFile (stream FileChunk) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+        post: "/uploadfile"
+        body: "*"
+    };
+  }
+}
+
+message FileChunk {
+  // 文件二进制数据
+  bytes data = 1;
+}
+
+message FileChunkResponse {
+}
