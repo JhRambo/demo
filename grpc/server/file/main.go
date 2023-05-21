@@ -1,17 +1,13 @@
 package main
 
 import (
-	"bytes"
-	"compress/zlib"
 	"context"
 	pb "demo/grpc/proto/file"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
-	"regexp"
 	"strings"
 
 	"github.com/golang/protobuf/ptypes/empty"
@@ -38,6 +34,7 @@ func (s *Server) UploadFile(stream pb.FileHttp_UploadFileServer) error {
 	for {
 		// 从客户端流中接收数据
 		chunk, err := stream.Recv()
+		log.Println("chunk============", chunk)
 		if err == io.EOF { //数据传输结束
 			stream.SendAndClose(&empty.Empty{})
 			break
@@ -48,55 +45,15 @@ func (s *Server) UploadFile(stream pb.FileHttp_UploadFileServer) error {
 		}
 		fileData = append(fileData, chunk.Data...)
 	}
-	errorMsg := ""
-	stackMsg := ""
-	// 创建 zlib 解压缩器
-	zlibReader, err := zlib.NewReader(bytes.NewReader(fileData))
-	if err != nil {
-		return err
-	}
-	defer zlibReader.Close()
-
-	// 创建一个正则表达式，用于匹配 <ErrorMessage></ErrorMessage> 中的值
-	errorMessageRegex := regexp.MustCompile(`<ErrorMessage>(.*?)</ErrorMessage>`)
-	stackMessageRegex := regexp.MustCompile(`<CallStack>([\s\S]*?)</CallStack>`)
-	uncompressedData, err := ioutil.ReadAll(zlibReader)
-	if err != nil {
-		return err
-	}
-	uncompressedString := string(uncompressedData)
-	matches := errorMessageRegex.FindAllStringSubmatch(uncompressedString, -1)
-	for _, match := range matches {
-		if len(match) > 1 {
-			errorMsg = match[1]
-		}
-	}
-	matches1 := stackMessageRegex.FindAllStringSubmatch(uncompressedString, -1)
-	for _, match := range matches1 {
-		if len(match) > 1 {
-			if strings.Contains(match[1], "UMyGameInstance::Shutdown()") {
-				stackMsg = match[1]
-			}
-		}
-	}
-	if errorMsg != "" {
-		errorMsg = "<ErrorMessage>" + errorMsg + "</ErrorMessage>"
-	}
-	if stackMsg != "" {
-		stackMsg = "<CallStack>" + stackMsg + "</CallStack>"
-	}
-	result := errorMsg
-	if stackMsg != "" {
-		result = result + "\n" + stackMsg
-	}
-	log.Println("result:", result)
+	log.Println("fileData====================", fileData)
 	return nil
 }
 
 // gw server 监听不同端口
 func main() {
 	ctx := context.Background()
-
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 	log.Println("GRPC-SERVER on http://0.0.0.0:8081")
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", server_port))
 	if err != nil {
@@ -105,14 +62,13 @@ func main() {
 	// 创建一个gRPC server对象
 	s := grpc.NewServer()
 	// 注册service到server
-	pb.RegisterFileHttpServer(s, &Server{})
+	pb.RegisterFileHttpServer(s, NewServer())
 	// 启动gRPC Server
 	go func() {
 		if err := s.Serve(lis); err != nil {
 			log.Fatalf("failed to serve: %v", err)
 		}
 	}()
-
 	// 创建一个gRPC客户端连接
 	// gRPC-Gateway 就是通过它来代理请求（将HTTP请求转为RPC请求）
 	conn, err := grpc.DialContext(
@@ -131,6 +87,7 @@ func main() {
 		log.Fatalln("Failed to register gateway:", err)
 	}
 
+	//自定义中间件
 	mux := http.NewServeMux()
 	mux.Handle("/", middleware(ctx, gwmux, conn))
 
@@ -164,6 +121,7 @@ func middleware(ctx context.Context, next http.Handler, conn *grpc.ClientConn) h
 		// // 结束客户端流，等待服务端响应
 		// stream.CloseAndRecv()
 		// return
+
 		next.ServeHTTP(w, r)
 	})
 }

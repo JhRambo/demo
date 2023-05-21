@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+option go_package = "./stream";
+
+// import "google/api/annotations.proto";
+
+// service ExampleService {
+//   rpc ProcessBinaryData(stream BytesInput) returns (BytesOutput) {
+//     option (google.api.http) = {
+//       post: "/uploadfile"
+//       body: "*"
+//     };
+//   }
+// }
+
+service ExampleService {
+  rpc ProcessBinaryData (stream BytesInput) returns (BytesOutput);
+}
+
+message BytesInput {
+  bytes data = 1;
+}
+
+message BytesOutput {
+  bytes data = 1;
+}
