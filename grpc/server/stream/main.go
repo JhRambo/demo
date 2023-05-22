@@ -2,107 +2,149 @@ package main
 
 import (
 	"context"
-	"encoding/base64"
-	"fmt"
-	"net/http"
-
 	pb "demo/grpc/proto/stream"
+	"fmt"
+	"io"
+	"io/ioutil"
+	"log"
+	"net"
+	"net/http"
+	"strings"
 
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
 )
 
-// 定义gRPC服务中的输入和输出结构体
-type BytesInput struct {
-	Data []byte `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+const server_port = 8081 //server端口
+const gw_port = 8088     //gw网关端口
+
+type Server struct {
+	pb.UnimplementedStreamHttpServer
 }
 
-type BytesOutput struct {
-	Data []byte `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+func NewServer() *Server {
+	return &Server{}
 }
 
-// 实现gRPC服务
-type myServer struct {
-	pb.UnimplementedExampleServiceServer
-}
-
-func (s *myServer) ProcessBinaryData(stream pb.ExampleService_ProcessBinaryDataServer) error {
-	// 从流中读取输入数据
-	var input BytesInput
+// gRPC ClientStream 的使用
+func (s *Server) UploadFile(stream pb.StreamHttp_UploadFileServer) error {
+	ctx := context.TODO()
+	c := make(chan error, 1)
+	var fileData []byte
 	for {
-		if err := stream.RecvMsg(&input); err != nil {
-			return err
+		select {
+		case <-ctx.Done():
+			<-c
+			return ctx.Err() // 处理上下文取消信号
+		case err := <-c:
+			log.Println(err)
+		default:
+			// 从客户端流中接收数据
+			// grpc客户端没有发送数据这里接收不到==================================================
+			chunk, err := stream.Recv()
+			log.Fatalln(chunk)
+			c <- err
+			log.Println(grpc.ErrorDesc(err)) //context canceled
+			log.Println(err)                 //rpc error: code = Canceled desc = context canceled
+			if err == io.EOF {
+				stream.SendAndClose(&empty.Empty{})
+				break
+			}
+			if err != nil {
+				return err
+			}
+			fileData = append(fileData, chunk.Data...)
 		}
-		// 处理输入数据，并生成输出数据
-		output := processBinaryData(input)
-		// 将输出数据写回流中
-		if err := stream.SendMsg(&output); err != nil {
-			return err
-		}
 	}
+	// return nil
 }
 
-func processBinaryData(input BytesInput) BytesOutput {
-	// 处理输入数据，这里我们简单地将输入数据拼接起来作为输出数据
-	return BytesOutput{Data: append([]byte("Processed: "), input.Data...)}
-}
-
-// 实现HTTP服务，对应的gRPC服务是myServer
-func startHTTPServer() error {
-	ctx := context.Background()
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	mux := runtime.NewServeMux()
-	opts := []grpc.DialOption{grpc.WithInsecure()}
-
-	err := pb.RegisterExampleServiceHandlerFromEndpoint(ctx, mux, "localhost:8081", opts)
-	if err != nil {
-		return err
-	}
-
-	http.ListenAndServe(":8088", mux)
-	return nil
-}
-
-// 发送HTTP请求
-func sendHTTPRequest(data []byte) ([]byte, error) {
-	// 将输入数据编码为base64字符串
-	inputStr := base64.StdEncoding.EncodeToString(data)
-	// 创建HTTP请求对象
-	req, err := http.NewRequest("POST", "http://localhost:8088/example/ProcessBinaryData", nil)
-	if err != nil {
-		return nil, err
-	}
-	// 添加自定义HTTP头部，包含base64编码的输入数据
-	md := metadata.Pairs("x-input-data", inputStr)
-	ctx := metadata.NewOutgoingContext(context.Background(), md)
-	// 发送HTTP请求
-	resp, err := http.DefaultClient.Do(req.WithContext(ctx))
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	// 从响应中读取并解码输出数据
-	outputStr := resp.Header.Get("x-output-data")
-	outputData, err := base64.StdEncoding.DecodeString(outputStr)
-	if err != nil {
-		return nil, err
-	}
-	return outputData, nil
-}
-
+// gw server 监听不同端口
 func main() {
-	// 启动HTTP服务
-	go startHTTPServer()
-
-	// 发送HTTP请求，并处理输出数据
-	inputData := []byte("Hello, world!")
-	outputData, err := sendHTTPRequest(inputData)
+	ctx := context.Background()
+	log.Println("GRPC-SERVER on http://0.0.0.0:8081")
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", server_port))
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatalln("Failed to listen:", err)
 	}
-	fmt.Printf("Output data: %s\n", string(outputData))
+	// 创建一个gRPC server对象
+	s := grpc.NewServer()
+	// 注册service到server
+	pb.RegisterStreamHttpServer(s, NewServer())
+	// 启动gRPC Server
+	go func() {
+		if err := s.Serve(lis); err != nil {
+			log.Fatalf("failed to serve: %v", err)
+		}
+	}()
+	// 创建一个gRPC客户端连接
+	// gRPC-Gateway 就是通过它来代理请求（将HTTP请求转为RPC请求）
+	conn, err := grpc.DialContext(
+		ctx,
+		fmt.Sprintf(":%d", server_port),
+		grpc.WithInsecure(),
+	)
+	if err != nil {
+		log.Fatalln("Failed to dial server:", err)
+	}
+
+	// m := &runtime.JSONPb{} //定义以哪种数据格式返回给客户端	默认json格式
+	// m := &runtime.ProtoMarshaller{} //二进制流格式返回
+	// gwmux := runtime.NewServeMux(runtime.WithMarshalerOption(runtime.MIMEWildcard, m))
+	gwmux := runtime.NewServeMux()
+
+	// 注册HelloHttpHandler
+	err = pb.RegisterStreamHttpHandler(ctx, gwmux, conn)
+	if err != nil {
+		log.Fatalln("Failed to register gateway:", err)
+	}
+
+	//自定义中间件
+	mux := http.NewServeMux()
+	mux.Handle("/", middleware(ctx, gwmux, conn))
+
+	gwServer := &http.Server{
+		Addr:    fmt.Sprintf(":%d", gw_port),
+		Handler: grpcHandlerFunc(s, mux), // 请求的统一入口
+	}
+	// 8088端口提供GRPC-Gateway服务
+	log.Println("GRPC-GATEWAY on http://0.0.0.0:8088")
+	log.Fatalln(gwServer.ListenAndServe())
+}
+
+// 自定义中间件
+func middleware(ctx context.Context, next http.Handler, conn *grpc.ClientConn) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		bys, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			log.Fatalln("Read failed:", err)
+		}
+		sendBinaryData(ctx, conn, bys)
+		next.ServeHTTP(w, r)
+	})
+}
+
+func sendBinaryData(ctx context.Context, conn *grpc.ClientConn, data []byte) error {
+	client := pb.NewStreamHttpClient(conn)
+	// 初始化客户端流对象
+	stream, err := client.UploadFile(ctx)
+	// 发送客户端数据流
+	stream.Send(&pb.FileChunk{
+		Data: data,
+	})
+	return err
+}
+
+// grpcHandlerFunc 将gRPC请求和HTTP请求分别调用不同的handler处理
+func grpcHandlerFunc(grpcServer *grpc.Server, otherHandler http.Handler) http.Handler {
+	return h2c.NewHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.ProtoMajor == 2 && strings.Contains(r.Header.Get("Content-Type"), "application/grpc") {
+			grpcServer.ServeHTTP(w, r)
+		} else {
+			otherHandler.ServeHTTP(w, r)
+		}
+	}), &http2.Server{})
 }

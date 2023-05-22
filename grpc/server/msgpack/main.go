@@ -21,9 +21,9 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-const server_port = 8081        //server端口
-const gw_port = 8088            //gw网关端口
-const pattern_msgpack = "HELLO" //这里追加使用msgpack协议的URI
+const server_port = 8081                //server端口
+const gw_port = 8088                    //gw网关端口
+const pattern_msgpack = "HELLO|GOODBYE" //这里追加使用msgpack协议的URI
 
 type Server struct {
 	pb.UnimplementedMsgpackHttpServer
@@ -52,7 +52,7 @@ func (s *Server) Binary(ctx context.Context, req *pb.MsgpackHttpRequest) (*pb.Ms
 // gw server 监听不同端口
 func main() {
 	ctx := context.Background()
-	log.Println("GRPC-SERVER on http://0.0.0.0:8081")
+	log.Println("server gRPC-Gateway on http://0.0.0.0:8081")
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", server_port))
 	if err != nil {
 		log.Fatalln("Failed to listen:", err)
@@ -94,7 +94,7 @@ func main() {
 		Handler: grpcHandlerFunc(s, mux), // 请求的统一入口
 	}
 	// 8088端口提供GRPC-Gateway服务
-	log.Println("GRPC-GATEWAY on http://0.0.0.0:8088")
+	log.Println("gw gRPC-Gateway on http://0.0.0.0:8088")
 	log.Fatalln(gwServer.ListenAndServe())
 }
 
@@ -109,7 +109,7 @@ func middleware(ctx context.Context, next http.Handler, conn *grpc.ClientConn) h
 		re_msgpack := regexp.MustCompile(pattern_msgpack)
 		match_msgpack := re_msgpack.MatchString(uri)
 		if match_msgpack {
-			// 模拟grpc客户端直接发起grpc请求
+			//模拟grpc客户端直接发起grpc请求（方案2）
 			// 手动注册grpc客户端
 			if uri == "/HELLO" {
 				client := pb.NewMsgpackHttpClient(conn)

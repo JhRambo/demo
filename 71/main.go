@@ -3,13 +3,17 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
+
+	"google.golang.org/grpc"
 )
 
 func Monitor(ctx context.Context) {
 	select {
 	case <-ctx.Done():
-		fmt.Println(ctx.Err()) //context deadline exceeded
+		log.Println(grpc.ErrorDesc(ctx.Err())) //context canceled
+		// fmt.Println(ctx.Err()) //context deadline exceeded
 	case <-time.After(2 * time.Second):
 		fmt.Println("stop monitor")
 	}

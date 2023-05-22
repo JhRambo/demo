@@ -13,14 +13,15 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/grpc-ecosystem/grpc-gateway/v2/utilities"
+	"github.com/golang/protobuf/descriptor"
+	"github.com/golang/protobuf/proto"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/utilities"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/proto"
 )
 
 // Suppress "imported and not used" errors
@@ -29,18 +30,19 @@ var _ io.Reader
 var _ status.Status
 var _ = runtime.String
 var _ = utilities.NewDoubleArray
+var _ = descriptor.ForMessage
 var _ = metadata.Join
 
-func request_ExampleService_ProcessBinaryData_0(ctx context.Context, marshaler runtime.Marshaler, client ExampleServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_StreamHttp_UploadFile_0(ctx context.Context, marshaler runtime.Marshaler, client StreamHttpClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var metadata runtime.ServerMetadata
-	stream, err := client.ProcessBinaryData(ctx)
+	stream, err := client.UploadFile(ctx)
 	if err != nil {
 		grpclog.Infof("Failed to start streaming: %v", err)
 		return nil, metadata, err
 	}
 	dec := marshaler.NewDecoder(req.Body)
 	for {
-		var protoReq BytesInput
+		var protoReq FileChunk
 		err = dec.Decode(&protoReq)
 		if err == io.EOF {
 			break
@@ -75,13 +77,13 @@ func request_ExampleService_ProcessBinaryData_0(ctx context.Context, marshaler r
 
 }
 
-// RegisterExampleServiceHandlerServer registers the http handlers for service ExampleService to "mux".
-// UnaryRPC     :call ExampleServiceServer directly.
+// RegisterStreamHttpHandlerServer registers the http handlers for service StreamHttp to "mux".
+// UnaryRPC     :call StreamHttpServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
-// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterExampleServiceHandlerFromEndpoint instead.
-func RegisterExampleServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server ExampleServiceServer) error {
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterStreamHttpHandlerFromEndpoint instead.
+func RegisterStreamHttpHandlerServer(ctx context.Context, mux *runtime.ServeMux, server StreamHttpServer) error {
 
-	mux.Handle("POST", pattern_ExampleService_ProcessBinaryData_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_StreamHttp_UploadFile_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		err := status.Error(codes.Unimplemented, "streaming calls are not yet supported in the in-process transport")
 		_, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -91,10 +93,10 @@ func RegisterExampleServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 	return nil
 }
 
-// RegisterExampleServiceHandlerFromEndpoint is same as RegisterExampleServiceHandler but
+// RegisterStreamHttpHandlerFromEndpoint is same as RegisterStreamHttpHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
-func RegisterExampleServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
-	conn, err := grpc.DialContext(ctx, endpoint, opts...)
+func RegisterStreamHttpHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+	conn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {
 		return err
 	}
@@ -113,41 +115,39 @@ func RegisterExampleServiceHandlerFromEndpoint(ctx context.Context, mux *runtime
 		}()
 	}()
 
-	return RegisterExampleServiceHandler(ctx, mux, conn)
+	return RegisterStreamHttpHandler(ctx, mux, conn)
 }
 
-// RegisterExampleServiceHandler registers the http handlers for service ExampleService to "mux".
+// RegisterStreamHttpHandler registers the http handlers for service StreamHttp to "mux".
 // The handlers forward requests to the grpc endpoint over "conn".
-func RegisterExampleServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	return RegisterExampleServiceHandlerClient(ctx, mux, NewExampleServiceClient(conn))
+func RegisterStreamHttpHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterStreamHttpHandlerClient(ctx, mux, NewStreamHttpClient(conn))
 }
 
-// RegisterExampleServiceHandlerClient registers the http handlers for service ExampleService
-// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "ExampleServiceClient".
-// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "ExampleServiceClient"
+// RegisterStreamHttpHandlerClient registers the http handlers for service StreamHttp
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "StreamHttpClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "StreamHttpClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "ExampleServiceClient" to call the correct interceptors.
-func RegisterExampleServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client ExampleServiceClient) error {
+// "StreamHttpClient" to call the correct interceptors.
+func RegisterStreamHttpHandlerClient(ctx context.Context, mux *runtime.ServeMux, client StreamHttpClient) error {
 
-	mux.Handle("POST", pattern_ExampleService_ProcessBinaryData_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_StreamHttp_UploadFile_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		var err error
-		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/.ExampleService/ProcessBinaryData", runtime.WithHTTPPathPattern("/uploadfile"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ExampleService_ProcessBinaryData_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		resp, md, err := request_StreamHttp_UploadFile_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ExampleService_ProcessBinaryData_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_StreamHttp_UploadFile_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -155,9 +155,9 @@ func RegisterExampleServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 }
 
 var (
-	pattern_ExampleService_ProcessBinaryData_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"uploadfile"}, ""))
+	pattern_StreamHttp_UploadFile_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"uploadfile"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
-	forward_ExampleService_ProcessBinaryData_0 = runtime.ForwardResponseMessage
+	forward_StreamHttp_UploadFile_0 = runtime.ForwardResponseMessage
 )
