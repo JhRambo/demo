@@ -4,15 +4,13 @@ import (
 	"context"
 	pb "demo/grpc/proto/stream"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
 	"strings"
 
-	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 	"google.golang.org/grpc"
@@ -30,36 +28,11 @@ func NewServer() *Server {
 }
 
 // gRPC ClientStream 的使用
-func (s *Server) UploadFile(stream pb.StreamHttp_UploadFileServer) error {
-	ctx := context.TODO()
-	c := make(chan error, 1)
-	var fileData []byte
-	for {
-		select {
-		case <-ctx.Done():
-			<-c
-			return ctx.Err() // 处理上下文取消信号
-		case err := <-c:
-			log.Println(err)
-		default:
-			// 从客户端流中接收数据
-			// grpc客户端没有发送数据这里接收不到==================================================
-			chunk, err := stream.Recv()
-			log.Fatalln(chunk)
-			c <- err
-			log.Println(grpc.ErrorDesc(err)) //context canceled
-			log.Println(err)                 //rpc error: code = Canceled desc = context canceled
-			if err == io.EOF {
-				stream.SendAndClose(&empty.Empty{})
-				break
-			}
-			if err != nil {
-				return err
-			}
-			fileData = append(fileData, chunk.Data...)
-		}
+func (s *Server) UploadFile(ctx context.Context, req *pb.FileChunk) (*pb.FileChunk, error) {
+	resp := &pb.FileChunk{
+		Data: req.Data,
 	}
-	// return nil
+	return resp, nil
 }
 
 // gw server 监听不同端口
@@ -92,9 +65,9 @@ func main() {
 	}
 
 	// m := &runtime.JSONPb{} //定义以哪种数据格式返回给客户端	默认json格式
-	// m := &runtime.ProtoMarshaller{} //二进制流格式返回
-	// gwmux := runtime.NewServeMux(runtime.WithMarshalerOption(runtime.MIMEWildcard, m))
-	gwmux := runtime.NewServeMux()
+	m := &runtime.ProtoMarshaller{} //二进制流格式返回
+	gwmux := runtime.NewServeMux(runtime.WithMarshalerOption(runtime.MIMEWildcard, m))
+	// gwmux := runtime.NewServeMux()
 
 	// 注册HelloHttpHandler
 	err = pb.RegisterStreamHttpHandler(ctx, gwmux, conn)
@@ -127,15 +100,16 @@ func middleware(ctx context.Context, next http.Handler, conn *grpc.ClientConn) h
 	})
 }
 
-func sendBinaryData(ctx context.Context, conn *grpc.ClientConn, data []byte) error {
+func sendBinaryData(ctx context.Context, conn *grpc.ClientConn, bys []byte) (*pb.FileChunk, error) {
 	client := pb.NewStreamHttpClient(conn)
 	// 初始化客户端流对象
-	stream, err := client.UploadFile(ctx)
+	req := &pb.FileChunk{
+		Data: bys,
+	}
+	resp, err := client.UploadFile(ctx, req)
+	log.Println("client============", resp)
 	// 发送客户端数据流
-	stream.Send(&pb.FileChunk{
-		Data: data,
-	})
-	return err
+	return resp, err
 }
 
 // grpcHandlerFunc 将gRPC请求和HTTP请求分别调用不同的handler处理

@@ -4,11 +4,10 @@ syntax = "proto3";
 option go_package = "./stream";
 
 import "google/api/annotations.proto";
-import "google/protobuf/empty.proto";
 
 // 对外暴露的http协议的接口的服务 restful风格
 service StreamHttp {
-  rpc UploadFile (stream FileChunk) returns (google.protobuf.Empty) {
+  rpc UploadFile (FileChunk) returns (FileChunk) {
     option (google.api.http) = {
         post: "/uploadfile"
         body: "*"

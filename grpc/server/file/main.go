@@ -5,12 +5,10 @@ import (
 	pb "demo/grpc/proto/file"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -80,9 +78,6 @@ func main() {
 
 	gwmux := runtime.NewServeMux()
 	// 注册HelloHttpHandler
-	// ctx2, c := context.WithTimeout(ctx, 10*time.Second) //n秒后超时
-	// defer c()
-	// var sss grpc.ServerStream
 	err = pb.RegisterFileHttpHandler(ctx, gwmux, conn)
 	if err != nil {
 		log.Fatalln("Failed to register gateway:", err)
@@ -105,23 +100,23 @@ func main() {
 // 自定义中间件
 func middleware(ctx context.Context, next http.Handler, conn *grpc.ClientConn) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		bys, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			log.Fatalln("Read failed:", err)
-		}
-		client := pb.NewFileHttpClient(conn)
-		// 因为grpc客户端取消了上下文，主要还是因为客户端没有发送数据，导致的================================================
-		// ctx, cancel := context.WithTimeout(ctx, 1*time.Nanosecond)
-		ctx, cancel := context.WithTimeout(ctx, 1*time.Second) //n秒后超时
-		defer cancel()                                         //客户端主动取消
-		stream, err := client.UploadFile(ctx)
-		if err != nil {
-			w.Write([]byte(err.Error()))
-			return
-		}
-		sendBinaryData(stream, bys)
-		return
-		// next.ServeHTTP(w, r)
+		// bys, err := ioutil.ReadAll(r.Body)
+		// if err != nil {
+		// 	log.Fatalln("Read failed:", err)
+		// }
+		// client := pb.NewFileHttpClient(conn)
+		// // 因为grpc客户端取消了上下文，主要还是因为客户端没有发送数据，导致的================================================
+		// // ctx, cancel := context.WithTimeout(ctx, 1*time.Nanosecond)
+		// ctx, cancel := context.WithTimeout(ctx, 1*time.Second) //n秒后超时
+		// defer cancel()                                         //客户端主动取消
+		// stream, err := client.UploadFile(ctx)
+		// if err != nil {
+		// 	w.Write([]byte(err.Error()))
+		// 	return
+		// }
+		// sendBinaryData(stream, bys)
+		// return
+		next.ServeHTTP(w, r)
 	})
 }
 

@@ -46,7 +46,7 @@ func main() {
 	// 创建一个gRPC server对象
 	s := grpc.NewServer()
 	// 注册StudyHttp服务到server层
-	pb.RegisterStudyHttpServer(s, &Server{})
+	pb.RegisterStudyHttpServer(s, NewServer())
 
 	gwmux := runtime.NewServeMux()
 	dops := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
