@@ -3,7 +3,6 @@ package main
 import (
 	pb "demo/grpc/proto/school"
 	"fmt"
-	"log"
 )
 
 func main() {
@@ -17,7 +16,6 @@ func main() {
 			Age:  int32(i),
 			Sex:  sex,
 		}
-		log.Println("==============", student)
 		students = append(students, student)
 	}
 	//创建班级信息

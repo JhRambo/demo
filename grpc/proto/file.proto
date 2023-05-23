@@ -20,6 +20,3 @@ message FileChunk {
   // 文件二进制数据
   bytes data = 1;
 }
-
-message FileChunkResponse {
-}

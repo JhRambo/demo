@@ -5,6 +5,7 @@ import (
 	pb "demo/grpc/proto/file"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -39,11 +40,11 @@ func (s *Server) UploadFile(stream pb.FileHttp_UploadFileServer) error {
 			break
 		}
 		if err != nil {
-			log.Println("err==============", err)
 			return err
 		}
 		fileData = append(fileData, chunk.Data...)
 	}
+	log.Println("fileData============", fileData)
 	return nil
 }
 
@@ -76,8 +77,11 @@ func main() {
 		log.Fatalln("Failed to dial server:", err)
 	}
 
-	gwmux := runtime.NewServeMux()
-	// 注册HelloHttpHandler
+	m := &runtime.JSONPb{} //定义以哪种数据格式返回给客户端	默认json格式
+	// m := &runtime.ProtoMarshaller{} //二进制流格式返回
+	gwmux := runtime.NewServeMux(runtime.WithMarshalerOption(runtime.MIMEWildcard, m))
+
+	// 自动注册grpc客户端，并与grpc服务端通信
 	err = pb.RegisterFileHttpHandler(ctx, gwmux, conn)
 	if err != nil {
 		log.Fatalln("Failed to register gateway:", err)
@@ -85,8 +89,8 @@ func main() {
 
 	//自定义中间件
 	mux := http.NewServeMux()
-	// mux.Handle("/", middleware(ctx, gwmux, conn))
-	mux.Handle("/", gwmux)
+	mux.Handle("/", middleware(ctx, gwmux, conn))
+	// mux.Handle("/", gwmux)
 
 	gwServer := &http.Server{
 		Addr:    fmt.Sprintf(":%d", gw_port),
@@ -100,39 +104,38 @@ func main() {
 // 自定义中间件
 func middleware(ctx context.Context, next http.Handler, conn *grpc.ClientConn) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// bys, err := ioutil.ReadAll(r.Body)
-		// if err != nil {
-		// 	log.Fatalln("Read failed:", err)
-		// }
-		// client := pb.NewFileHttpClient(conn)
-		// // 因为grpc客户端取消了上下文，主要还是因为客户端没有发送数据，导致的================================================
-		// // ctx, cancel := context.WithTimeout(ctx, 1*time.Nanosecond)
-		// ctx, cancel := context.WithTimeout(ctx, 1*time.Second) //n秒后超时
-		// defer cancel()                                         //客户端主动取消
-		// stream, err := client.UploadFile(ctx)
-		// if err != nil {
-		// 	w.Write([]byte(err.Error()))
-		// 	return
-		// }
-		// sendBinaryData(stream, bys)
-		// return
-		next.ServeHTTP(w, r)
+		bys, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			w.Write([]byte(err.Error()))
+			return
+		}
+		// 手动创建grpc客户端
+		client := pb.NewFileHttpClient(conn)
+		stream, err := client.UploadFile(ctx)
+		if err != nil {
+			w.Write([]byte(err.Error()))
+			return
+		}
+		sendBinaryData(stream, bys, w, r)
+		return
+		// next.ServeHTTP(w, r)
 	})
 }
 
 // grpc客户端发送二进制流数据
-func sendBinaryData(stream pb.FileHttp_UploadFileClient, bys []byte) error {
-	// req := &pb.FileChunk{Data: bys}
-	// err := stream.Send(req)
-	// if err != nil {
-	// 	return err
-	// }
-	// // 关闭流
-	// _, err = stream.CloseAndRecv()
-	// if err != nil {
-	// 	return err
-	// }
-	return nil
+func sendBinaryData(stream pb.FileHttp_UploadFileClient, bys []byte, w http.ResponseWriter, r *http.Request) {
+	req := &pb.FileChunk{Data: bys}
+	err := stream.Send(req)
+	if err != nil {
+		w.Write([]byte(err.Error()))
+		return
+	}
+	// 关闭流
+	_, err = stream.CloseAndRecv()
+	if err != nil {
+		w.Write([]byte(err.Error()))
+		return
+	}
 }
 
 // grpcHandlerFunc 将gRPC请求和HTTP请求分别调用不同的handler处理

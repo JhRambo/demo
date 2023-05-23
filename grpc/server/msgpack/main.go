@@ -79,7 +79,7 @@ func main() {
 		log.Fatalln("Failed to dial server:", err)
 	}
 
-	gwmux := runtime.NewServeMux() //这里是重点，手动创建的grpc客户端没有这个操作，导致没有往context里塞数据，所以手动创建的grpc客户端也需要设置
+	gwmux := runtime.NewServeMux() //这里是重点，手动创建的grpc客户端没有这个操作，导致没有往metadata context里塞数据，所以手动创建的grpc客户端也需要设置
 	// 注册HelloHttpHandler，这里注册了，下面如果手动注册了grpc客户端，导致同一个方法会被执行两次，需要注意，二选一即可
 	err = pb.RegisterMsgpackHttpHandler(ctx, gwmux, conn)
 	if err != nil {

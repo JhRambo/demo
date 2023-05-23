@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 	"google.golang.org/grpc"
@@ -107,7 +107,7 @@ func sendBinaryData(ctx context.Context, conn *grpc.ClientConn, bys []byte) (*pb
 		Data: bys,
 	}
 	resp, err := client.UploadFile(ctx, req)
-	log.Println("client============", resp)
+	log.Println("resp============", resp)
 	// 发送客户端数据流
 	return resp, err
 }
