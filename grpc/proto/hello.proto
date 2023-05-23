@@ -26,20 +26,8 @@ service HelloHttp {
       body: "*"
     };
   }
-  rpc SayGoodBye (GoodByeHttpRequest) returns (GoodByeHttpResponse) {
-    option (google.api.http) = {
-      post: "/goodbye"
-      body: "*"
-    };
-  }
-  //通用msgpack接口
-  rpc Binary (MsgpackRequest) returns (MsgpackResponse) {
-    option (google.api.http) = {
-      post: "/binary"
-      body: "*"
-    };
-  }
 }
+
 message HelloHttpRequest {
   string name = 1;
   int32 age = 2;
@@ -47,21 +35,4 @@ message HelloHttpRequest {
 message HelloHttpResponse {
   string name = 1;
   int32 age = 2;
-}
-
-message GoodByeHttpRequest {
-  string token = 1;
-}
-message GoodByeHttpResponse {
-  int32 code = 1;
-  string token = 2;
-}
-
-message MsgpackRequest {
-  string key = 1;
-  bytes val = 2;
-}
-
-message MsgpackResponse {
-  bytes val = 1;
 }

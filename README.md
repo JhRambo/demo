@@ -53,11 +53,12 @@ Value：   从 context.Context 中获取键对应的值，对于同一个上下�
 
 99.proto
 切到当前文件所在的目录下执行
-方式1（二选一）：protoc --go_out=plugins=grpc:./ hello.proto						         生成：hello.pb.go（忽略，有问题）
-方式2（二选一）：protoc --go_out=./ hello.proto									             生成：hello.pb.go
-方式3（grpc）: protoc --go-grpc_out=./ hello.proto								            生成：hello_grpc.pb.go
-方式4（grpc）: protoc --grpc-gateway_out=logtostderr=true:./ hello.proto		            生成：hello.pb.gw.go
+protoc --go_out=./ hello.proto						生成：hello.pb.go         包含 Protocol Buffers 生成的代码，定义您的消息类型和服务接口。
+protoc --go-grpc_out=./ hello.proto					生成：hello_grpc.pb.go    包含 gRPC 服务实现的代码，实现由 .proto 文件定义的服务方法。
+protoc --grpc-gateway_out=./ hello.proto		    生成：hello.pb.gw.go      包含 gRPC-Gateway 的代码，它允许您通过 RESTful API 访问您的 gRPC 服务。
+
+protoc --go_out=. --go-grpc_out=. --grpc-gateway_out=. hello.proto  一次性生成3个文件
 
 --go_out 		        生成 .pb.go			    需要安装：go install github.com/golang/protobuf/protoc-gen-go@latest
---go-grpc_out 	        生成 _grpc.pb.go		需要安装：go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
---grpc-gateway_out      生成 pb.gw.go			需要安装：go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2
+--go-grpc_out 	        生成 _grpc.pb.go		需要安装：go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+--grpc-gateway_out      生成 pb.gw.go			需要安装：go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@latest

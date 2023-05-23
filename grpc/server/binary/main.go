@@ -2,17 +2,16 @@ package main
 
 import (
 	"context"
-	pb "demo/grpc/proto/file"
+	pb "demo/grpc/proto/binary"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
 	"strings"
 
 	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 	"google.golang.org/grpc"
@@ -22,7 +21,7 @@ const server_port = 8081 //server端口
 const gw_port = 8088     //gw网关端口
 
 type Server struct {
-	pb.UnimplementedFileHttpServer
+	pb.UnimplementedBinaryHttpServer
 }
 
 func NewServer() *Server {
@@ -30,11 +29,12 @@ func NewServer() *Server {
 }
 
 // gRPC ClientStream 的使用
-func (s *Server) UploadFile(stream pb.FileHttp_UploadFileServer) error {
+func (s *Server) UploadFile(stream pb.BinaryHttp_UploadFileServer) error {
 	var fileData []byte
 	for {
 		// 从客户端流中接收数据
 		chunk, err := stream.Recv()
+		log.Println("err============", err)
 		if err == io.EOF { //数据传输结束
 			stream.SendAndClose(&empty.Empty{})
 			break
@@ -59,7 +59,7 @@ func main() {
 	// 创建一个gRPC server对象
 	s := grpc.NewServer()
 	// 注册service到server
-	pb.RegisterFileHttpServer(s, NewServer())
+	pb.RegisterBinaryHttpServer(s, NewServer())
 	// 启动gRPC Server
 	go func() {
 		if err := s.Serve(lis); err != nil {
@@ -82,7 +82,7 @@ func main() {
 	gwmux := runtime.NewServeMux(runtime.WithMarshalerOption(runtime.MIMEWildcard, m))
 
 	// 自动注册grpc客户端，并与grpc服务端通信
-	err = pb.RegisterFileHttpHandler(ctx, gwmux, conn)
+	err = pb.RegisterBinaryHttpHandler(ctx, gwmux, conn)
 	if err != nil {
 		log.Fatalln("Failed to register gateway:", err)
 	}
@@ -104,27 +104,27 @@ func main() {
 // 自定义中间件
 func middleware(ctx context.Context, next http.Handler, conn *grpc.ClientConn) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		bys, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			w.Write([]byte(err.Error()))
-			return
-		}
-		// 手动创建grpc客户端
-		client := pb.NewFileHttpClient(conn)
-		stream, err := client.UploadFile(ctx)
-		if err != nil {
-			w.Write([]byte(err.Error()))
-			return
-		}
-		sendBinaryData(stream, bys, w, r)
-		return
-		// next.ServeHTTP(w, r)
+		// bys, err := ioutil.ReadAll(r.Body)
+		// if err != nil {
+		// 	w.Write([]byte(err.Error()))
+		// 	return
+		// }
+		// // 手动创建grpc客户端
+		// client := pb.NewBinaryHttpClient(conn)
+		// stream, err := client.UploadFile(ctx)
+		// if err != nil {
+		// 	w.Write([]byte(err.Error()))
+		// 	return
+		// }
+		// sendBinaryData(stream, bys, w, r)
+		// return
+		next.ServeHTTP(w, r)
 	})
 }
 
 // grpc客户端发送二进制流数据
-func sendBinaryData(stream pb.FileHttp_UploadFileClient, bys []byte, w http.ResponseWriter, r *http.Request) {
-	req := &pb.FileChunk{Data: bys}
+func sendBinaryData(stream pb.BinaryHttp_UploadFileClient, bys []byte, w http.ResponseWriter, r *http.Request) {
+	req := &pb.BinaryRequest{Data: bys}
 	err := stream.Send(req)
 	if err != nil {
 		w.Write([]byte(err.Error()))

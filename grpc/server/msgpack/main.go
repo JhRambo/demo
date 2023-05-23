@@ -13,7 +13,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/vmihailenco/msgpack/v5"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"

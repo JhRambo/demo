@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
@@ -26,7 +26,6 @@ func run() error {
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-	// mux := runtime.NewServeMux() //多路复用器，它将根据 JSON/Restful 请求的路径将请求路由到各种注册服务
 	m := &runtime.JSONPb{} //定义以哪种数据格式返回给客户端
 	mux := runtime.NewServeMux(runtime.WithMarshalerOption(runtime.MIMEWildcard, m))
 	opts := []grpc.DialOption{grpc.WithInsecure()}

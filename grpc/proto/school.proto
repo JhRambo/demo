@@ -2,7 +2,6 @@ syntax = "proto3";
  
 option go_package = "./school";
 
-//性别
 //枚举类型第一个字段必须为0
 enum Sex {
     male = 0;
