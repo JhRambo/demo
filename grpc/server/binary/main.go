@@ -17,8 +17,8 @@ import (
 	"google.golang.org/grpc"
 )
 
-const server_port = 8081 //server端口
-const gw_port = 8088     //gw网关端口
+const server_port = 8081 //grpc-server端口
+const gw_port = 8088     //gateway网关端口
 
 type Server struct {
 	pb.UnimplementedBinaryHttpServer
