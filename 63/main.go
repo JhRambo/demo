@@ -5,7 +5,6 @@ import (
 	"net/http"
 )
 
-// 空结构体
 type HelloHandler struct{}
 
 // Handle需要手动实现ServeHTTP接口

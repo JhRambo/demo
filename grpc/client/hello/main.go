@@ -27,10 +27,10 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	// 2.注册grpc客户端
+	// 2.创建grpc客户端
 	client := pb.NewHelloHttpClient(grpcClient)
 	ctx := context.Background()
-	//客户端自定义metadata数据
+	// 3.客户端自定义metadata数据
 	ctx = metadata.NewOutgoingContext(ctx, SetMetaData())
 	res, err := client.SayHello(ctx, &pb.HelloHttpRequest{
 		Name: "张三李四王五老六",

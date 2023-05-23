@@ -52,20 +52,22 @@ func (s *Server) UploadFile(stream pb.BinaryHttp_UploadFileServer) error {
 func main() {
 	ctx := context.Background() //不带超时时间的ctx，所以不会被取消，除非手动取消
 	log.Println("GRPC-SERVER on http://0.0.0.0:8081")
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", server_port))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", server_port)) //监听端口
 	if err != nil {
 		log.Fatalln("Failed to listen:", err)
 	}
-	// 创建一个gRPC server对象
+
+	// 创建一个gRPC-server服务
 	s := grpc.NewServer()
-	// 注册service到server
+	// 注册gRPC-server服务
 	pb.RegisterBinaryHttpServer(s, NewServer())
-	// 启动gRPC Server
+	// 启动gRPC-Server
 	go func() {
 		if err := s.Serve(lis); err != nil {
 			log.Fatalf("failed to serve: %v", err)
 		}
 	}()
+
 	// 创建一个gRPC客户端连接
 	// gRPC-Gateway 就是通过它来代理请求（将HTTP请求转为RPC请求）
 	conn, err := grpc.DialContext(
@@ -79,6 +81,7 @@ func main() {
 
 	m := &runtime.JSONPb{} //定义以哪种数据格式返回给客户端	默认json格式
 	// m := &runtime.ProtoMarshaller{} //二进制流格式返回
+	// 用于将RESTful API转换成等效的gRPC调用
 	gwmux := runtime.NewServeMux(runtime.WithMarshalerOption(runtime.MIMEWildcard, m))
 
 	// 自动注册grpc客户端，并与grpc服务端通信
@@ -87,7 +90,7 @@ func main() {
 		log.Fatalln("Failed to register gateway:", err)
 	}
 
-	//自定义中间件
+	// 用于创建HTTP请求路由的标准库的方法。它可以用于HTTP服务器端点，用于将不同的HTTP请求映射到不同的处理函数。
 	mux := http.NewServeMux()
 	mux.Handle("/", middleware(ctx, gwmux, conn))
 	// mux.Handle("/", gwmux)
@@ -139,12 +142,14 @@ func sendBinaryData(stream pb.BinaryHttp_UploadFileClient, bys []byte, w http.Re
 }
 
 // grpcHandlerFunc 将gRPC请求和HTTP请求分别调用不同的handler处理
-func grpcHandlerFunc(grpcServer *grpc.Server, otherHandler http.Handler) http.Handler {
+func grpcHandlerFunc(grpcServer *grpc.Server, httpServer http.Handler) http.Handler {
 	return h2c.NewHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.ProtoMajor == 2 && strings.Contains(r.Header.Get("Content-Type"), "application/grpc") {
+			//grpc-server请求
 			grpcServer.ServeHTTP(w, r)
 		} else {
-			otherHandler.ServeHTTP(w, r)
+			//http-server请求
+			httpServer.ServeHTTP(w, r)
 		}
 	}), &http2.Server{})
 }
