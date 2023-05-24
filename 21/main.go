@@ -14,7 +14,6 @@ type Writer interface {
 	golang()
 }
 
-//空结构体
 type Computer struct {
 }
 
