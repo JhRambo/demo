@@ -88,7 +88,7 @@ func main() {
 		log.Fatalln("Failed to register gateway:", err)
 	}
 
-	// 用于创建HTTP请求路由的标准库的方法。它可以用于HTTP服务器端点，用于将不同的HTTP请求映射到不同的处理函数。
+	// 用于创建HTTP请求路由的标准库的方法。它可以用于HTTP服务器端点，用于将不同的HTTP请求映射到不同的处理函数。可以简单理解为这是路由
 	mux := http.NewServeMux()
 	mux.Handle("/", middleware(ctx, gwmux, conn))
 	// mux.Handle("/", gwmux)
@@ -103,7 +103,7 @@ func main() {
 }
 
 // 自定义中间件
-func middleware(ctx context.Context, next http.Handler, conn *grpc.ClientConn) http.Handler {
+func middleware(ctx context.Context, gw http.Handler, conn *grpc.ClientConn) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// bys, err := ioutil.ReadAll(r.Body)
 		// if err != nil {
@@ -119,7 +119,7 @@ func middleware(ctx context.Context, next http.Handler, conn *grpc.ClientConn) h
 		// }
 		// sendBinaryData(stream, bys, w, r)
 		// return
-		next.ServeHTTP(w, r)
+		gw.ServeHTTP(w, r)
 	})
 }
 

@@ -1,7 +1,11 @@
 package routers
 
 import (
-	pb "demo/grpc/proto/binary"
+	"demo/gin/config"
+	pb_binary "demo/gin/proto/binary"
+	pb_hello "demo/gin/proto/hello"
+	"demo/gin/utils"
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 
@@ -9,13 +13,15 @@ import (
 	"google.golang.org/grpc"
 )
 
+var gWResponse = &config.GWResponse{}
+
 func InitRouter(r *gin.Engine, conn *grpc.ClientConn) {
-	r.POST("/uploadfile", func(c *gin.Context) {
-		// 手动创建grpc客户端
-		client := pb.NewBinaryHttpClient(conn)
-		stream, err := client.UploadFile(c)
-		bys, err := ioutil.ReadAll(c.Request.Body)
-		req := &pb.BinaryRequest{Data: bys}
+	r.POST("/uploadfile", func(ctx *gin.Context) {
+		// 注册gRPC-server客户端
+		client := pb_binary.NewBinaryHttpClient(conn)
+		stream, err := client.UploadFile(ctx)
+		bys, err := ioutil.ReadAll(ctx.Request.Body)
+		req := &pb_binary.BinaryRequest{Data: bys}
 		err = stream.Send(req)
 		if err != nil {
 			return
@@ -25,6 +31,25 @@ func InitRouter(r *gin.Engine, conn *grpc.ClientConn) {
 		if err != nil {
 			return
 		}
-		c.JSON(http.StatusOK, gin.H{})
+		ctx.JSON(http.StatusOK, gin.H{
+			gWResponse.Code: http.StatusBadRequest,
+			gWResponse.Msg:  "ok",
+		})
+	})
+	r.POST("/hello", func(ctx *gin.Context) {
+		// 注册gRPC-server客户端
+		client := pb_hello.NewHelloHttpClient(conn)
+		bys, err := utils.GetBodyBytes(ctx)
+		if err != nil {
+			ctx.JSON(http.StatusOK, gin.H{
+				gWResponse.Code: http.StatusBadRequest,
+				gWResponse.Msg:  err,
+			})
+			return
+		}
+		req := &pb_hello.HelloHttpRequest{}
+		json.Unmarshal(bys, req)
+		res, _ := client.SayHello(ctx, req)
+		ctx.JSON(http.StatusOK, res)
 	})
 }

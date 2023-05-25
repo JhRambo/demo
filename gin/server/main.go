@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"demo/gin/config"
-	pb "demo/gin/proto/binary"
+	pb_binary "demo/gin/proto/binary"
+	pb_hello "demo/gin/proto/hello"
 	"fmt"
 	"io"
 	"log"
@@ -13,14 +15,15 @@ import (
 )
 
 type Server struct {
-	pb.UnimplementedBinaryHttpServer
+	pb_binary.UnimplementedBinaryHttpServer
+	pb_hello.UnimplementedHelloHttpServer
 }
 
 func NewServer() *Server {
 	return &Server{}
 }
 
-func (s *Server) UploadFile(stream pb.BinaryHttp_UploadFileServer) error {
+func (s *Server) UploadFile(stream pb_binary.BinaryHttp_UploadFileServer) error {
 	var fileData []byte
 	for {
 		// 从客户端流中接收数据
@@ -38,6 +41,14 @@ func (s *Server) UploadFile(stream pb.BinaryHttp_UploadFileServer) error {
 	return nil
 }
 
+func (s *Server) SayHello(ctx context.Context, req *pb_hello.HelloHttpRequest) (*pb_hello.HelloHttpResponse, error) {
+	resp := &pb_hello.HelloHttpResponse{
+		Code: 200,
+		Msg:  req.Name + " hello!",
+	}
+	return resp, nil
+}
+
 // grpc-server
 func main() {
 	log.Println("GRPC-SERVER on http://0.0.0.0:8081")
@@ -45,10 +56,11 @@ func main() {
 	if err != nil {
 		log.Fatalln("Failed to listen:", err)
 	}
-	// 创建一个gRPC-server服务
+	// 创建gRPC-server服务
 	s := grpc.NewServer()
 	// 注册gRPC-server服务
-	pb.RegisterBinaryHttpServer(s, NewServer())
+	pb_binary.RegisterBinaryHttpServer(s, NewServer())
+	pb_hello.RegisterHelloHttpServer(s, NewServer())
 	// 启动gRPC-Server
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)

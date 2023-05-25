@@ -1,0 +1,40 @@
+// 协议类型
+syntax = "proto3";
+
+option go_package = "./hello";
+
+import "google/api/annotations.proto";
+
+// 对外暴露的http协议的接口的服务 restful风格
+service HelloHttp {
+  rpc SayHello (HelloHttpRequest) returns (HelloHttpResponse) {
+    option (google.api.http) = {
+        post: "/hello"
+        body: "*"
+    };
+  }
+  rpc SayGoodbye (GoodByeHttpRequest) returns (GoodByeHttpResponse) {
+    option (google.api.http) = {
+        post: "/goodbye"
+        body: "*"
+    };
+  }
+}
+
+message HelloHttpRequest {
+  string name = 1;
+}
+
+message HelloHttpResponse {
+  int32 code = 1;
+  string msg = 2;
+}
+
+message GoodByeHttpRequest {
+  string name = 1;
+}
+
+message GoodByeHttpResponse {
+  int32 code = 1;
+  string msg = 2;
+}
