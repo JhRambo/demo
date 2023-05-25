@@ -28,7 +28,6 @@ func NewServer() *Server {
 	return &Server{}
 }
 
-// gRPC ClientStream 的使用
 func (s *Server) UploadFile(stream pb.BinaryHttp_UploadFileServer) error {
 	var fileData []byte
 	for {
@@ -48,7 +47,6 @@ func (s *Server) UploadFile(stream pb.BinaryHttp_UploadFileServer) error {
 	return nil
 }
 
-// gw server 监听不同端口
 func main() {
 	ctx := context.Background() //不带超时时间的ctx，所以不会被取消，除非手动取消
 	log.Println("GRPC-SERVER on http://0.0.0.0:8081")
@@ -79,8 +77,8 @@ func main() {
 		log.Fatalln("Failed to dial server:", err)
 	}
 
-	// m := &runtime.JSONPb{} //定义以哪种数据格式返回给客户端	默认json格式
-	m := &runtime.ProtoMarshaller{} //二进制流格式返回
+	m := &runtime.JSONPb{} //定义以哪种数据格式返回给客户端	默认json格式
+	// m := &runtime.ProtoMarshaller{} //二进制流格式返回
 	// 用于将RESTful API转换成等效的gRPC调用
 	gwmux := runtime.NewServeMux(runtime.WithMarshalerOption(runtime.MIMEWildcard, m))
 
