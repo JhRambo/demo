@@ -79,8 +79,8 @@ func main() {
 		log.Fatalln("Failed to dial server:", err)
 	}
 
-	m := &runtime.JSONPb{} //定义以哪种数据格式返回给客户端	默认json格式
-	// m := &runtime.ProtoMarshaller{} //二进制流格式返回
+	// m := &runtime.JSONPb{} //定义以哪种数据格式返回给客户端	默认json格式
+	m := &runtime.ProtoMarshaller{} //二进制流格式返回
 	// 用于将RESTful API转换成等效的gRPC调用
 	gwmux := runtime.NewServeMux(runtime.WithMarshalerOption(runtime.MIMEWildcard, m))
 
