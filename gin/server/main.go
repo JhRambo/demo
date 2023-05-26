@@ -6,11 +6,9 @@ import (
 	pb_binary "demo/gin/proto/binary"
 	pb_hello "demo/gin/proto/hello"
 	"fmt"
-	"io"
 	"log"
 	"net"
 
-	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
 )
 
@@ -24,20 +22,6 @@ func NewServer() *Server {
 }
 
 func (s *Server) UploadFile(stream pb_binary.BinaryHttp_UploadFileServer) error {
-	var fileData []byte
-	for {
-		// 从客户端流中接收数据
-		chunk, err := stream.Recv()
-		if err == io.EOF { //数据传输结束
-			stream.SendAndClose(&empty.Empty{})
-			break
-		}
-		if err != nil {
-			return err
-		}
-		fileData = append(fileData, chunk.Data...)
-	}
-	log.Println("fileData============", fileData)
 	return nil
 }
 

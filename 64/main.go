@@ -23,10 +23,10 @@ func middleware(next http.Handler) http.Handler {
 }
 
 func main() {
-	mux := http.NewServeMux()
+	mux := http.NewServeMux() //路由器
 	myh := &myHandler{}
 	mux.Handle("/h1", middleware(myh))
-	if err := http.ListenAndServe(":8088", mux); err != nil {
+	if err := http.ListenAndServe(":8089", mux); err != nil {
 		panic(err)
 	}
 }

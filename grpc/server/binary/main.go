@@ -1,13 +1,17 @@
 package main
 
 import (
+	"bytes"
+	"compress/zlib"
 	"context"
 	pb "demo/grpc/proto/binary"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
+	"regexp"
 	"strings"
 
 	"github.com/golang/protobuf/ptypes/empty"
@@ -30,20 +34,95 @@ func NewServer() *Server {
 
 func (s *Server) UploadFile(stream pb.BinaryHttp_UploadFileServer) error {
 	var fileData []byte
+
+	log.Println("fei shu  UploadFile")
+
 	for {
-		// 从客户端流中接收数据
+		// 从流中读取文件数据
 		chunk, err := stream.Recv()
-		log.Println("err============", err)
-		if err == io.EOF { //数据传输结束
+		if err == io.EOF {
 			stream.SendAndClose(&empty.Empty{})
 			break
 		}
+
 		if err != nil {
+			log.Println(err)
 			return err
 		}
+
 		fileData = append(fileData, chunk.Data...)
 	}
-	log.Println("fileData============", fileData)
+
+	errorMsg := ""
+	stackMsg := ""
+
+	// 创建 zlib 解压缩器
+	zlibReader, err := zlib.NewReader(bytes.NewReader(fileData))
+	if err != nil {
+		return err
+	}
+	defer zlibReader.Close()
+
+	// 创建一个正则表达式，用于匹配 <ErrorMessage></ErrorMessage> 中的值
+	errorMessageRegex := regexp.MustCompile(`<ErrorMessage>(.*?)</ErrorMessage>`)
+
+	stackMessageRegex := regexp.MustCompile(`<CallStack>([\s\S]*?)</CallStack>`)
+	log.Println("fei shu  UploadFile2")
+	uncompressedData, err := ioutil.ReadAll(zlibReader)
+	if err != nil {
+		return err
+	}
+
+	uncompressedString := string(uncompressedData)
+
+	//fmt.Println(uncompressedString)
+
+	matches := errorMessageRegex.FindAllStringSubmatch(uncompressedString, -1)
+	for _, match := range matches {
+		if len(match) > 1 {
+			errorMsg = match[1]
+		}
+	}
+
+	matches1 := stackMessageRegex.FindAllStringSubmatch(uncompressedString, -1)
+	for _, match := range matches1 {
+		if len(match) > 1 {
+			if strings.Contains(match[1], "UMyGameInstance::Shutdown()") {
+				stackMsg = match[1]
+			}
+		}
+	}
+
+	if errorMsg != "" {
+		errorMsg = "<ErrorMessage>" + errorMsg + "</ErrorMessage>"
+	}
+
+	if stackMsg != "" {
+		stackMsg = "<CallStack>" + stackMsg + "</CallStack>"
+	}
+
+	result := errorMsg
+	if stackMsg != "" {
+		result = result + "\n" + stackMsg
+	}
+
+	// 将解压缩后的数据写入输出文件
+	//_, err = outputFile.Write(uncompressedData)
+	//if err != nil {
+	//	return errorMsg, stackMsg, err
+	//}
+	log.Println("fei shu  UploadFile2")
+	// service := feishu.Service{}
+
+	// service.FsAlarmPush(context.Background(), &message.FsAlarmPushRequest{
+	// 	MsgType: "text",
+	// 	Content: &message.FsAlarmInfo{
+	// 		Text: result,
+	// 	},
+	// })
+
+	log.Println("result:", result)
+
 	return nil
 }
 
@@ -105,21 +184,21 @@ func main() {
 // 自定义中间件
 func middleware(ctx context.Context, gw http.Handler, conn *grpc.ClientConn) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// bys, err := ioutil.ReadAll(r.Body)
-		// if err != nil {
-		// 	w.Write([]byte(err.Error()))
-		// 	return
-		// }
-		// // 手动创建grpc客户端
-		// client := pb.NewBinaryHttpClient(conn)
-		// stream, err := client.UploadFile(ctx)
-		// if err != nil {
-		// 	w.Write([]byte(err.Error()))
-		// 	return
-		// }
-		// sendBinaryData(stream, bys, w, r)
-		// return
-		gw.ServeHTTP(w, r)
+		bys, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			w.Write([]byte(err.Error()))
+			return
+		}
+		// 手动创建grpc客户端
+		client := pb.NewBinaryHttpClient(conn)
+		stream, err := client.UploadFile(ctx)
+		if err != nil {
+			w.Write([]byte(err.Error()))
+			return
+		}
+		sendBinaryData(stream, bys, w, r)
+		return
+		// gw.ServeHTTP(w, r)
 	})
 }
 

@@ -18,7 +18,7 @@ func main() {
 	http.HandleFunc("/user/list", c.List)
 	http.HandleFunc("/user/getById", c.GetById)
 	log.Println(fmt.Sprintf("server启动中，监听%d端口...", port))
-	if err := http.ListenAndServe("localhost:"+fmt.Sprintf("%d", port), nil); err != nil {
+	if err := http.ListenAndServe(":"+fmt.Sprintf("%d", port), nil); err != nil {
 		log.Println("启动服务失败", err)
 		return
 	}

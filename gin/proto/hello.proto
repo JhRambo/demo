@@ -9,13 +9,13 @@ import "google/api/annotations.proto";
 service HelloHttp {
   rpc SayHello (HelloHttpRequest) returns (HelloHttpResponse) {
     option (google.api.http) = {
-        post: "/hello"
+        post: "/hello/sayhello"
         body: "*"
     };
   }
   rpc SayGoodbye (GoodByeHttpRequest) returns (GoodByeHttpResponse) {
     option (google.api.http) = {
-        post: "/goodbye"
+        post: "/hello/saygoodbye"
         body: "*"
     };
   }

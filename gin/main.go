@@ -1,8 +1,7 @@
 package main
 
 import (
-	"context"
-	"demo/gin/client"
+	grpc_client "demo/gin/client"
 	"demo/gin/config"
 	"demo/gin/middlewares"
 	"demo/gin/routers"
@@ -14,15 +13,13 @@ import (
 
 // gateway
 func main() {
-	ctx := context.Background()
-	client.InitGRPCClients()
-	conn, _ := client.GetGRPCClient(ctx, config.SERVER_NAME1)
+	grpc_client.InitGRPCClients()
 	r := gin.Default()
 	middlewarres := &middlewares.Auth{}
 	r.Use(middlewarres.MyAuth) //自定义中间件
-	routers.InitRouter(r, conn)
+	routers.InitRouter(r)      //gin 路由
+	log.Println("GATEWAY on http://0.0.0.0:8088")
 	if err := r.Run(fmt.Sprintf(":%d", config.GW_PORT)); err != nil {
 		log.Fatalf("GATEWAY could not run :%v", err)
 	}
-	log.Println("GATEWAY on http://0.0.0.0:8088")
 }

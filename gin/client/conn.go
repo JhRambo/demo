@@ -1,7 +1,6 @@
 package client
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"time"
@@ -16,7 +15,7 @@ var ClientConnMap = make(map[string]*grpc.ClientConn)
 
 // InitGRPCClients read grpc configuration and init clients
 func InitGRPCClients() error {
-	config := config.Grpcserver
+	config := config.GRPCserver
 	for name, addr := range config {
 		_, ok := ClientConnMap[name]
 		if ok {
@@ -40,7 +39,7 @@ func InitGRPCClients() error {
 }
 
 // GetGRPCClient get grpc client by name
-func GetGRPCClient(ctx context.Context, name string) (*grpc.ClientConn, error) {
+func GetGRPCClient(name string) (*grpc.ClientConn, error) {
 	cc, ok := ClientConnMap[name]
 	if !ok {
 		return nil, fmt.Errorf("not found grpc client [%s]", name)
