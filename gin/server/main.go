@@ -33,6 +33,14 @@ func (s *Server) SayHello(ctx context.Context, req *pb_hello.HelloHttpRequest) (
 	return resp, nil
 }
 
+func (s *Server) SayGoodbye(ctx context.Context, req *pb_hello.GoodByeHttpRequest) (*pb_hello.GoodByeHttpResponse, error) {
+	resp := &pb_hello.GoodByeHttpResponse{
+		Code: 200,
+		Msg:  req.Name + " goodbye!",
+	}
+	return resp, nil
+}
+
 // grpc-server
 func main() {
 	log.Println("GRPC-SERVER on http://0.0.0.0:8081")

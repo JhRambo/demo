@@ -5,6 +5,20 @@ option go_package = "./hello";
 
 import "google/api/annotations.proto";
 
+// DB连接
+service HelloDB {
+  rpc SayHello(HelloDBRequest) returns (HelloDBResponse){}
+  rpc SayHello2(HelloDBRequest) returns (HelloDBResponse){}
+}
+message HelloDBRequest {
+  string name = 1;
+  int32 age = 2;
+}
+message HelloDBResponse {
+  string name = 1;
+  int32 age = 2;
+}
+
 // 对外暴露的http协议的接口的服务 restful风格
 service HelloHttp {
   rpc SayHello (HelloHttpRequest) returns (HelloHttpResponse) {
