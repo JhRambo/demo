@@ -10,10 +10,9 @@ import (
 	"google.golang.org/grpc"
 )
 
-// ClientConnMap keep connections
 var ClientConnMap = make(map[string]*grpc.ClientConn)
 
-// InitGRPCClients read grpc configuration and init clients
+// 初始化grpc-client连接
 func InitGRPCClients() error {
 	config := config.GRPCserver
 	for name, addr := range config {
@@ -25,11 +24,11 @@ func InitGRPCClients() error {
 			addr,
 			grpc.WithInsecure(),
 			grpc.WithBlock(),
-			grpc.WithTimeout(3*time.Second),
+			grpc.WithTimeout(30*time.Second),
 		)
 		if err != nil {
 			log.Printf("Failed to connect to gRPC service [%s] on [%s]: %v", name, addr, err)
-			continue
+			panic(err)
 		}
 
 		ClientConnMap[name] = conn
@@ -38,7 +37,6 @@ func InitGRPCClients() error {
 	return nil
 }
 
-// GetGRPCClient get grpc client by name
 func GetGRPCClient(name string) (*grpc.ClientConn, error) {
 	cc, ok := ClientConnMap[name]
 	if !ok {

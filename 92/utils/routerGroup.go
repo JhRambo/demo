@@ -19,13 +19,13 @@ func InitRouterGroup() {
 		for _, v := range ms {
 			ss := strings.Split(v["uri"], "/")
 			uri := ss[len(ss)-1]
-			//这里要通过正则，循环遍历api方法：
-			gs += "g." + v["method"] + "(\"" + uri + "\", handler_" + protos[i] + "." + v["rpcName"] + ")\n"
+			gs += `g.` + v["method"] + `("` + uri + `", handler_` + protos[i] + `.` + v["rpcName"] + `)
+			`
 		}
 		content := `
 		package ` + protos[i] + `
 		import (
-			handler_` + protos[i] + " \"demo/gin/handlers/" + protos[i] + `"	
+			handler_` + protos[i] + ` "demo/gin/handlers/` + protos[i] + `"
 			"github.com/gin-gonic/gin"
 		)
 		
@@ -35,7 +35,7 @@ func InitRouterGroup() {
 			` + gs + `
 		}	
 		`
-		filePath := "D:/code/demo/92/routers/" + protos[i] + "/router.go"
+		filePath := "D:/code/demo/gin/routers/" + protos[i] + "/router.go"
 		CreateFile(filePath, content)
 	}
 }

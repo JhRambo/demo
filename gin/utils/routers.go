@@ -1,33 +1,34 @@
 package utils
 
-/* 创建router.go文件
-该文件初始化路由 */
+//初始化路由文件
 func InitRouters() {
 	dir := "D:/code/demo/gin/proto"
 	protos := ScanFiles(dir)
-	routers := make(map[string]string)
+	handles := ""
+	uris := ""
 	for i := 0; i < len(protos); i++ {
-		routers["router_"+protos[i]] = "\"demo/gin/routers/" + protos[i] + "\""
-	}
-	router_pb := ""
-	router_init := ""
-	for k, v := range routers {
-		router_pb += k + " " + v + "\n"
-		router_init += k + ".InitRouter(r)" + "\n"
+		protoPath := dir + "/" + protos[i] + ".proto"
+		ms := ReadProto(protoPath)
+		handles += `handler_` + protos[i] + ` "demo/gin/handlers/` + protos[i] + `"
+		`
+		for _, v := range ms {
+			uris += `r.` + v["method"] + `("` + v["uri"] + `", handler_` + protos[i] + `.` + v["rpcName"] + `)
+			`
+		}
 	}
 	content := `
 	package routers
 
 	import (
-		` + router_pb + `
+		` + handles + `
 		"github.com/gin-gonic/gin"
 	)
 
 	// 初始化路由
-	func InitRouter(r *gin.Engine) {
-		` + router_init + `
+	func InitRouters(r *gin.Engine) {
+		` + uris + `
 	}
 	`
-	filePath := "D:/code/demo/gin/routers/router.go"
+	filePath := "D:/code/demo/gin/routers/routers.go"
 	CreateFile(filePath, content)
 }

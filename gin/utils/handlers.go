@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// 生成Handlers
+// 生成Handlers业务处理文件
 func InitHandlers() {
 	dir := "D:/code/demo/gin/proto"
 	protos := ScanFiles(dir)

@@ -63,7 +63,7 @@ func InitHandlers() {
 					package ` + protos[i] + `
 
 					import (` + `
-						"demo/92/utils"
+						"demo/gin/utils"
 						grpc_client "demo/gin/client"` + `
 						"demo/gin/config"` + `
 						"net/http"` + `
@@ -71,7 +71,7 @@ func InitHandlers() {
 						"github.com/gin-gonic/gin"` + `
 					)
 				` + fcs
-				filePath := "D:/code/demo/92/handlers/" + protos[i] + "/" + protos[i] + ".go"
+				filePath := "D:/code/demo/gin/handlers/" + protos[i] + "/" + protos[i] + ".go"
 				CreateFile(filePath, content)
 			} else {
 				fcs += `
@@ -102,7 +102,7 @@ func InitHandlers() {
 						"github.com/gin-gonic/gin"` + `
 					)
 				` + fcs
-				filePath := "D:/code/demo/92/handlers/" + protos[i] + "/" + protos[i] + ".go"
+				filePath := "D:/code/demo/gin/handlers/" + protos[i] + "/" + protos[i] + ".go"
 				CreateFile(filePath, content)
 			}
 		}

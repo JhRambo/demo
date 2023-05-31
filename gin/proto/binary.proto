@@ -9,7 +9,7 @@ import "google/api/annotations.proto";
 service BinaryHttp {
   rpc UploadFile (stream BinaryRequest) returns (BinaryResponse) {
     option (google.api.http) = {
-        post: "binary/uploadfile"
+        post: "/binary/uploadfile"
         body: "*"
     };
   }
