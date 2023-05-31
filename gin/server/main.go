@@ -61,7 +61,7 @@ func (s *Server) SayGoodbye(ctx context.Context, req *pb_hello.GoodByeHttpReques
 // grpc-server
 func main() {
 	log.Println("GRPC-SERVER on http://0.0.0.0:8081")
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", config.SERVER_PORT))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", config.SERVER_PORT1))
 	if err != nil {
 		log.Fatalln("Failed to listen:", err)
 	}
