@@ -9,9 +9,7 @@ import (
 )
 
 func SayHello(ctx *gin.Context) {
-	// 注册gRPC-client客户端
-	conn, _ := grpc_client.GetGRPCClient(config.SERVER_NAME1)
-	client := pb_hello.NewHelloHttpClient(conn)
+	client := GetClient()
 	req := &pb_hello.HelloHttpRequest{}
 	if err := ctx.ShouldBindJSON(req); err != nil {
 		ctx.JSON(http.StatusOK, &config.GWResponse{
@@ -25,9 +23,7 @@ func SayHello(ctx *gin.Context) {
 }
 
 func SayGoodbye(ctx *gin.Context) {
-	// 注册gRPC-client客户端
-	conn, _ := grpc_client.GetGRPCClient(config.SERVER_NAME1)
-	client := pb_hello.NewHelloHttpClient(conn)
+	client := GetClient()
 	req := &pb_hello.GoodByeHttpRequest{}
 	if err := ctx.ShouldBindJSON(req); err != nil {
 		ctx.JSON(http.StatusOK, &config.GWResponse{
@@ -38,4 +34,11 @@ func SayGoodbye(ctx *gin.Context) {
 	}
 	res, _ := client.SayGoodbye(ctx, req)
 	ctx.JSON(http.StatusOK, res)
+}
+
+// 注册gRPC-client客户端
+func GetClient() pb_hello.HelloHttpClient {
+	conn, _ := grpc_client.GetGRPCClient(config.SERVER_NAME1)
+	client := pb_hello.NewHelloHttpClient(conn)
+	return client
 }

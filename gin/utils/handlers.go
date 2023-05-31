@@ -35,9 +35,7 @@ func InitHandlers() {
 						})
 						return
 					}
-					// 注册gRPC-client客户端
-					conn, _ := grpc_client.GetGRPCClient(config.SERVER_NAME1)` + `
-					client := pb_` + protos[i] + `.New` + v["serviceName"] + `Client(conn)` + `
+					client:=GetClient()` + `
 					stream, err := client.` + v["rpcName"] + `(ctx)` + `
 					req := &pb_` + protos[i] + `.` + requestParam + `{Data: bys}` + `
 					err = stream.Send(req)
@@ -71,14 +69,21 @@ func InitHandlers() {
 						"github.com/gin-gonic/gin"` + `
 					)
 				` + fcs
+
+				content += `
+				// 注册gRPC-client客户端
+				func GetClient() pb_` + protos[i] + `.` + v["serviceName"] + `Client {
+					conn, _ := grpc_client.GetGRPCClient(config.SERVER_NAME1)
+					client := pb_` + protos[i] + `.New` + v["serviceName"] + `Client(conn)
+					return client
+				}
+				`
 				filePath := "D:/code/demo/gin/handlers/" + protos[i] + "/" + protos[i] + ".go"
 				CreateFile(filePath, content)
 			} else {
 				fcs += `
 				func ` + v["rpcName"] + `(ctx *gin.Context) {` + `
-					// 注册gRPC-client客户端 ` + `
-					conn, _ := grpc_client.GetGRPCClient(config.SERVER_NAME1)` + `
-					client := pb_` + protos[i] + `.New` + v["serviceName"] + `Client(conn)` + `
+					client:=GetClient()` + `
 					req := &pb_` + protos[i] + `.` + requestParam + `{}` + `
 					if err := ctx.ShouldBindJSON(req); err != nil {` + `
 						ctx.JSON(http.StatusOK, &config.GWResponse{` + `
@@ -102,6 +107,16 @@ func InitHandlers() {
 						"github.com/gin-gonic/gin"` + `
 					)
 				` + fcs
+
+				content += `
+				// 注册gRPC-client客户端
+				func GetClient() pb_` + protos[i] + `.` + v["serviceName"] + `Client {
+					conn, _ := grpc_client.GetGRPCClient(config.SERVER_NAME1)
+					client := pb_` + protos[i] + `.New` + v["serviceName"] + `Client(conn)
+					return client
+				}
+				`
+
 				filePath := "D:/code/demo/gin/handlers/" + protos[i] + "/" + protos[i] + ".go"
 				CreateFile(filePath, content)
 			}

@@ -18,9 +18,7 @@ func UploadFile(ctx *gin.Context) {
 		})
 		return
 	}
-	// 注册gRPC-client客户端
-	conn, _ := grpc_client.GetGRPCClient(config.SERVER_NAME1)
-	client := pb_binary.NewBinaryHttpClient(conn)
+	client := GetClient()
 	stream, err := client.UploadFile(ctx)
 	req := &pb_binary.BinaryRequest{Data: bys}
 	err = stream.Send(req)
@@ -41,4 +39,11 @@ func UploadFile(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, res)
+}
+
+// 注册gRPC-client客户端
+func GetClient() pb_binary.BinaryHttpClient {
+	conn, _ := grpc_client.GetGRPCClient(config.SERVER_NAME1)
+	client := pb_binary.NewBinaryHttpClient(conn)
+	return client
 }
