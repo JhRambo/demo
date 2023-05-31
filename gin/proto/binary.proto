@@ -4,13 +4,12 @@ syntax = "proto3";
 option go_package = "./binary";
 
 import "google/api/annotations.proto";
-import "google/protobuf/empty.proto";
 
 // 对外暴露的http协议的接口的服务 restful风格
 service BinaryHttp {
-  rpc UploadFile (stream BinaryRequest) returns (google.protobuf.Empty) {
+  rpc UploadFile (stream BinaryRequest) returns (BinaryResponse) {
     option (google.api.http) = {
-        post: "/uploadfile"
+        post: "binary/uploadfile"
         body: "*"
     };
   }
@@ -19,4 +18,9 @@ service BinaryHttp {
 message BinaryRequest {
   // 文件二进制数据
   bytes data = 1;
+}
+
+message BinaryResponse {
+  int32 code = 1;
+  string message = 2;
 }

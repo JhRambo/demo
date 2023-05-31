@@ -13,6 +13,6 @@ var GRPCserver = map[string]string{
 }
 
 type GWResponse struct {
-	Code int32  `json:"code"`
-	Msg  string `json:"msg"`
+	Code    int32  `json:"code"`
+	Message string `json:"message"`
 }

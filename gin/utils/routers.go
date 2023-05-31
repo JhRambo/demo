@@ -28,6 +28,6 @@ func InitRouters() {
 		` + router_init + `
 	}
 	`
-	filePath := "./routers/router.go"
+	filePath := "D:/code/demo/gin/routers/router.go"
 	CreateFile(filePath, content)
 }

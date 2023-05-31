@@ -7,7 +7,7 @@ import "google/api/annotations.proto";
 
 // DB连接
 service HelloDB {
-  rpc SayHello(HelloDBRequest) returns (HelloDBResponse){}
+  rpc SayHello1(HelloDBRequest) returns (HelloDBResponse){}
   rpc SayHello2(HelloDBRequest) returns (HelloDBResponse){}
 }
 message HelloDBRequest {

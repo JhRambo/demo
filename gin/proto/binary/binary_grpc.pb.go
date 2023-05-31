@@ -13,7 +13,6 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -51,7 +50,7 @@ func (c *binaryHttpClient) UploadFile(ctx context.Context, opts ...grpc.CallOpti
 
 type BinaryHttp_UploadFileClient interface {
 	Send(*BinaryRequest) error
-	CloseAndRecv() (*emptypb.Empty, error)
+	CloseAndRecv() (*BinaryResponse, error)
 	grpc.ClientStream
 }
 
@@ -63,11 +62,11 @@ func (x *binaryHttpUploadFileClient) Send(m *BinaryRequest) error {
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *binaryHttpUploadFileClient) CloseAndRecv() (*emptypb.Empty, error) {
+func (x *binaryHttpUploadFileClient) CloseAndRecv() (*BinaryResponse, error) {
 	if err := x.ClientStream.CloseSend(); err != nil {
 		return nil, err
 	}
-	m := new(emptypb.Empty)
+	m := new(BinaryResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -107,7 +106,7 @@ func _BinaryHttp_UploadFile_Handler(srv interface{}, stream grpc.ServerStream) e
 }
 
 type BinaryHttp_UploadFileServer interface {
-	SendAndClose(*emptypb.Empty) error
+	SendAndClose(*BinaryResponse) error
 	Recv() (*BinaryRequest, error)
 	grpc.ServerStream
 }
@@ -116,7 +115,7 @@ type binaryHttpUploadFileServer struct {
 	grpc.ServerStream
 }
 
-func (x *binaryHttpUploadFileServer) SendAndClose(m *emptypb.Empty) error {
+func (x *binaryHttpUploadFileServer) SendAndClose(m *BinaryResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 

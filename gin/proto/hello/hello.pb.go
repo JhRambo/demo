@@ -23,6 +23,116 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type HelloDBRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Age  int32  `protobuf:"varint,2,opt,name=age,proto3" json:"age,omitempty"`
+}
+
+func (x *HelloDBRequest) Reset() {
+	*x = HelloDBRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_hello_proto_msgTypes[0]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *HelloDBRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HelloDBRequest) ProtoMessage() {}
+
+func (x *HelloDBRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_hello_proto_msgTypes[0]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HelloDBRequest.ProtoReflect.Descriptor instead.
+func (*HelloDBRequest) Descriptor() ([]byte, []int) {
+	return file_hello_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *HelloDBRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *HelloDBRequest) GetAge() int32 {
+	if x != nil {
+		return x.Age
+	}
+	return 0
+}
+
+type HelloDBResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Age  int32  `protobuf:"varint,2,opt,name=age,proto3" json:"age,omitempty"`
+}
+
+func (x *HelloDBResponse) Reset() {
+	*x = HelloDBResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_hello_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *HelloDBResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HelloDBResponse) ProtoMessage() {}
+
+func (x *HelloDBResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_hello_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HelloDBResponse.ProtoReflect.Descriptor instead.
+func (*HelloDBResponse) Descriptor() ([]byte, []int) {
+	return file_hello_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *HelloDBResponse) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *HelloDBResponse) GetAge() int32 {
+	if x != nil {
+		return x.Age
+	}
+	return 0
+}
+
 type HelloHttpRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -34,7 +144,7 @@ type HelloHttpRequest struct {
 func (x *HelloHttpRequest) Reset() {
 	*x = HelloHttpRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_hello_proto_msgTypes[0]
+		mi := &file_hello_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -47,7 +157,7 @@ func (x *HelloHttpRequest) String() string {
 func (*HelloHttpRequest) ProtoMessage() {}
 
 func (x *HelloHttpRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_hello_proto_msgTypes[0]
+	mi := &file_hello_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -60,7 +170,7 @@ func (x *HelloHttpRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HelloHttpRequest.ProtoReflect.Descriptor instead.
 func (*HelloHttpRequest) Descriptor() ([]byte, []int) {
-	return file_hello_proto_rawDescGZIP(), []int{0}
+	return file_hello_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *HelloHttpRequest) GetName() string {
@@ -82,7 +192,7 @@ type HelloHttpResponse struct {
 func (x *HelloHttpResponse) Reset() {
 	*x = HelloHttpResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_hello_proto_msgTypes[1]
+		mi := &file_hello_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -95,7 +205,7 @@ func (x *HelloHttpResponse) String() string {
 func (*HelloHttpResponse) ProtoMessage() {}
 
 func (x *HelloHttpResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_hello_proto_msgTypes[1]
+	mi := &file_hello_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -108,7 +218,7 @@ func (x *HelloHttpResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HelloHttpResponse.ProtoReflect.Descriptor instead.
 func (*HelloHttpResponse) Descriptor() ([]byte, []int) {
-	return file_hello_proto_rawDescGZIP(), []int{1}
+	return file_hello_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *HelloHttpResponse) GetCode() int32 {
@@ -136,7 +246,7 @@ type GoodByeHttpRequest struct {
 func (x *GoodByeHttpRequest) Reset() {
 	*x = GoodByeHttpRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_hello_proto_msgTypes[2]
+		mi := &file_hello_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -149,7 +259,7 @@ func (x *GoodByeHttpRequest) String() string {
 func (*GoodByeHttpRequest) ProtoMessage() {}
 
 func (x *GoodByeHttpRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_hello_proto_msgTypes[2]
+	mi := &file_hello_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -162,7 +272,7 @@ func (x *GoodByeHttpRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GoodByeHttpRequest.ProtoReflect.Descriptor instead.
 func (*GoodByeHttpRequest) Descriptor() ([]byte, []int) {
-	return file_hello_proto_rawDescGZIP(), []int{2}
+	return file_hello_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GoodByeHttpRequest) GetName() string {
@@ -184,7 +294,7 @@ type GoodByeHttpResponse struct {
 func (x *GoodByeHttpResponse) Reset() {
 	*x = GoodByeHttpResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_hello_proto_msgTypes[3]
+		mi := &file_hello_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -197,7 +307,7 @@ func (x *GoodByeHttpResponse) String() string {
 func (*GoodByeHttpResponse) ProtoMessage() {}
 
 func (x *GoodByeHttpResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_hello_proto_msgTypes[3]
+	mi := &file_hello_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -210,7 +320,7 @@ func (x *GoodByeHttpResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GoodByeHttpResponse.ProtoReflect.Descriptor instead.
 func (*GoodByeHttpResponse) Descriptor() ([]byte, []int) {
-	return file_hello_proto_rawDescGZIP(), []int{3}
+	return file_hello_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *GoodByeHttpResponse) GetCode() int32 {
@@ -232,20 +342,34 @@ var File_hello_proto protoreflect.FileDescriptor
 var file_hello_proto_rawDesc = []byte{
 	0x0a, 0x0b, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1c, 0x67,
 	0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x61, 0x6e, 0x6e, 0x6f, 0x74, 0x61,
-	0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x26, 0x0a, 0x10, 0x48,
-	0x65, 0x6c, 0x6c, 0x6f, 0x48, 0x74, 0x74, 0x70, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
-	0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e,
-	0x61, 0x6d, 0x65, 0x22, 0x39, 0x0a, 0x11, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x48, 0x74, 0x74, 0x70,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x12, 0x10, 0x0a, 0x03,
-	0x6d, 0x73, 0x67, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6d, 0x73, 0x67, 0x22, 0x28,
-	0x0a, 0x12, 0x47, 0x6f, 0x6f, 0x64, 0x42, 0x79, 0x65, 0x48, 0x74, 0x74, 0x70, 0x52, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x3b, 0x0a, 0x13, 0x47, 0x6f, 0x6f, 0x64,
-	0x42, 0x79, 0x65, 0x48, 0x74, 0x74, 0x70, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
-	0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x04, 0x63,
-	0x6f, 0x64, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x6d, 0x73, 0x67, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x03, 0x6d, 0x73, 0x67, 0x32, 0xb1, 0x01, 0x0a, 0x09, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x48,
+	0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x36, 0x0a, 0x0e, 0x48,
+	0x65, 0x6c, 0x6c, 0x6f, 0x44, 0x42, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a,
+	0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d,
+	0x65, 0x12, 0x10, 0x0a, 0x03, 0x61, 0x67, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x03,
+	0x61, 0x67, 0x65, 0x22, 0x37, 0x0a, 0x0f, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x44, 0x42, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x61, 0x67,
+	0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x03, 0x61, 0x67, 0x65, 0x22, 0x26, 0x0a, 0x10,
+	0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x48, 0x74, 0x74, 0x70, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04,
+	0x6e, 0x61, 0x6d, 0x65, 0x22, 0x39, 0x0a, 0x11, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x48, 0x74, 0x74,
+	0x70, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64,
+	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x12, 0x10, 0x0a,
+	0x03, 0x6d, 0x73, 0x67, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6d, 0x73, 0x67, 0x22,
+	0x28, 0x0a, 0x12, 0x47, 0x6f, 0x6f, 0x64, 0x42, 0x79, 0x65, 0x48, 0x74, 0x74, 0x70, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x3b, 0x0a, 0x13, 0x47, 0x6f, 0x6f,
+	0x64, 0x42, 0x79, 0x65, 0x48, 0x74, 0x74, 0x70, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x04,
+	0x63, 0x6f, 0x64, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x6d, 0x73, 0x67, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x03, 0x6d, 0x73, 0x67, 0x32, 0x6d, 0x0a, 0x07, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x44,
+	0x42, 0x12, 0x30, 0x0a, 0x09, 0x53, 0x61, 0x79, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x31, 0x12, 0x0f,
+	0x2e, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x44, 0x42, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
+	0x10, 0x2e, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x44, 0x42, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x22, 0x00, 0x12, 0x30, 0x0a, 0x09, 0x53, 0x61, 0x79, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x32,
+	0x12, 0x0f, 0x2e, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x44, 0x42, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x1a, 0x10, 0x2e, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x44, 0x42, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x22, 0x00, 0x32, 0xb1, 0x01, 0x0a, 0x09, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x48,
 	0x74, 0x74, 0x70, 0x12, 0x4d, 0x0a, 0x08, 0x53, 0x61, 0x79, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x12,
 	0x11, 0x2e, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x48, 0x74, 0x74, 0x70, 0x52, 0x65, 0x71, 0x75, 0x65,
 	0x73, 0x74, 0x1a, 0x12, 0x2e, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x48, 0x74, 0x74, 0x70, 0x52, 0x65,
@@ -272,20 +396,26 @@ func file_hello_proto_rawDescGZIP() []byte {
 	return file_hello_proto_rawDescData
 }
 
-var file_hello_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_hello_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_hello_proto_goTypes = []interface{}{
-	(*HelloHttpRequest)(nil),    // 0: HelloHttpRequest
-	(*HelloHttpResponse)(nil),   // 1: HelloHttpResponse
-	(*GoodByeHttpRequest)(nil),  // 2: GoodByeHttpRequest
-	(*GoodByeHttpResponse)(nil), // 3: GoodByeHttpResponse
+	(*HelloDBRequest)(nil),      // 0: HelloDBRequest
+	(*HelloDBResponse)(nil),     // 1: HelloDBResponse
+	(*HelloHttpRequest)(nil),    // 2: HelloHttpRequest
+	(*HelloHttpResponse)(nil),   // 3: HelloHttpResponse
+	(*GoodByeHttpRequest)(nil),  // 4: GoodByeHttpRequest
+	(*GoodByeHttpResponse)(nil), // 5: GoodByeHttpResponse
 }
 var file_hello_proto_depIdxs = []int32{
-	0, // 0: HelloHttp.SayHello:input_type -> HelloHttpRequest
-	2, // 1: HelloHttp.SayGoodbye:input_type -> GoodByeHttpRequest
-	1, // 2: HelloHttp.SayHello:output_type -> HelloHttpResponse
-	3, // 3: HelloHttp.SayGoodbye:output_type -> GoodByeHttpResponse
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
+	0, // 0: HelloDB.SayHello1:input_type -> HelloDBRequest
+	0, // 1: HelloDB.SayHello2:input_type -> HelloDBRequest
+	2, // 2: HelloHttp.SayHello:input_type -> HelloHttpRequest
+	4, // 3: HelloHttp.SayGoodbye:input_type -> GoodByeHttpRequest
+	1, // 4: HelloDB.SayHello1:output_type -> HelloDBResponse
+	1, // 5: HelloDB.SayHello2:output_type -> HelloDBResponse
+	3, // 6: HelloHttp.SayHello:output_type -> HelloHttpResponse
+	5, // 7: HelloHttp.SayGoodbye:output_type -> GoodByeHttpResponse
+	4, // [4:8] is the sub-list for method output_type
+	0, // [0:4] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -298,7 +428,7 @@ func file_hello_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_hello_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*HelloHttpRequest); i {
+			switch v := v.(*HelloDBRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -310,7 +440,7 @@ func file_hello_proto_init() {
 			}
 		}
 		file_hello_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*HelloHttpResponse); i {
+			switch v := v.(*HelloDBResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -322,7 +452,7 @@ func file_hello_proto_init() {
 			}
 		}
 		file_hello_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GoodByeHttpRequest); i {
+			switch v := v.(*HelloHttpRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -334,6 +464,30 @@ func file_hello_proto_init() {
 			}
 		}
 		file_hello_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*HelloHttpResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_hello_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GoodByeHttpRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_hello_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GoodByeHttpResponse); i {
 			case 0:
 				return &v.state
@@ -352,9 +506,9 @@ func file_hello_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_hello_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   6,
 			NumExtensions: 0,
-			NumServices:   1,
+			NumServices:   2,
 		},
 		GoTypes:           file_hello_proto_goTypes,
 		DependencyIndexes: file_hello_proto_depIdxs,

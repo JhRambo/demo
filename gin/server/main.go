@@ -6,6 +6,7 @@ import (
 	pb_binary "demo/gin/proto/binary"
 	pb_hello "demo/gin/proto/hello"
 	"fmt"
+	"io"
 	"log"
 	"net"
 
@@ -22,6 +23,22 @@ func NewServer() *Server {
 }
 
 func (s *Server) UploadFile(stream pb_binary.BinaryHttp_UploadFileServer) error {
+	var fileData []byte
+	for {
+		// 从流中读取文件数据
+		chunk, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return err
+		}
+		fileData = append(fileData, chunk.Data...)
+	}
+	stream.SendAndClose(&pb_binary.BinaryResponse{
+		Code:    200,
+		Message: "ok",
+	})
 	return nil
 }
 

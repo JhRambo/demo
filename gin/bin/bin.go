@@ -1,5 +1,0 @@
-package bin
-
-func main() {
-
-}

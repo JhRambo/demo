@@ -1,7 +1,7 @@
 package main
 
 import (
-	"demo/92/utils"
+	"demo/gin/utils"
 	"log"
 )
 
