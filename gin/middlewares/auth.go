@@ -13,8 +13,8 @@ type Auth struct{}
 
 func (x *Auth) MyAuth(ctx *gin.Context) {
 	// 创建一个取消上下文
-	ctxReq, cancel := context.WithTimeout(ctx.Request.Context(), time.Second*10)
 	// ctxReq, cancel := context.WithCancel(ctx.Request.Context())
+	ctxReq, cancel := context.WithTimeout(ctx.Request.Context(), time.Second*10)
 	defer cancel()
 
 	// 将新的上下文对象附加到请求上下文中
