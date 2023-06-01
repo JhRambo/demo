@@ -12,7 +12,7 @@ import (
 func Monitor(ctx context.Context) {
 	select {
 	case <-ctx.Done():
-		log.Println(grpc.ErrorDesc(ctx.Err())) //context canceled
+		log.Println(grpc.ErrorDesc(ctx.Err()))
 		// fmt.Println(ctx.Err()) //context deadline exceeded
 	case <-time.After(2 * time.Second):
 		fmt.Println("stop monitor")

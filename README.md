@@ -36,7 +36,7 @@ Goroutine是一个轻量级的执行线程，多个Goroutine比一个线程轻�
 Goroutine是Go中最基本的执行单元，每一个Go程序至少有一个Goroutine：主Goroutine。程序启动时会自动创建。
 
 7.Context的理解
-答：context包可以提供一个请求从API请求边界到各goroutine的请求域数据传递、取消信号及截至时间等能力。
+答：context包可以提供一个请求从API请求边界到各goroutine的请求域数据传递、取消信号及截止时间等能力。
 Go 语言中的每一个请求的都是通过一个单独的 Goroutine 进行处理的。
 HTTP/RPC 请求的处理器往往都会启动新的 Goroutine 访问数据库和 RPC 服务，我们可能会创建多个 Goroutine 来处理一次请求。
 而 Context 的主要作用就是在不同的 Goroutine 之间同步请求特定的数据、取消信号以及处理请求的截止日期。
@@ -49,6 +49,15 @@ Done：    返回一个 Channel，这个 Channel 会在当前工作完成或者�
 Err：     返回 context.Context 结束的原因，它只会在 Done 返回的 Channel 被关闭时才会返回非空的值，
           如果 context.Context 被取消，会返回 Canceled 错误；如果 context.Context 超时，会返回 DeadlineExceeded 错误。
 Value：   从 context.Context 中获取键对应的值，对于同一个上下文来说，多次调用 Value 并传入相同的 Key 会返回相同的结果，该方法可以用来传递请求特定的数据。
+
+8.context的作用和使用场景
+答：context 是 Go 语言标准库中提供的一种用于在多个Goroutine之间共享上下文信息的机制，它对控制goroutine运行的生命周期和取消很有用。context 可以用于在一个请求的多个goroutine之间传递请求的元数据、控制goroutine的超时操作和取消操作。在 Go 语言中一个goroutine所运行的都是同一个request请求，每一个goroutine都可能需要访问该请求的元数据、控制goroutine的超时操作和取消操作，如果每个goroutine都需要独立传递这些数据和控制，就需要在多个goroutine之间传递相同的数据，这样会非常麻烦，而 context 可以使用上下文信息来更方便地传递数据。
+context 在网络编程中的某些情景下非常有用，例如在 HTTP 服务器中处理请求时，多个处理程序可能需要访问一些请求参数，如请求头或URL参数，而 context 可以让一个处理程序将这些参数存储在上下文中，以便其他处理程序可以方便地访问它们。
+context 的几个使用场景：
+1.在 HTTP 服务器中处理请求时，可以将请求作为一个上下文，它可以用于在多个处理程序之间传递参数和元数据。
+2.在长时间运行的 Goroutine 中控制请求的生命周期。例如，在运行一个耗时的请求时，如果用户提前取消该请求，则可以使用 context 将取消信号传递给 Goroutine。
+3.在多个 Goroutine 之间共享取消信号。例如，如果你的应用程序由多个 Goroutine 组成，其中一个 Goroutine（如主 Goroutine）负责收到系统终止信号，那么你可以使用 context 来通知其他 Goroutine 系统正在关闭，以便让它们可以完美停止并释放资源。
+总之，context 为多个 Goroutine 之间共享数据提供了便利，并且在某些场景下，使用 context 能让代码更加简洁和易于维护。
 
 
 99.proto
