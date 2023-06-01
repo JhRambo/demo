@@ -49,8 +49,8 @@ func (c *binaryHttpClient) UploadFile(ctx context.Context, opts ...grpc.CallOpti
 }
 
 type BinaryHttp_UploadFileClient interface {
-	Send(*BinaryRequest) error
-	CloseAndRecv() (*BinaryResponse, error)
+	Send(*BinaryHttpRequest) error
+	CloseAndRecv() (*BinaryHttpResponse, error)
 	grpc.ClientStream
 }
 
@@ -58,15 +58,15 @@ type binaryHttpUploadFileClient struct {
 	grpc.ClientStream
 }
 
-func (x *binaryHttpUploadFileClient) Send(m *BinaryRequest) error {
+func (x *binaryHttpUploadFileClient) Send(m *BinaryHttpRequest) error {
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *binaryHttpUploadFileClient) CloseAndRecv() (*BinaryResponse, error) {
+func (x *binaryHttpUploadFileClient) CloseAndRecv() (*BinaryHttpResponse, error) {
 	if err := x.ClientStream.CloseSend(); err != nil {
 		return nil, err
 	}
-	m := new(BinaryResponse)
+	m := new(BinaryHttpResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -106,8 +106,8 @@ func _BinaryHttp_UploadFile_Handler(srv interface{}, stream grpc.ServerStream) e
 }
 
 type BinaryHttp_UploadFileServer interface {
-	SendAndClose(*BinaryResponse) error
-	Recv() (*BinaryRequest, error)
+	SendAndClose(*BinaryHttpResponse) error
+	Recv() (*BinaryHttpRequest, error)
 	grpc.ServerStream
 }
 
@@ -115,12 +115,12 @@ type binaryHttpUploadFileServer struct {
 	grpc.ServerStream
 }
 
-func (x *binaryHttpUploadFileServer) SendAndClose(m *BinaryResponse) error {
+func (x *binaryHttpUploadFileServer) SendAndClose(m *BinaryHttpResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *binaryHttpUploadFileServer) Recv() (*BinaryRequest, error) {
-	m := new(BinaryRequest)
+func (x *binaryHttpUploadFileServer) Recv() (*BinaryHttpRequest, error) {
+	m := new(BinaryHttpRequest)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
 	}

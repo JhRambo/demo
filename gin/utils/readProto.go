@@ -12,9 +12,10 @@ func ReadProto(filePath string) []map[string]string {
 	if err != nil {
 		panic(err)
 	}
+
 	// 定义正则表达式来匹配服务名、接口名、路由和请求类型
-	serviceRegex := regexp.MustCompile(`service\s+(\w+)\s+{\s+rpc\s+(\w+)\s*\(\s*([^\)]*)\s*\)\s+returns\s+\(([^\)]*)\)\s*{[^}]*option`)
-	routeRegex := regexp.MustCompile(`rpc\s+(\w+)\s*\(\s*([^\)]*)\s*\)\s+returns\s+\(([^\)]*)\)\s*{[^}]*option\s*\(\s*google\.api\.http\s*\)\s*=\s*\{\s*(get|post|delete|put):\s*["'](/?[^\s"']*)["'];?\s*`)
+	serviceRegex := regexp.MustCompile(`service\s+(\w+)\s*{\s*rpc\s+(\w+)\s*\(\s*([^\)]*)\s*\)\s*returns\s*\(([^\)]*)\)\s*{[^}]*option`)
+	routeRegex := regexp.MustCompile(`rpc\s+(\w+)\s*\(\s*([^\)]*)\s*\)\s*returns\s*\(([^\)]*)\)\s*{[^}]*option\s*\(\s*google\.api\.http\s*\)\s*=\s*\{\s*(get|post|delete|put):\s*["'](/?[^\s"']*)["'];?\s*`)
 
 	ms := []map[string]string{}
 	serviceName := ""

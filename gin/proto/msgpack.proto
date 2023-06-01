@@ -1,0 +1,30 @@
+// 协议类型
+syntax = "proto3";
+
+option go_package = "./msgpack";
+
+import "google/api/annotations.proto";
+
+//msgpack协议
+message MsgpackHttpRequest {
+  string key = 1;
+  bytes val = 2;
+}
+
+message MsgpackHttpResponse {
+  bytes val = 1;
+}
+
+/*  这里配置http服务 
+ 多行注释 */
+service MsgpackHttp { // 服务名称 
+  // 这里是具体restful api的名称 
+  rpc MsgPackProtocol (MsgpackHttpRequest) returns (MsgpackHttpResponse) {  // msgpack协议通用方法 
+    // 这里配置method 和 uri 
+    option (google.api.http) = {  // 具体配置如下  
+      // method 
+      post: "/msgpack/protocol"  // uri 
+      body: "*"
+    };
+  }
+}

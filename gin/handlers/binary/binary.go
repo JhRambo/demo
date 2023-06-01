@@ -20,7 +20,7 @@ func UploadFile(ctx *gin.Context) {
 	}
 	client := GetClient()
 	stream, err := client.UploadFile(ctx)
-	req := &pb_binary.BinaryRequest{Data: bys}
+	req := &pb_binary.BinaryHttpRequest{Data: bys}
 	err = stream.Send(req)
 	if err != nil {
 		ctx.JSON(http.StatusOK, &config.GWResponse{

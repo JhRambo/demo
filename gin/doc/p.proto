@@ -1,0 +1,30 @@
+
+syntax = "proto3";
+
+option go_package = "./msgpack";
+
+import "google/api/annotations.proto";
+
+
+message MsgpackHttpRequest {
+  string key = 1;
+  bytes val = 2;
+}
+
+message MsgpackHttpResponse {
+  bytes val = 1;
+}
+
+/*  这里配置http服务 
+ 多行注释 */
+service MsgpackHttp { 
+  
+  rpc MsgPackProtocol (MsgpackHttpRequest) returns (MsgpackHttpResponse) {  
+    
+    option (google.api.http) = {  
+      
+      post: "/msgpack/protocol"  
+      body: "*"
+    };
+  }
+}

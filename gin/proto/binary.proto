@@ -7,7 +7,7 @@ import "google/api/annotations.proto";
 
 // 对外暴露的http协议的接口的服务 restful风格
 service BinaryHttp {
-  rpc UploadFile (stream BinaryRequest) returns (BinaryResponse) {
+  rpc UploadFile (stream BinaryHttpRequest) returns (BinaryHttpResponse) {
     option (google.api.http) = {
         post: "/binary/uploadfile"
         body: "*"
@@ -15,12 +15,12 @@ service BinaryHttp {
   }
 }
 
-message BinaryRequest {
+message BinaryHttpRequest {
   // 文件二进制数据
   bytes data = 1;
 }
 
-message BinaryResponse {
+message BinaryHttpResponse {
   int32 code = 1;
   string message = 2;
 }

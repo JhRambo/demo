@@ -11,7 +11,8 @@ func InitHandlers() {
 	protos := ScanFiles(dir)
 	for i := 0; i < len(protos); i++ {
 		protoPath := dir + "/" + protos[i] + ".proto"
-		ms := ReadProto(protoPath)
+		protoFile := FilterFile(protoPath)
+		ms := ReadProto(protoFile)
 		fcs := ""
 		for _, v := range ms {
 			requestParam := strings.TrimSpace(v["request"])

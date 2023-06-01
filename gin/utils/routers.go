@@ -8,7 +8,8 @@ func InitRouters() {
 	uris := ""
 	for i := 0; i < len(protos); i++ {
 		protoPath := dir + "/" + protos[i] + ".proto"
-		ms := ReadProto(protoPath)
+		protoFile := FilterFile(protoPath)
+		ms := ReadProto(protoFile)
 		handles += `handler_` + protos[i] + ` "demo/gin/handlers/` + protos[i] + `"
 		`
 		for _, v := range ms {

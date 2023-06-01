@@ -35,7 +35,7 @@ func (s *Server) UploadFile(stream pb_binary.BinaryHttp_UploadFileServer) error 
 		}
 		fileData = append(fileData, chunk.Data...)
 	}
-	stream.SendAndClose(&pb_binary.BinaryResponse{
+	stream.SendAndClose(&pb_binary.BinaryHttpResponse{
 		Code:    200,
 		Message: "ok",
 	})
