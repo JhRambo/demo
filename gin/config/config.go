@@ -16,3 +16,5 @@ type GWResponse struct {
 	Code    int32  `json:"code"`
 	Message string `json:"message"`
 }
+
+const MSGPACK_URI = "/HELLO/SAYHELLO|/HELLO/SAYGOODBYE" //使用msgpack协议的接口uri

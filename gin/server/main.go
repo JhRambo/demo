@@ -5,21 +5,41 @@ import (
 	"demo/gin/config"
 	pb_binary "demo/gin/proto/binary"
 	pb_hello "demo/gin/proto/hello"
+	pb_msgpack "demo/gin/proto/msgpack"
 	"fmt"
 	"io"
 	"log"
 	"net"
 
+	"github.com/vmihailenco/msgpack/v5"
 	"google.golang.org/grpc"
 )
 
 type Server struct {
 	pb_binary.UnimplementedBinaryHttpServer
 	pb_hello.UnimplementedHelloHttpServer
+	pb_msgpack.UnimplementedMsgpackHttpServer
 }
 
 func NewServer() *Server {
 	return &Server{}
+}
+
+// 使用msgpack协议
+func (s *Server) Binary(ctx context.Context, req *pb_msgpack.MsgpackHttpRequest) (*pb_msgpack.MsgpackHttpResponse, error) {
+	var bys []byte
+	//根据不同key跳转到不同的服务去执行
+	switch req.Key {
+	case "/HELLO/SAYHELLO":
+		r := &pb_hello.HelloHttpRequest{}
+		msgpack.Unmarshal(req.Val, r)
+		w, _ := s.SayHello(ctx, r)
+		bys, _ = msgpack.Marshal(w)
+		//这里追加=====================TODO
+	}
+	return &pb_msgpack.MsgpackHttpResponse{
+		Val: bys,
+	}, nil
 }
 
 func (s *Server) UploadFile(stream pb_binary.BinaryHttp_UploadFileServer) error {

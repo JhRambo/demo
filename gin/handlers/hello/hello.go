@@ -18,7 +18,14 @@ func SayHello(ctx *gin.Context) {
 		})
 		return
 	}
-	res, _ := client.SayHello(ctx, req)
+	res, err := client.SayHello(ctx, req)
+	if err != nil {
+		ctx.JSON(http.StatusOK, &config.GWResponse{
+			Code:    -1,
+			Message: err.Error(),
+		})
+		return
+	}
 	ctx.JSON(http.StatusOK, res)
 }
 
@@ -32,7 +39,14 @@ func SayGoodbye(ctx *gin.Context) {
 		})
 		return
 	}
-	res, _ := client.SayGoodbye(ctx, req)
+	res, err := client.SayGoodbye(ctx, req)
+	if err != nil {
+		ctx.JSON(http.StatusOK, &config.GWResponse{
+			Code:    -1,
+			Message: err.Error(),
+		})
+		return
+	}
 	ctx.JSON(http.StatusOK, res)
 }
 
