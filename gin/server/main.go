@@ -30,12 +30,12 @@ func (s *Server) MsgPackProtocol(ctx context.Context, req *pb_msgpack.MsgpackHtt
 	var bys []byte
 	//根据不同key跳转到不同的服务去执行
 	switch req.Key {
-	case "/msgpack/protocol":
+	case "/HELLO/SAYHELLO": //统一转大写处理
 		r := &pb_hello.HelloHttpRequest{}
 		msgpack.Unmarshal(req.Val, r)
 		w, _ := s.SayHello(ctx, r)
 		bys, _ = msgpack.Marshal(w)
-		//这里追加=====================TODO
+		//这里追加其他的case=====================TODO
 	}
 	return &pb_msgpack.MsgpackHttpResponse{
 		Data: bys,

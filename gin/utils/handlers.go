@@ -30,7 +30,7 @@ func InitHandlers() {
 				func ` + v["rpcName"] + `(ctx *gin.Context) {
 					bys, err := utils.GetBinary(ctx)
 					if err != nil {
-						ctx.JSON(http.StatusInternalServerError, &config.GWResponse{
+						ctx.JSON(http.StatusBadRequest, &config.GWResponse{
 							Code:    -1,
 							Message: err.Error(),
 						})
@@ -82,12 +82,13 @@ func InitHandlers() {
 				filePath := "D:/code/demo/gin/handlers/" + protos[i] + "/" + protos[i] + ".go"
 				CreateFile(filePath, content)
 			} else if v["serviceName"] == "MsgpackHttp" {
-				//Msgpack协议处理
+				// Msgpack协议处理
 				fcs += `
+				//通用msgpack协议入口，服务端根据uri跳转到对应的服务处理
 				func ` + v["rpcName"] + `(ctx *gin.Context) {
 					bys, err := utils.GetBinary(ctx)
 					if err != nil {
-						ctx.JSON(http.StatusInternalServerError, &config.GWResponse{
+						ctx.JSON(http.StatusBadRequest, &config.GWResponse{
 							Code:    -1,
 							Message: err.Error(),
 						})
@@ -95,7 +96,7 @@ func InitHandlers() {
 					}
 					client:=GetClient()
 					req := &pb_` + protos[i] + `.` + requestParam + `{
-						Key: ctx.Request.RequestURI,
+						Key: strings.ToUpper(ctx.Request.RequestURI),
 						Val: bys,
 					}
 					res, err := client.` + v["rpcName"] + `(ctx, req)
@@ -119,6 +120,7 @@ func InitHandlers() {
 						"net/http"
 						pb_` + protos[i] + `"demo/gin/proto/` + protos[i] + `"
 						"github.com/gin-gonic/gin"
+						"strings"
 					)
 				` + fcs
 
@@ -140,7 +142,7 @@ func InitHandlers() {
 					client:=GetClient()
 					req := &pb_` + protos[i] + `.` + requestParam + `{}
 					if err := ctx.ShouldBindJSON(req); err != nil {
-						ctx.JSON(http.StatusInternalServerError, &config.GWResponse{
+						ctx.JSON(http.StatusBadRequest, &config.GWResponse{
 							Code: -1,
 							Message:  err.Error(),
 						})

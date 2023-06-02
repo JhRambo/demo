@@ -4,15 +4,16 @@ import (
 	grpc_client "demo/gin/client"
 	"demo/gin/config"
 	pb_hello "demo/gin/proto/hello"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 func SayHello(ctx *gin.Context) {
 	client := GetClient()
 	req := &pb_hello.HelloHttpRequest{}
 	if err := ctx.ShouldBindJSON(req); err != nil {
-		ctx.JSON(http.StatusInternalServerError, &config.GWResponse{
+		ctx.JSON(http.StatusBadRequest, &config.GWResponse{
 			Code:    -1,
 			Message: err.Error(),
 		})
@@ -33,7 +34,7 @@ func SayGoodbye(ctx *gin.Context) {
 	client := GetClient()
 	req := &pb_hello.GoodByeHttpRequest{}
 	if err := ctx.ShouldBindJSON(req); err != nil {
-		ctx.JSON(http.StatusInternalServerError, &config.GWResponse{
+		ctx.JSON(http.StatusBadRequest, &config.GWResponse{
 			Code:    -1,
 			Message: err.Error(),
 		})

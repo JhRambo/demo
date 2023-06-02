@@ -15,8 +15,7 @@ message MsgpackHttpResponse {
   bytes data = 1;
 }
 
-/*  这里配置http服务 
- 多行注释 */
+
 service MsgpackHttp { 
   
   rpc MsgPackProtocol (MsgpackHttpRequest) returns (MsgpackHttpResponse) {  

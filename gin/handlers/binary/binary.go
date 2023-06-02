@@ -5,14 +5,15 @@ import (
 	"demo/gin/config"
 	pb_binary "demo/gin/proto/binary"
 	"demo/gin/utils"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 func UploadFile(ctx *gin.Context) {
 	bys, err := utils.GetBinary(ctx)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, &config.GWResponse{
+		ctx.JSON(http.StatusBadRequest, &config.GWResponse{
 			Code:    -1,
 			Message: err.Error(),
 		})

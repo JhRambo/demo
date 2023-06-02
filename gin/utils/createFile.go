@@ -42,9 +42,17 @@ func CreateFile(filePath string, content string) {
 		}
 	}
 
-	// Format the file
-	cmd := exec.Command("go", "fmt", filePath)
+	// 自动格式化代码，使用 gofmt 工具
+	cmd := exec.Command("gofmt", "-w", "-s", filePath)
 	err := cmd.Run()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// 自动检测和处理未使用的 import，使用 goimports 工具
+	cmd = exec.Command("goimports", "-w", "-local", ".", filePath)
+	err = cmd.Run()
 	if err != nil {
 		fmt.Println(err)
 		return

@@ -1,6 +1,11 @@
 package utils
 
-//初始化路由文件
+import (
+	"demo/gin/config"
+	"strings"
+)
+
+// 初始化路由文件
 func InitRouters() {
 	dir := "D:/code/demo/gin/proto"
 	protos := ScanFiles(dir)
@@ -13,8 +18,14 @@ func InitRouters() {
 		handles += `handler_` + protos[i] + ` "demo/gin/handlers/` + protos[i] + `"
 		`
 		for _, v := range ms {
-			uris += `r.` + v["method"] + `("` + v["uri"] + `", handler_` + protos[i] + `.` + v["rpcName"] + `)
-			`
+			if strings.Contains(config.MSGPACK_URI, strings.ToUpper(v["uri"])) {
+				//通用msgpack协议入口，服务端根据uri跳转到对应的服务处理
+				uris += `r.` + v["method"] + `("` + v["uri"] + `", handler_msgpack.MsgPackProtocol)
+				`
+			} else {
+				uris += `r.` + v["method"] + `("` + v["uri"] + `", handler_` + protos[i] + `.` + v["rpcName"] + `)
+				`
+			}
 		}
 	}
 	content := `
