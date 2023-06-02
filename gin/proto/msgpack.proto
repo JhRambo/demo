@@ -15,7 +15,10 @@ message MsgpackHttpResponse {
   bytes data = 1;
 }
 
-//通用msgpack协议入口，服务端根据uri跳转到对应的服务处理
+/* 
+msgpack
+通用msgpack协议入口，服务端根据uri跳转到对应的服务处理 
+*/
 service MsgpackHttp { // 服务名称 
   // 这里是具体restful api的名称 
   rpc MsgPackProtocol (MsgpackHttpRequest) returns (MsgpackHttpResponse) {  // msgpack协议通用方法 
