@@ -11,9 +11,9 @@ import (
 )
 
 /*
-	监控文件内容变化
+	监听文件内容变化
 
-并自动生成代码
+并自动生成网关代码
 */
 func main() {
 	watchDir := "D:/code/demo/gin/utils/proto" //proto生成的.go文件所在的目录
@@ -47,20 +47,18 @@ func generateCode(readDir string) error {
 	if err != nil {
 		return err
 	}
-
 	// 遍历文件，生成代码
 	for _, file := range files {
 		if !file.IsDir() {
 			fmt.Printf("Generating code from %s...\n", file.Name())
-			// 根据文件生成所需代码
+			// 自动生成网关所需的代码
 			utils.CreateCode()
 		}
 	}
-
 	return nil
 }
 
-// 监控proto生成的.go文件所在的目录
+// 监听proto生成的.go文件所在的目录
 func watchFiles(watchDir string, restartFunc func()) error {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
