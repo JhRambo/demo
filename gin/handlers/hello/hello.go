@@ -3,7 +3,7 @@ package hello
 import (
 	grpc_client "demo/gin/client"
 	"demo/gin/config"
-	pb_hello "demo/gin/proto/hello"
+	pb_hello "demo/gin/utils/proto/hello"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

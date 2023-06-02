@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"demo/gin/config"
-	pb_binary "demo/gin/proto/binary"
-	pb_hello "demo/gin/proto/hello"
-	pb_msgpack "demo/gin/proto/msgpack"
+	pb_binary "demo/gin/utils/proto/binary"
+	pb_hello "demo/gin/utils/proto/hello"
+	pb_msgpack "demo/gin/utils/proto/msgpack"
 	"fmt"
 	"io"
 	"log"

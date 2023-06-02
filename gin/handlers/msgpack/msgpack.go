@@ -3,8 +3,8 @@ package msgpack
 import (
 	grpc_client "demo/gin/client"
 	"demo/gin/config"
-	pb_msgpack "demo/gin/proto/msgpack"
 	"demo/gin/utils"
+	pb_msgpack "demo/gin/utils/proto/msgpack"
 	"net/http"
 	"strings"
 

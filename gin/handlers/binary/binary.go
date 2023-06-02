@@ -3,8 +3,8 @@ package binary
 import (
 	grpc_client "demo/gin/client"
 	"demo/gin/config"
-	pb_binary "demo/gin/proto/binary"
 	"demo/gin/utils"
+	pb_binary "demo/gin/utils/proto/binary"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

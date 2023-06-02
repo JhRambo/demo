@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 
 	"github.com/fsnotify/fsnotify"
-	"github.com/gin-gonic/gin"
 )
 
 /*
@@ -17,19 +16,19 @@ import (
 并自动生成代码
 */
 func main() {
-	watchDir := "D:/code/demo/gin/proto"
-	router := gin.Default()
+	watchDir := "D:/code/demo/gin/utils/proto" //proto生成的.go文件所在的目录
+	readDir := "D:/code/demo/gin/proto"        //proto文件所在的目录
 
 	// 定义需要热更新的函数
 	restartFunc := func() {
-		if err := generateCode(watchDir); err != nil {
+		if err := generateCode(readDir); err != nil {
 			fmt.Println("Error generating code:", err)
 			return
 		}
 		fmt.Println("Code successfully generated...")
 	}
 
-	if err := generateCode(watchDir); err != nil {
+	if err := generateCode(readDir); err != nil {
 		fmt.Println("Error generating code:", err)
 		return
 	}
@@ -39,23 +38,12 @@ func main() {
 		fmt.Println("Error watching files:", err)
 		return
 	}
-
-	// 注册默认路由
-	router.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "Welcome to your gin app",
-		})
-	})
-
-	// 启动 gin
-	if err := router.Run(":8080"); err != nil {
-		fmt.Println("Error starting router:", err)
-	}
 }
 
-func generateCode(watchDir string) error {
+// 遍历proto文件所在的目录
+func generateCode(readDir string) error {
 	// 读取文件夹下所有文件
-	files, err := ioutil.ReadDir(watchDir)
+	files, err := ioutil.ReadDir(readDir)
 	if err != nil {
 		return err
 	}
@@ -64,8 +52,7 @@ func generateCode(watchDir string) error {
 	for _, file := range files {
 		if !file.IsDir() {
 			fmt.Printf("Generating code from %s...\n", file.Name())
-
-			// TODO: 根据文件生成所需代码，比如 grpc-client 客户端和路由代码
+			// 根据文件生成所需代码
 			utils.CreateCode()
 		}
 	}
@@ -73,6 +60,7 @@ func generateCode(watchDir string) error {
 	return nil
 }
 
+// 监控proto生成的.go文件所在的目录
 func watchFiles(watchDir string, restartFunc func()) error {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {

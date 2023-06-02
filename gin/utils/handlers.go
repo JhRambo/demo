@@ -66,7 +66,7 @@ func InitHandlers() {
 						grpc_client "demo/gin/client"
 						"demo/gin/config"
 						"net/http"
-						pb_` + protos[i] + `"demo/gin/proto/` + protos[i] + `"
+						pb_` + protos[i] + `"demo/gin/utils/proto/` + protos[i] + `"
 						"github.com/gin-gonic/gin"
 					)
 				` + fcs
@@ -118,7 +118,7 @@ func InitHandlers() {
 						grpc_client "demo/gin/client"
 						"demo/gin/config"
 						"net/http"
-						pb_` + protos[i] + `"demo/gin/proto/` + protos[i] + `"
+						pb_` + protos[i] + `"demo/gin/utils/proto/` + protos[i] + `"
 						"github.com/gin-gonic/gin"
 						"strings"
 					)
@@ -166,7 +166,7 @@ func InitHandlers() {
 						grpc_client "demo/gin/client"
 						"demo/gin/config"
 						"net/http"
-						pb_` + protos[i] + `"demo/gin/proto/` + protos[i] + `"
+						pb_` + protos[i] + `"demo/gin/utils/proto/` + protos[i] + `"
 						"github.com/gin-gonic/gin"
 					)
 				` + fcs

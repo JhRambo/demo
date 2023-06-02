@@ -1,7 +1,7 @@
 // 协议类型
 syntax = "proto3";
 
-option go_package = "./msgpack";
+option go_package = "../utils/proto/msgpack";
 
 import "google/api/annotations.proto";
 
