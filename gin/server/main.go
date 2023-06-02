@@ -26,11 +26,11 @@ func NewServer() *Server {
 }
 
 // 使用msgpack协议
-func (s *Server) Binary(ctx context.Context, req *pb_msgpack.MsgpackHttpRequest) (*pb_msgpack.MsgpackHttpResponse, error) {
+func (s *Server) MsgPackProtocol(ctx context.Context, req *pb_msgpack.MsgpackHttpRequest) (*pb_msgpack.MsgpackHttpResponse, error) {
 	var bys []byte
 	//根据不同key跳转到不同的服务去执行
 	switch req.Key {
-	case "/HELLO/SAYHELLO":
+	case "/msgpack/protocol":
 		r := &pb_hello.HelloHttpRequest{}
 		msgpack.Unmarshal(req.Val, r)
 		w, _ := s.SayHello(ctx, r)
@@ -38,7 +38,7 @@ func (s *Server) Binary(ctx context.Context, req *pb_msgpack.MsgpackHttpRequest)
 		//这里追加=====================TODO
 	}
 	return &pb_msgpack.MsgpackHttpResponse{
-		Val: bys,
+		Data: bys,
 	}, nil
 }
 
@@ -56,7 +56,7 @@ func (s *Server) UploadFile(stream pb_binary.BinaryHttp_UploadFileServer) error 
 		fileData = append(fileData, chunk.Data...)
 	}
 	stream.SendAndClose(&pb_binary.BinaryHttpResponse{
-		Code:    200,
+		Code:    0,
 		Message: "ok",
 	})
 	return nil
@@ -64,16 +64,16 @@ func (s *Server) UploadFile(stream pb_binary.BinaryHttp_UploadFileServer) error 
 
 func (s *Server) SayHello(ctx context.Context, req *pb_hello.HelloHttpRequest) (*pb_hello.HelloHttpResponse, error) {
 	resp := &pb_hello.HelloHttpResponse{
-		Code: 200,
-		Msg:  req.Name + " hello!",
+		Code:    0,
+		Message: req.Name + " hello!",
 	}
 	return resp, nil
 }
 
 func (s *Server) SayGoodbye(ctx context.Context, req *pb_hello.GoodByeHttpRequest) (*pb_hello.GoodByeHttpResponse, error) {
 	resp := &pb_hello.GoodByeHttpResponse{
-		Code: 200,
-		Msg:  req.Name + " goodbye!",
+		Code:    0,
+		Message: req.Name + " goodbye!",
 	}
 	return resp, nil
 }
@@ -90,6 +90,7 @@ func main() {
 	// 注册gRPC-server服务
 	pb_binary.RegisterBinaryHttpServer(s, NewServer())
 	pb_hello.RegisterHelloHttpServer(s, NewServer())
+	pb_msgpack.RegisterMsgpackHttpServer(s, NewServer())
 	// 启动gRPC-Server
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)

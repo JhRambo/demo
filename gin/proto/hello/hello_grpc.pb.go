@@ -21,16 +21,16 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	HelloDB_SayHello1_FullMethodName = "/HelloDB/SayHello1"
-	HelloDB_SayHello2_FullMethodName = "/HelloDB/SayHello2"
+	HelloDB_SayHello_FullMethodName   = "/HelloDB/SayHello"
+	HelloDB_SayGoodbye_FullMethodName = "/HelloDB/SayGoodbye"
 )
 
 // HelloDBClient is the client API for HelloDB service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type HelloDBClient interface {
-	SayHello1(ctx context.Context, in *HelloDBRequest, opts ...grpc.CallOption) (*HelloDBResponse, error)
-	SayHello2(ctx context.Context, in *HelloDBRequest, opts ...grpc.CallOption) (*HelloDBResponse, error)
+	SayHello(ctx context.Context, in *HelloDBRequest, opts ...grpc.CallOption) (*HelloDBResponse, error)
+	SayGoodbye(ctx context.Context, in *GoodByeDBRequest, opts ...grpc.CallOption) (*GoodByeDBResponse, error)
 }
 
 type helloDBClient struct {
@@ -41,18 +41,18 @@ func NewHelloDBClient(cc grpc.ClientConnInterface) HelloDBClient {
 	return &helloDBClient{cc}
 }
 
-func (c *helloDBClient) SayHello1(ctx context.Context, in *HelloDBRequest, opts ...grpc.CallOption) (*HelloDBResponse, error) {
+func (c *helloDBClient) SayHello(ctx context.Context, in *HelloDBRequest, opts ...grpc.CallOption) (*HelloDBResponse, error) {
 	out := new(HelloDBResponse)
-	err := c.cc.Invoke(ctx, HelloDB_SayHello1_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, HelloDB_SayHello_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *helloDBClient) SayHello2(ctx context.Context, in *HelloDBRequest, opts ...grpc.CallOption) (*HelloDBResponse, error) {
-	out := new(HelloDBResponse)
-	err := c.cc.Invoke(ctx, HelloDB_SayHello2_FullMethodName, in, out, opts...)
+func (c *helloDBClient) SayGoodbye(ctx context.Context, in *GoodByeDBRequest, opts ...grpc.CallOption) (*GoodByeDBResponse, error) {
+	out := new(GoodByeDBResponse)
+	err := c.cc.Invoke(ctx, HelloDB_SayGoodbye_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -63,8 +63,8 @@ func (c *helloDBClient) SayHello2(ctx context.Context, in *HelloDBRequest, opts 
 // All implementations must embed UnimplementedHelloDBServer
 // for forward compatibility
 type HelloDBServer interface {
-	SayHello1(context.Context, *HelloDBRequest) (*HelloDBResponse, error)
-	SayHello2(context.Context, *HelloDBRequest) (*HelloDBResponse, error)
+	SayHello(context.Context, *HelloDBRequest) (*HelloDBResponse, error)
+	SayGoodbye(context.Context, *GoodByeDBRequest) (*GoodByeDBResponse, error)
 	mustEmbedUnimplementedHelloDBServer()
 }
 
@@ -72,11 +72,11 @@ type HelloDBServer interface {
 type UnimplementedHelloDBServer struct {
 }
 
-func (UnimplementedHelloDBServer) SayHello1(context.Context, *HelloDBRequest) (*HelloDBResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SayHello1 not implemented")
+func (UnimplementedHelloDBServer) SayHello(context.Context, *HelloDBRequest) (*HelloDBResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SayHello not implemented")
 }
-func (UnimplementedHelloDBServer) SayHello2(context.Context, *HelloDBRequest) (*HelloDBResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SayHello2 not implemented")
+func (UnimplementedHelloDBServer) SayGoodbye(context.Context, *GoodByeDBRequest) (*GoodByeDBResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SayGoodbye not implemented")
 }
 func (UnimplementedHelloDBServer) mustEmbedUnimplementedHelloDBServer() {}
 
@@ -91,38 +91,38 @@ func RegisterHelloDBServer(s grpc.ServiceRegistrar, srv HelloDBServer) {
 	s.RegisterService(&HelloDB_ServiceDesc, srv)
 }
 
-func _HelloDB_SayHello1_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _HelloDB_SayHello_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(HelloDBRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(HelloDBServer).SayHello1(ctx, in)
+		return srv.(HelloDBServer).SayHello(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: HelloDB_SayHello1_FullMethodName,
+		FullMethod: HelloDB_SayHello_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(HelloDBServer).SayHello1(ctx, req.(*HelloDBRequest))
+		return srv.(HelloDBServer).SayHello(ctx, req.(*HelloDBRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _HelloDB_SayHello2_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(HelloDBRequest)
+func _HelloDB_SayGoodbye_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GoodByeDBRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(HelloDBServer).SayHello2(ctx, in)
+		return srv.(HelloDBServer).SayGoodbye(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: HelloDB_SayHello2_FullMethodName,
+		FullMethod: HelloDB_SayGoodbye_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(HelloDBServer).SayHello2(ctx, req.(*HelloDBRequest))
+		return srv.(HelloDBServer).SayGoodbye(ctx, req.(*GoodByeDBRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -135,12 +135,12 @@ var HelloDB_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*HelloDBServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "SayHello1",
-			Handler:    _HelloDB_SayHello1_Handler,
+			MethodName: "SayHello",
+			Handler:    _HelloDB_SayHello_Handler,
 		},
 		{
-			MethodName: "SayHello2",
-			Handler:    _HelloDB_SayHello2_Handler,
+			MethodName: "SayGoodbye",
+			Handler:    _HelloDB_SayGoodbye_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

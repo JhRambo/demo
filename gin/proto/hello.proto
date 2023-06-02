@@ -7,16 +7,23 @@ import "google/api/annotations.proto";
 
 // DB连接
 service HelloDB {
-  rpc SayHello1(HelloDBRequest) returns (HelloDBResponse){}
-  rpc SayHello2(HelloDBRequest) returns (HelloDBResponse){}
+  rpc SayHello(HelloDBRequest) returns (HelloDBResponse){}
+  rpc SayGoodbye(GoodByeDBRequest) returns (GoodByeDBResponse){}
 }
 message HelloDBRequest {
   string name = 1;
-  int32 age = 2;
 }
 message HelloDBResponse {
+  int32 code = 1;
+  string message = 2;
+}
+
+message GoodByeDBRequest {
   string name = 1;
-  int32 age = 2;
+}
+message GoodByeDBResponse {
+  int32 code = 1;
+  string message = 2;
 }
 
 // 对外暴露的http协议的接口的服务 restful风格
@@ -41,7 +48,7 @@ message HelloHttpRequest {
 
 message HelloHttpResponse {
   int32 code = 1;
-  string msg = 2;
+  string message = 2;
 }
 
 message GoodByeHttpRequest {
@@ -50,5 +57,5 @@ message GoodByeHttpRequest {
 
 message GoodByeHttpResponse {
   int32 code = 1;
-  string msg = 2;
+  string message = 2;
 }

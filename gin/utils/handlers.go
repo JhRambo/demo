@@ -16,9 +16,9 @@ func InitHandlers() {
 		fcs := ""
 		for _, v := range ms {
 			requestParam := strings.TrimSpace(v["request"])
-			//binary二进制流特殊处理
 			regex := regexp.MustCompile(`stream`)
 			if regex.MatchString(v["request"]) {
+				//binary二进制流
 				re := regexp.MustCompile(`stream\s+(\w+)`)
 				match := re.FindStringSubmatch(requestParam)
 				if len(match) > 1 {
@@ -30,7 +30,7 @@ func InitHandlers() {
 				func ` + v["rpcName"] + `(ctx *gin.Context) {
 					bys, err := utils.GetBinary(ctx)
 					if err != nil {
-						ctx.JSON(http.StatusOK, &config.GWResponse{
+						ctx.JSON(http.StatusInternalServerError, &config.GWResponse{
 							Code:    -1,
 							Message: err.Error(),
 						})
@@ -41,7 +41,7 @@ func InitHandlers() {
 					req := &pb_` + protos[i] + `.` + requestParam + `{Data: bys}
 					err = stream.Send(req)
 					if err != nil {
-						ctx.JSON(http.StatusOK, &config.GWResponse{
+						ctx.JSON(http.StatusInternalServerError, &config.GWResponse{
 							Code:    -1,
 							Message: err.Error(),
 						})
@@ -50,7 +50,7 @@ func InitHandlers() {
 					// 关闭流
 					res, err := stream.CloseAndRecv()
 					if err != nil {
-						ctx.JSON(http.StatusOK, &config.GWResponse{
+						ctx.JSON(http.StatusInternalServerError, &config.GWResponse{
 							Code:    -1,
 							Message: err.Error(),
 						})
@@ -87,7 +87,7 @@ func InitHandlers() {
 				func ` + v["rpcName"] + `(ctx *gin.Context) {
 					bys, err := utils.GetBinary(ctx)
 					if err != nil {
-						ctx.JSON(http.StatusOK, &config.GWResponse{
+						ctx.JSON(http.StatusInternalServerError, &config.GWResponse{
 							Code:    -1,
 							Message: err.Error(),
 						})
@@ -100,21 +100,13 @@ func InitHandlers() {
 					}
 					res, err := client.` + v["rpcName"] + `(ctx, req)
 					if err != nil {
-						ctx.JSON(http.StatusOK, &config.GWResponse{
-							Code:    -1,
-							Message: err.Error(),
-						})
-						return
-					}
-					data, err := msgpack.Marshal(res.Val)
-					if err != nil {
 						ctx.JSON(http.StatusInternalServerError, &config.GWResponse{
 							Code:    -1,
 							Message: err.Error(),
 						})
 						return
 					}
-					ctx.Data(http.StatusOK, "application/x-msgpack", data)
+					ctx.Data(http.StatusOK, "application/x-msgpack", res.Data)
 				}
 				`
 				content := `
@@ -127,7 +119,6 @@ func InitHandlers() {
 						"net/http"
 						pb_` + protos[i] + `"demo/gin/proto/` + protos[i] + `"
 						"github.com/gin-gonic/gin"
-						"github.com/vmihailenco/msgpack/v5"
 					)
 				` + fcs
 
@@ -143,12 +134,13 @@ func InitHandlers() {
 				filePath := "D:/code/demo/gin/handlers/" + protos[i] + "/" + protos[i] + ".go"
 				CreateFile(filePath, content)
 			} else {
+				//json协议
 				fcs += `
 				func ` + v["rpcName"] + `(ctx *gin.Context) {
 					client:=GetClient()
 					req := &pb_` + protos[i] + `.` + requestParam + `{}
 					if err := ctx.ShouldBindJSON(req); err != nil {
-						ctx.JSON(http.StatusOK, &config.GWResponse{
+						ctx.JSON(http.StatusInternalServerError, &config.GWResponse{
 							Code: -1,
 							Message:  err.Error(),
 						})
@@ -156,7 +148,7 @@ func InitHandlers() {
 					}
 					res, err := client.` + v["rpcName"] + `(ctx, req)
 					if err != nil {
-						ctx.JSON(http.StatusOK, &config.GWResponse{
+						ctx.JSON(http.StatusInternalServerError, &config.GWResponse{
 							Code:    -1,
 							Message: err.Error(),
 						})

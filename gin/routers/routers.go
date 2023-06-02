@@ -11,7 +11,7 @@ import (
 // 初始化路由
 func InitRouters(r *gin.Engine) {
 	r.POST("/binary/uploadfile", handler_binary.UploadFile)
-	r.POST("/hello/sayhello", handler_msgpack.MsgPackProtocol)
+	r.POST("/hello/sayhello", handler_hello.SayHello)
 	r.POST("/hello/saygoodbye", handler_hello.SayGoodbye)
 	r.POST("/msgpack/protocol", handler_msgpack.MsgPackProtocol)
 

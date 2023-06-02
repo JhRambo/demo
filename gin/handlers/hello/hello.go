@@ -12,7 +12,7 @@ func SayHello(ctx *gin.Context) {
 	client := GetClient()
 	req := &pb_hello.HelloHttpRequest{}
 	if err := ctx.ShouldBindJSON(req); err != nil {
-		ctx.JSON(http.StatusOK, &config.GWResponse{
+		ctx.JSON(http.StatusInternalServerError, &config.GWResponse{
 			Code:    -1,
 			Message: err.Error(),
 		})
@@ -20,7 +20,7 @@ func SayHello(ctx *gin.Context) {
 	}
 	res, err := client.SayHello(ctx, req)
 	if err != nil {
-		ctx.JSON(http.StatusOK, &config.GWResponse{
+		ctx.JSON(http.StatusInternalServerError, &config.GWResponse{
 			Code:    -1,
 			Message: err.Error(),
 		})
@@ -33,7 +33,7 @@ func SayGoodbye(ctx *gin.Context) {
 	client := GetClient()
 	req := &pb_hello.GoodByeHttpRequest{}
 	if err := ctx.ShouldBindJSON(req); err != nil {
-		ctx.JSON(http.StatusOK, &config.GWResponse{
+		ctx.JSON(http.StatusInternalServerError, &config.GWResponse{
 			Code:    -1,
 			Message: err.Error(),
 		})
@@ -41,7 +41,7 @@ func SayGoodbye(ctx *gin.Context) {
 	}
 	res, err := client.SayGoodbye(ctx, req)
 	if err != nil {
-		ctx.JSON(http.StatusOK, &config.GWResponse{
+		ctx.JSON(http.StatusInternalServerError, &config.GWResponse{
 			Code:    -1,
 			Message: err.Error(),
 		})

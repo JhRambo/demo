@@ -12,7 +12,7 @@ import (
 func UploadFile(ctx *gin.Context) {
 	bys, err := utils.GetBinary(ctx)
 	if err != nil {
-		ctx.JSON(http.StatusOK, &config.GWResponse{
+		ctx.JSON(http.StatusInternalServerError, &config.GWResponse{
 			Code:    -1,
 			Message: err.Error(),
 		})
@@ -23,7 +23,7 @@ func UploadFile(ctx *gin.Context) {
 	req := &pb_binary.BinaryHttpRequest{Data: bys}
 	err = stream.Send(req)
 	if err != nil {
-		ctx.JSON(http.StatusOK, &config.GWResponse{
+		ctx.JSON(http.StatusInternalServerError, &config.GWResponse{
 			Code:    -1,
 			Message: err.Error(),
 		})
@@ -32,7 +32,7 @@ func UploadFile(ctx *gin.Context) {
 	// 关闭流
 	res, err := stream.CloseAndRecv()
 	if err != nil {
-		ctx.JSON(http.StatusOK, &config.GWResponse{
+		ctx.JSON(http.StatusInternalServerError, &config.GWResponse{
 			Code:    -1,
 			Message: err.Error(),
 		})

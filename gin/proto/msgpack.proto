@@ -12,7 +12,7 @@ message MsgpackHttpRequest {
 }
 
 message MsgpackHttpResponse {
-  bytes val = 1;
+  bytes data = 1;
 }
 
 /*  这里配置http服务 

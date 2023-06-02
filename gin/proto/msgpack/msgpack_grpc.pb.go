@@ -28,7 +28,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MsgpackHttpClient interface {
-	// msgpack协议通用方法
+	// 这里是具体restful api的名称
 	MsgPackProtocol(ctx context.Context, in *MsgpackHttpRequest, opts ...grpc.CallOption) (*MsgpackHttpResponse, error)
 }
 
@@ -53,7 +53,7 @@ func (c *msgpackHttpClient) MsgPackProtocol(ctx context.Context, in *MsgpackHttp
 // All implementations must embed UnimplementedMsgpackHttpServer
 // for forward compatibility
 type MsgpackHttpServer interface {
-	// msgpack协议通用方法
+	// 这里是具体restful api的名称
 	MsgPackProtocol(context.Context, *MsgpackHttpRequest) (*MsgpackHttpResponse, error)
 	mustEmbedUnimplementedMsgpackHttpServer()
 }
