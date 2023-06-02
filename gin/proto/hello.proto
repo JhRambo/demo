@@ -10,9 +10,11 @@ service HelloDB {
   rpc SayHello(HelloDBRequest) returns (HelloDBResponse){}
   rpc SayGoodbye(GoodByeDBRequest) returns (GoodByeDBResponse){}
 }
+
 message HelloDBRequest {
   string name = 1;
 }
+
 message HelloDBResponse {
   int32 code = 1;
   string message = 2;
@@ -21,6 +23,7 @@ message HelloDBResponse {
 message GoodByeDBRequest {
   string name = 1;
 }
+
 message GoodByeDBResponse {
   int32 code = 1;
   string message = 2;

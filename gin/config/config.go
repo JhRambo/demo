@@ -17,4 +17,4 @@ type GWResponse struct {
 	Message string `json:"message"`
 }
 
-const MSGPACK_URI = "/HELLO/SAYHELLO" //使用msgpack协议的接口uri
+const MSGPACK_URI = "/HELLO/SAYHELLO" //使用msgpack协议的接口uri，统一转大写处理，多个uri用|分割
