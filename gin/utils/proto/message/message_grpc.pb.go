@@ -33,6 +33,7 @@ const (
 type PushServiceClient interface {
 	// 查询系统配置信息
 	PushInviteMessage(ctx context.Context, in *PushInvitedMessageRequest, opts ...grpc.CallOption) (*PushInvitedMessageResponse, error)
+	// service 2
 	// 飞书告警消息转发
 	WebFsAlarmPush(ctx context.Context, in *FsAlarmPushRequest, opts ...grpc.CallOption) (*FsAlarmPushResponse, error)
 	// 飞书告警消息转发
@@ -113,6 +114,7 @@ func (c *pushServiceClient) WebFsAlarmRobotDelete(ctx context.Context, in *WebFs
 type PushServiceServer interface {
 	// 查询系统配置信息
 	PushInviteMessage(context.Context, *PushInvitedMessageRequest) (*PushInvitedMessageResponse, error)
+	// service 2
 	// 飞书告警消息转发
 	WebFsAlarmPush(context.Context, *FsAlarmPushRequest) (*FsAlarmPushResponse, error)
 	// 飞书告警消息转发
@@ -303,6 +305,57 @@ var PushService_ServiceDesc = grpc.ServiceDesc{
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "message.proto",
+}
+
+const ()
+
+// FeiShuServiceClient is the client API for FeiShuService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type FeiShuServiceClient interface {
+}
+
+type feiShuServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewFeiShuServiceClient(cc grpc.ClientConnInterface) FeiShuServiceClient {
+	return &feiShuServiceClient{cc}
+}
+
+// FeiShuServiceServer is the server API for FeiShuService service.
+// All implementations must embed UnimplementedFeiShuServiceServer
+// for forward compatibility
+type FeiShuServiceServer interface {
+	mustEmbedUnimplementedFeiShuServiceServer()
+}
+
+// UnimplementedFeiShuServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedFeiShuServiceServer struct {
+}
+
+func (UnimplementedFeiShuServiceServer) mustEmbedUnimplementedFeiShuServiceServer() {}
+
+// UnsafeFeiShuServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to FeiShuServiceServer will
+// result in compilation errors.
+type UnsafeFeiShuServiceServer interface {
+	mustEmbedUnimplementedFeiShuServiceServer()
+}
+
+func RegisterFeiShuServiceServer(s grpc.ServiceRegistrar, srv FeiShuServiceServer) {
+	s.RegisterService(&FeiShuService_ServiceDesc, srv)
+}
+
+// FeiShuService_ServiceDesc is the grpc.ServiceDesc for FeiShuService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var FeiShuService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "FeiShuService",
+	HandlerType: (*FeiShuServiceServer)(nil),
+	Methods:     []grpc.MethodDesc{},
+	Streams:     []grpc.StreamDesc{},
+	Metadata:    "message.proto",
 }
 
 const (

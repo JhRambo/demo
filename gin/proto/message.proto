@@ -124,8 +124,8 @@ message   DeleteFeiShuAlarmInfoDBResponse{
   string message = 2;
 }
 
+// service 1
 service PushService{
-
   //查询系统配置信息
   rpc PushInviteMessage(PushInvitedMessageRequest) returns (PushInvitedMessageResponse) {
     option (google.api.http) = {
@@ -134,7 +134,7 @@ service PushService{
     };
   }
 
-  
+  // service 2
   //飞书告警消息转发
   rpc WebFsAlarmPush(FsAlarmPushRequest) returns (FsAlarmPushResponse) {
     option (google.api.http) = {
@@ -173,11 +173,11 @@ service PushService{
 
 }
 
-
-// service FeiShuService{
+// service 2
+service FeiShuService{
   
 
-// }
+}
 
 service FeiShuAlarmDB {
 
