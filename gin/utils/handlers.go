@@ -1,44 +1,36 @@
 package utils
 
 import (
-	"regexp"
-	"strings"
+	"fmt"
 )
 
-// 生成Handlers业务处理文件
+// 初始化Handlers业务处理文件
 func InitHandlers() {
 	dir := "D:/code/demo/gin/proto"
 	protos := ScanFiles(dir)
 	for i := 0; i < len(protos); i++ {
+		fmt.Println("gin generating code from", protos[i]+".proto")
 		protoPath := dir + "/" + protos[i] + ".proto"
 		protoFile := FilterFile(protoPath)
 		ms := ReadProto(protoFile)
 		fcs := ""
 		for _, v := range ms {
-			requestParam := strings.TrimSpace(v["request"])
-			regex := regexp.MustCompile(`stream`)
-			if regex.MatchString(v["request"]) {
-				//binary二进制流
-				re := regexp.MustCompile(`stream\s+(\w+)`)
-				match := re.FindStringSubmatch(requestParam)
-				if len(match) > 1 {
-					requestParam = match[1]
-				} else {
-					continue
-				}
+			requestParam := v["request"]
+			if v["streamBinary"] == "stream" {
+				//stream binary二进制流
 				fcs += `
 				func ` + v["rpcName"] + `(ctx *gin.Context) {
 					bys, err := utils.GetBinary(ctx)
-					if err != nil {
+					if err != nil && err != io.EOF {
 						ctx.JSON(http.StatusBadRequest, &config.GWResponse{
 							Code:    -1,
 							Message: err.Error(),
 						})
 						return
 					}
-					client:=GetClient()
+					client := GetClient()
 					stream, err := client.` + v["rpcName"] + `(ctx)
-					req := &pb_` + protos[i] + `.` + requestParam + `{Data: bys}
+					req := &pb_` + protos[i] + `.` + requestParam + `{` + v["bytesName"] + `: bys}
 					err = stream.Send(req)
 					if err != nil {
 						ctx.JSON(http.StatusInternalServerError, &config.GWResponse{
@@ -65,8 +57,9 @@ func InitHandlers() {
 						"demo/gin/utils"
 						grpc_client "demo/gin/client"
 						"demo/gin/config"
+						"io"
 						"net/http"
-						pb_` + protos[i] + `"demo/gin/utils/proto/` + protos[i] + `"
+						pb_` + protos[i] + `"demo/gin/utils/proto/` + v["packName"] + `"
 						"github.com/gin-gonic/gin"
 					)
 				` + fcs
@@ -87,14 +80,14 @@ func InitHandlers() {
 				//通用msgpack协议入口，服务端根据uri跳转到对应的服务处理
 				func ` + v["rpcName"] + `(ctx *gin.Context) {
 					bys, err := utils.GetBinary(ctx)
-					if err != nil {
+					if err != nil && err != io.EOF {
 						ctx.JSON(http.StatusBadRequest, &config.GWResponse{
 							Code:    -1,
 							Message: err.Error(),
 						})
 						return
 					}
-					client:=GetClient()
+					client := GetClient()
 					req := &pb_` + protos[i] + `.` + requestParam + `{
 						Key: strings.ToUpper(ctx.Request.RequestURI),
 						Val: bys,
@@ -117,8 +110,9 @@ func InitHandlers() {
 						"demo/gin/utils"
 						grpc_client "demo/gin/client"
 						"demo/gin/config"
+						"io"
 						"net/http"
-						pb_` + protos[i] + `"demo/gin/utils/proto/` + protos[i] + `"
+						pb_` + protos[i] + `"demo/gin/utils/proto/` + v["packName"] + `"
 						"github.com/gin-gonic/gin"
 						"strings"
 					)
@@ -139,9 +133,9 @@ func InitHandlers() {
 				//json协议
 				fcs += `
 				func ` + v["rpcName"] + `(ctx *gin.Context) {
-					client:=GetClient()
+					client := GetClient()
 					req := &pb_` + protos[i] + `.` + requestParam + `{}
-					if err := ctx.ShouldBindJSON(req); err != nil {
+					if err := ctx.ShouldBindJSON(req); err != nil && err != io.EOF {
 						ctx.JSON(http.StatusBadRequest, &config.GWResponse{
 							Code: -1,
 							Message:  err.Error(),
@@ -165,8 +159,9 @@ func InitHandlers() {
 					import (
 						grpc_client "demo/gin/client"
 						"demo/gin/config"
+						"io"
 						"net/http"
-						pb_` + protos[i] + `"demo/gin/utils/proto/` + protos[i] + `"
+						pb_` + protos[i] + `"demo/gin/utils/proto/` + v["packName"] + `"
 						"github.com/gin-gonic/gin"
 					)
 				` + fcs

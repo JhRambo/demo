@@ -5,6 +5,7 @@ import (
 	"demo/gin/config"
 	"demo/gin/utils"
 	pb_binary "demo/gin/utils/proto/binary"
+	"io"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,7 +13,7 @@ import (
 
 func UploadFile(ctx *gin.Context) {
 	bys, err := utils.GetBinary(ctx)
-	if err != nil {
+	if err != nil && err != io.EOF {
 		ctx.JSON(http.StatusBadRequest, &config.GWResponse{
 			Code:    -1,
 			Message: err.Error(),

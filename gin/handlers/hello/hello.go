@@ -4,6 +4,7 @@ import (
 	grpc_client "demo/gin/client"
 	"demo/gin/config"
 	pb_hello "demo/gin/utils/proto/hello"
+	"io"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,7 +13,7 @@ import (
 func SayHello(ctx *gin.Context) {
 	client := GetClient()
 	req := &pb_hello.HelloHttpRequest{}
-	if err := ctx.ShouldBindJSON(req); err != nil {
+	if err := ctx.ShouldBindJSON(req); err != nil && err != io.EOF {
 		ctx.JSON(http.StatusBadRequest, &config.GWResponse{
 			Code:    -1,
 			Message: err.Error(),
@@ -33,7 +34,7 @@ func SayHello(ctx *gin.Context) {
 func SayGoodbye(ctx *gin.Context) {
 	client := GetClient()
 	req := &pb_hello.GoodByeHttpRequest{}
-	if err := ctx.ShouldBindJSON(req); err != nil {
+	if err := ctx.ShouldBindJSON(req); err != nil && err != io.EOF {
 		ctx.JSON(http.StatusBadRequest, &config.GWResponse{
 			Code:    -1,
 			Message: err.Error(),

@@ -2,6 +2,7 @@ package utils
 
 import (
 	"demo/gin/config"
+	"log"
 	"strings"
 )
 
@@ -43,4 +44,5 @@ func InitRouters() {
 	`
 	filePath := "D:/code/demo/gin/routers/routers.go"
 	CreateFile(filePath, content)
+	log.Println("routers created and updated successfully.")
 }

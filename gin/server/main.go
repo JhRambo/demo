@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"demo/gin/config"
+	pb_account "demo/gin/utils/proto/account"
 	pb_binary "demo/gin/utils/proto/binary"
 	pb_hello "demo/gin/utils/proto/hello"
 	pb_msgpack "demo/gin/utils/proto/msgpack"
@@ -19,10 +20,20 @@ type Server struct {
 	pb_binary.UnimplementedBinaryHttpServer
 	pb_hello.UnimplementedHelloHttpServer
 	pb_msgpack.UnimplementedMsgpackHttpServer
+	pb_account.UnimplementedAccountHttpServer
 }
 
 func NewServer() *Server {
 	return &Server{}
+}
+
+func (s *Server) AccountInfo(ctx context.Context, req *pb_account.AccountInfoRequest) (*pb_account.AccountInfoResponse, error) {
+	resp := &pb_account.AccountInfoResponse{
+		Code:    0,
+		Message: " AccountInfo!",
+		Info:    &pb_account.AccountInfo{},
+	}
+	return resp, nil
 }
 
 // 使用msgpack协议
@@ -72,9 +83,14 @@ func (s *Server) SayHello(ctx context.Context, req *pb_hello.HelloHttpRequest) (
 
 func (s *Server) SayGoodbye(ctx context.Context, req *pb_hello.GoodByeHttpRequest) (*pb_hello.GoodByeHttpResponse, error) {
 	resp := &pb_hello.GoodByeHttpResponse{
-		Code:    0,
-		Message: req.Name + " goodbye!",
+		Code: 0,
 	}
+	if req.Name == "" {
+		resp.Code = -101
+		resp.Message = "参数不能为空！"
+		return resp, nil
+	}
+	resp.Message = req.Name + " goodbye!"
 	return resp, nil
 }
 
@@ -91,6 +107,7 @@ func main() {
 	pb_binary.RegisterBinaryHttpServer(s, NewServer())
 	pb_hello.RegisterHelloHttpServer(s, NewServer())
 	pb_msgpack.RegisterMsgpackHttpServer(s, NewServer())
+	pb_account.RegisterAccountHttpServer(s, NewServer())
 	// 启动gRPC-Server
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)

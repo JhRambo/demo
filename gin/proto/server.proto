@@ -7,56 +7,56 @@ import "google/api/annotations.proto";
 
 
 service  ServerDB {
-  
+  //获取服务器列表
   rpc ServerList(ServerListRequest) returns (ServerListResponse) {}
-  
+  //获取渲染服地址
   rpc GetRenderServerList(GetRenderServerListRequest) returns (GetRenderServerListResponse){}
-  
+  //获取服务器信息
   rpc GetRenderServerInfo(GetRenderServerInfoRequest) returns (GetRenderServerInfoResponse){}
-  
+  //获取服务器信息
   rpc UpdateRenderServerInfo(UpdateRenderServerInfoRequest) returns (UpdateRenderServerInfoResponse){}
-  
+  //获取解析服地址
   rpc GetFbxUploadUrl(GetFbxUploadUrlRequest) returns (GetFbxUploadUrlResponse) {}
-  
+  //获取设备连接地址
   rpc StartUE(StartUERequest) returns (StartUEResponse) {}
-  
+  //版本列表
   rpc GetVersionList(GetVersionListRequest) returns(GetVersionListResponse) {}
-  
+  //下载obs版本
   rpc VersionDownLoad(VersionDownLoadRequest) returns(VersionDownLoadResponse) {}
-  
+  //获取版本信息
   rpc GetVersionInfo(GetVersionInfoRequest) returns(GetVersionInfoResponse) {}
-  
+  //获取版本信息
   rpc CheckPakServerRestart(CheckPakServerRestartRequest) returns(CheckPakServerRestartResponse) {}
-  
+  //解析服重启（给解析服推送未解析文件 ）
   rpc PushParseFileList(PushParseFileListRequest) returns(PushParseFileListResponse) {}
-  
+  //获取版本信息
   rpc DownLoadParseFile(DownLoadParseFileRequest) returns(DownLoadParseFileResponse) {}
-  
+  //获取服务器日志文件列表
   rpc GetLogFile(GetLogFileRequest) returns(GetLogFileResponse) {}
-  
+  //请求开启代理
   rpc StartProxy(stream ProxyData) returns(stream ProxyData) {}
-  
+  //同步服重启
   rpc RestartSyncServer(RestartSyncServerRequest) returns(RestartSyncServerResponse) {}
 
-  
+  // 渲染/代理服务器踢出设备
   rpc ServerDeviceOut(ServerDeviceOutRequest) returns (ServerDeviceOutResponse){}
-  
+  // 渲染/代理服务器重启Steam
   rpc ServersRestartSteam(ServersRestartSteamRequest) returns (ServersRestartSteamResponse){}
-  
+  // 渲染/代理服务器重启App
   rpc ServersRestartApp(ServersRestartAppRequest) returns (ServersRestartAppResponse){}
-  
+  // 分配渲染/代理服务器地址
   rpc ServersAddr(ServersAddrRequest) returns (ServersAddrResponse){}
-  
+  // 同步/解析强制重启服务器
   rpc RestartServer(RestartServerRequest) returns (RestartServerResponse) {}
-  
+  // 获取服务器更新文件
   rpc GetUpdateFiles(GetUpdateFilesRequest) returns (GetUpdateFilesResponse){}
-  
+  // 服务器更新
   rpc UpdateVersion(UpdateVersionRequest) returns(UpdateVersionResponse) {}
 
 }
 
 
-
+//服务器信息
 message Server{
   string serverID = 1;
   string serverAddr = 2;
@@ -70,7 +70,7 @@ message Server{
 }
 
 
-
+//用户信息
 message ServerInfo{
   string serverID = 1;
   string serverAddr = 2;
@@ -87,35 +87,35 @@ message ServerInfo{
 }
 
 message ServerListRequest {
-  int32  serverType = 2;  
+  int32  serverType = 2;  //0 所有 1房间服 2 解析服 3 业务服
 }
 
 message ServerListResponse {
   string message = 1;
-  int32  code = 2;  
+  int32  code = 2;  //0 所有 1业务服 2房间服 3 解析服
   repeated Server list = 3;
   repeated google.protobuf.Struct data = 4;
 }
 
 message GetServerListRequest {
   string token = 1;
-  int32  serverType = 2;  
+  int32  serverType = 2;  //0 所有 1房间服 2 解析服 3 业务服
 }
 
 
 message GetServerListResponse {
   string message = 1;
-  int32  code = 2;  
+  int32  code = 2;  //0 所有 1业务服 2房间服 3 解析服
   repeated ServerInfo list = 3;
 }
 
 message UpdateServerRequest {
   string token = 1;
-  string filePath = 2;  
+  string filePath = 2;  //更新路径版本
   string serverID = 3;
-  repeated string serverIDs = 4; 
-  repeated string pakList = 5; 
-  int32 updateType = 6; 
+  repeated string serverIDs = 4; //需要升级的服务器ID列表
+  repeated string pakList = 5; //更新组件包与基础包列表
+  int32 updateType = 6; //更新类型:0-普通更新，1-强制更新，2-重新下载
 }
 
 message UpdateServerResponse {
@@ -134,7 +134,7 @@ message GetServerAddrRequest {
 }
 
 message GetServerAddrResponse {
-  int32  code = 1;  
+  int32  code = 1;  //0 所有 1房间服 2 解析服 3 业务服
   string message = 2;
   string ip = 3;
 }
@@ -145,7 +145,7 @@ message StartVRRequest {
 }
 
 message StartVRResponse {
-  int32  code = 1;  
+  int32  code = 1;  //0 所有 1房间服 2 解析服 3 业务服
   string message = 2;
   string ip = 3;
 }
@@ -155,7 +155,7 @@ message StartPlanetRequest {
 }
 
 message StartPlanetResponse {
-  int32  code = 1;  
+  int32  code = 1;  //0 所有 1房间服 2 解析服 3 业务服
   string message = 2;
 }
 
@@ -187,7 +187,7 @@ message GetFbxUploadUrlRequest {
 
 }
 
-
+//获取解析服务器地址
 message GetFbxUploadUrlResponse {
   int32 code = 1;
 
@@ -209,11 +209,11 @@ enum UEType {
 }
 
 enum ServerType {
-  ServerALL = 0;  
-  ServerSync = 1; 
-  ServerRender = 2; 
-  ServerParse = 3; 
-  ServerProxy = 4; 
+  ServerALL = 0;  //所有服务
+  ServerSync = 1; //同步服
+  ServerRender = 2; //渲染服
+  ServerParse = 3; //解析服
+  ServerProxy = 4; //代理服
 }
 
 
@@ -234,13 +234,13 @@ message StartUEResponse {
 message File {
   string fileName = 1;
   string filepath = 2;
-  int64 LastModifiedTime = 3; 
+  int64 LastModifiedTime = 3; //最后修改时间
   repeated string pakList = 4;
 }
 message GetUpdateFilesRequest{
   int32 fileType = 1;
   string serverID = 2;
-  int32  serverType = 3;  
+  int32  serverType = 3;  //0 所有 1房间服 2 解析服 3 业务服
 }
 message GetUpdateFilesResponse{
   int32 code = 1;
@@ -268,8 +268,8 @@ message VersionDownLoadRequest {
   string fileName = 1;
   int32 versionType = 2;
   repeated string pakList = 3;
-
-  int32 updateType = 6; 
+//  string fileServer = 4;//内部服务器地址
+  int32 updateType = 6; //更新类型:0-普通更新，1-强制更新，2-重新下载
 }
 
 message VersionDownLoadResponse {
@@ -295,28 +295,28 @@ message GetVersionInfoResponse {
   Version version = 3;
 }
 
-
+//渲染服消息体
 message RenderServer {
-  string serverID = 1; 
-  string serverAddr = 2;
+  string serverID = 1; //服务器id，绑定网卡和cpu
+  string serverAddr = 2;//服务器地址 grpc
   string internalAddr = 3;
 
-  string version = 4; 
-  int32  state = 5; 
-  string updateVersion = 6;
-  string createTime = 7; 
-  string updateTime = 8; 
+  string version = 4; //当前版本号
+  int32  state = 5; //版本状态
+  string updateVersion = 6;//更新版本
+  string createTime = 7; //版本创建时间
+  string updateTime = 8; //版本更新时间
 
-  string device = 9; 
-  string deviceName = 10; 
-  int32  flag = 11;
-  string serverName = 12;
-  string enterpriseName = 13;
-  int32 enterpriseId = 14;
-  string licenseId = 15; 
+  string device = 9; //设备id
+  string deviceName = 10; //设备备注
+  int32  flag = 11;//服务器标识
+  string serverName = 12;//服务器备注
+  string enterpriseName = 13;//服务器备注
+  int32 enterpriseId = 14;//服务器备注
+  string licenseId = 15; //授权码
   string validDate = 16;
   bool proxyMode = 17;
-  repeated int32 lflag = 18;
+  repeated int32 lflag = 18;//服务器标识
 
   string instanceId = 19;
   string agencyId = 20;
@@ -356,7 +356,7 @@ message CheckPakServerRestartRequest {
 message CheckPakServerRestartResponse {
   int32 code = 1;
   string message = 2;
-  bool reStart = 3; 
+  bool reStart = 3; //是否重启
   int64 diskSize = 4;
 }
 
@@ -386,16 +386,16 @@ message PushParseFileListResponse {
 }
 
 message GetLogFileRequest{
-  int32 root = 1; 
+  int32 root = 1; //1-同步服 2-渲染服
 }
 message GetLogFileResponse{
-  repeated LogFileInfo list = 1;
+  repeated LogFileInfo list = 1;//路径下载地址
   int32 code = 2;
   string message = 3;
 }
 message LogFileInfo{
   string dir = 1;
-  repeated pathInfo pathList = 2;
+  repeated pathInfo pathList = 2;//路径下载地址
   int32 total = 5;
 }
 message pathInfo {
@@ -405,15 +405,15 @@ message pathInfo {
 }
 
 message GetLogFileListRequest{
-  int32 root = 1; 
-  string ip = 2; 
+  int32 root = 1; //1-同步服 2-渲染服
+  string ip = 2; //服务器ip端口127.0.0.1:38601
   int32 pageIndex = 3;
   int32 pageSize = 4;
   string token = 5;
 }
 message GetLogFileListResponse{
-  repeated LogFileInfo List = 1;
-  string wsAddr = 2; 
+  repeated LogFileInfo List = 1;//路径下载地址
+  string wsAddr = 2; //websocket 地址
   int32 code = 3;
   string message = 4;
 }
@@ -479,24 +479,24 @@ message ProxyData {
   bytes data = 2;
 }
 
-
+//渲染服消息实体
 message RenderServerGroupInfo{
   string enterpriseName = 1;
   int32 enterpriseId = 2;
   repeated RenderServer list = 3;
 }
 
-
+//获取渲染服服务器列表
 message GetRenderServerListRequest {
   string token = 1;
   int32 pageIndex = 2;
   int32 pageSize = 3;
   string search = 4;
 }
-
+//获取渲染服服务器列表
 message GetRenderServerListResponse {
   string message = 1;
-  int32  code = 2;  
+  int32  code = 2;  //0 所有 1房间服 2 解析服 3 业务服
   repeated RenderServerGroupInfo list = 3;
   repeated RenderServer deviceOnLineList = 4;
   int32  total = 5;
@@ -513,10 +513,10 @@ message RestartSyncServerResponse {
   int32  code = 2;
 }
 
-
-
+//========================================================================
+//渲染/代理服务器踢出设备
 message ServerDeviceOutRequest {
-  string addr = 1;
+  string addr = 1;//服务器
   string token = 2;
 }
 
@@ -525,10 +525,10 @@ message ServerDeviceOutResponse{
   string message = 2;
 }
 
-
-
+//========================================================================
+//渲染/代理服务器重启Steam
 message ServersRestartSteamRequest {
-  repeated string addrList = 1;
+  repeated string addrList = 1;//服务器地址列表
   string token = 2;
 }
 
@@ -538,10 +538,10 @@ message ServersRestartSteamResponse{
 }
 
 
-
-
+//========================================================================
+//渲染/代理服务器重启App
 message ServersRestartAppRequest {
-  repeated string addrList = 1;
+  repeated string addrList = 1;//服务器地址列表
   string token = 2;
 }
 
@@ -550,23 +550,23 @@ message ServersRestartAppResponse{
   string message = 2;
 }
 
-
-
+//========================================================================
+//分配渲染/代理服务器地址
 message ServersAddrRequest {
-  string deviceID = 1;
-  string area = 2;
-  string version = 3;
+  string deviceID = 1;//设备ID
+  string area = 2;//区域
+  string version = 3;//版本
   string token = 4;
 }
 
 message ServersAddrResponse{
   int32 code = 1;
   string message = 2;
-  string addr = 3; 
+  string addr = 3; //分配地址
 }
 
-
-
+//========================================================================
+//同步/解析强制重启服务器
 message RestartServerRequest {
   string token = 1;
   repeated string serverIDs = 3;
@@ -577,8 +577,8 @@ message RestartServerResponse {
   int32  code = 2;
 }
 
-
-
+//========================================================================
+//获取更新版本列表
 message GetServerUpdateFilesRequest {
   string token = 1;
   string serverID = 2;
@@ -597,15 +597,15 @@ message ServerFile {
   repeated string pakList = 3;
 }
 
-
-
+//========================================================================
+// 服务器更新
 message UpdateVersionRequest {
-  string version = 1;
-  int32 versionType = 2; 
-  string serverID = 3;
-
-  repeated  string pakList = 5; 
-  int32 updateType = 6; 
+  string version = 1;//版本号
+  int32 versionType = 2; //0更新同步服，1更新渲染服
+  string serverID = 3;//更新的服务器id
+//  string fileServer = 4;//内部服务器地址
+  repeated  string pakList = 5; //更新组件包与基础包列表
+  int32 updateType = 6; //更新类型:0-普通更新，1-强制更新，2-重新下载
 }
 
 message UpdateVersionResponse {
@@ -615,17 +615,17 @@ message UpdateVersionResponse {
 
 
 
-
+//服务器注册信息
 message RegisterServerInfo{
-  string serverId = 1;
-  string eid = 2;
-  string deviceId = 3;
-  string currentVersion = 4;
-  string updateVersion = 5;
-  string updateState = 6;
-  string updateTime = 7;
-  string internalAddr = 8;
-  string serverVersion = 9;
+  string serverId = 1;//服务器id
+  string eid = 2;//企业id
+  string deviceId = 3;//连接服务器设备
+  string currentVersion = 4;//当前VR版本
+  string updateVersion = 5;//更新VR版本
+  string updateState = 6;//VR版本更新状态
+  string updateTime = 7;//VR版本更新时间
+  string internalAddr = 8;//内部地址
+  string serverVersion = 9;//服务器版本
 }
 
 
@@ -639,7 +639,7 @@ service  ServerHttp {
     };
   }
 
-  
+  //获取渲染服服务列表
   rpc GetRenderServerList(GetRenderServerListRequest) returns (GetRenderServerListResponse){
     option (google.api.http) = {
       post: "/v2/web/server/renderList"
@@ -668,7 +668,7 @@ service  ServerHttp {
       body: "*"
     };
   }
-  
+  //内网更新,获取相同服务器内网地址
   rpc GetInternalList(GetInternalListRequest) returns (GetInternalListResponse){
     option (google.api.http) = {
       post: "/v2/web/server/internalList"
@@ -676,7 +676,7 @@ service  ServerHttp {
     };
   }
 
-  
+  //渲染/代理服务器踢出设备
   rpc ServerDeviceOut(ServerDeviceOutRequest) returns (ServerDeviceOutResponse) {
     option (google.api.http) = {
       post: "/v2/web/server/device/out"
@@ -684,7 +684,7 @@ service  ServerHttp {
     };
   }
 
-  
+  //渲染/代理服务器重启Steam
   rpc ServersRestartSteam(ServersRestartSteamRequest) returns (ServersRestartSteamResponse){
     option (google.api.http) = {
       post: "/v2/web/server/stream/restart"
@@ -692,7 +692,7 @@ service  ServerHttp {
     };
   }
 
-  
+  // 渲染/代理服务器重启App
   rpc ServersRestartApp(ServersRestartAppRequest) returns (ServersRestartAppResponse){
     option (google.api.http) = {
       post: "/v2/web/server/app/restart"
@@ -700,7 +700,7 @@ service  ServerHttp {
     };
   }
 
-  
+  //获取空闲渲染/代理服地址
   rpc ServersAddr(ServersAddrRequest) returns (ServersAddrResponse){
     option (google.api.http) = {
       post: "/v2/server/device/addr"
@@ -708,7 +708,7 @@ service  ServerHttp {
     };
   }
 
-  
+  //同步/解析强制重启服务器
   rpc RestartServer(RestartServerRequest) returns (RestartServerResponse){
     option (google.api.http) = {
       post: "/v2/web/server/restart"
@@ -716,7 +716,7 @@ service  ServerHttp {
     };
   }
 
-  
+  // 获取更新版本列表
   rpc GetUpdateFiles(GetServerUpdateFilesRequest) returns (GetServerUpdateFilesResponse){
     option (google.api.http) = {
       post: "/v2/web/server/files"
@@ -724,7 +724,7 @@ service  ServerHttp {
     };
   }
 
-  
+  // 服务器更新
   rpc UpdateServer(UpdateServerRequest) returns (UpdateServerResponse){
     option (google.api.http) = {
       post: "/v2/web/server/update"

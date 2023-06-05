@@ -24,7 +24,7 @@ func InitGRPCClients() error {
 			addr,
 			grpc.WithInsecure(),
 			grpc.WithBlock(),
-			grpc.WithTimeout(30*time.Second),
+			grpc.WithTimeout(60*time.Second),
 		)
 		if err != nil {
 			log.Printf("Failed to connect to gRPC service [%s] on [%s]: %v", name, addr, err)

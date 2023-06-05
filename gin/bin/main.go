@@ -3,7 +3,6 @@ package main
 import (
 	"demo/gin/utils"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -13,49 +12,28 @@ import (
 /*
 	监听文件内容变化
 
-并自动生成网关代码
+并自动生成gin网关代码
 */
 func main() {
 	watchDir := "D:/code/demo/gin/utils/proto" //proto生成的.go文件所在的目录
 	readDir := "D:/code/demo/gin/proto"        //proto文件所在的目录
 
+	// 初始化proto文件自动生成代码
+	utils.InitProto(readDir)
+
 	// 定义需要热更新的函数
 	restartFunc := func() {
-		if err := generateCode(readDir); err != nil {
-			fmt.Println("Error generating code:", err)
-			return
-		}
-		fmt.Println("Code successfully generated...")
+		// 自动生成网关所需的代码
+		utils.CreateCode()
 	}
 
-	if err := generateCode(readDir); err != nil {
-		fmt.Println("Error generating code:", err)
-		return
-	}
+	restartFunc()
 
 	// 监听指定文件夹下的所有文件的变化
 	if err := watchFiles(watchDir, restartFunc); err != nil {
 		fmt.Println("Error watching files:", err)
 		return
 	}
-}
-
-// 遍历proto文件所在的目录
-func generateCode(readDir string) error {
-	// 读取文件夹下所有文件
-	files, err := ioutil.ReadDir(readDir)
-	if err != nil {
-		return err
-	}
-	// 遍历文件，生成代码
-	for _, file := range files {
-		if !file.IsDir() {
-			fmt.Printf("Generating code from %s...\n", file.Name())
-			// 自动生成网关所需的代码
-			utils.CreateCode()
-		}
-	}
-	return nil
 }
 
 // 监听proto生成的.go文件所在的目录

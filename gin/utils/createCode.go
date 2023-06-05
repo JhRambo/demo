@@ -1,8 +1,6 @@
 package utils
 
-import (
-	"log"
-)
+import "log"
 
 /*
 	实现
@@ -13,5 +11,5 @@ import (
 func CreateCode() {
 	InitRouters()
 	InitHandlers()
-	log.Println("File created and updated successfully.")
+	log.Println("all file created and updated successfully.")
 }

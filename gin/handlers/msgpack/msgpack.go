@@ -5,6 +5,7 @@ import (
 	"demo/gin/config"
 	"demo/gin/utils"
 	pb_msgpack "demo/gin/utils/proto/msgpack"
+	"io"
 	"net/http"
 	"strings"
 
@@ -14,7 +15,7 @@ import (
 // 通用msgpack协议入口，服务端根据uri跳转到对应的服务处理
 func MsgPackProtocol(ctx *gin.Context) {
 	bys, err := utils.GetBinary(ctx)
-	if err != nil {
+	if err != nil && err != io.EOF {
 		ctx.JSON(http.StatusBadRequest, &config.GWResponse{
 			Code:    -1,
 			Message: err.Error(),
