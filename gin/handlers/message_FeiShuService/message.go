@@ -10,27 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func PushInviteMessage(ctx *gin.Context) {
-	client := GetClient()
-	req := &pb_message.PushInvitedMessageRequest{}
-	if err := ctx.ShouldBindJSON(req); err != nil && err != io.EOF {
-		ctx.JSON(http.StatusBadRequest, &config.GWResponse{
-			Code:    -1,
-			Message: err.Error(),
-		})
-		return
-	}
-	res, err := client.PushInviteMessage(ctx, req)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, &config.GWResponse{
-			Code:    -1,
-			Message: err.Error(),
-		})
-		return
-	}
-	ctx.JSON(http.StatusOK, res)
-}
-
 func WebFsAlarmPush(ctx *gin.Context) {
 	client := GetClient()
 	req := &pb_message.FsAlarmPushRequest{}
@@ -137,8 +116,8 @@ func WebFsAlarmRobotDelete(ctx *gin.Context) {
 }
 
 // 注册gRPC-client客户端
-func GetClient() pb_message.PushServiceClient {
+func GetClient() pb_message.FeiShuServiceClient {
 	conn, _ := grpc_client.GetGRPCClient(config.SERVER_NAME1)
-	client := pb_message.NewPushServiceClient(conn)
+	client := pb_message.NewFeiShuServiceClient(conn)
 	return client
 }

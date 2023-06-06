@@ -19,21 +19,17 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	PushService_PushInviteMessage_FullMethodName      = "/PushService/PushInviteMessage"
-	PushService_WebFsAlarmPush_FullMethodName         = "/PushService/WebFsAlarmPush"
-	PushService_FsAlarmPush_FullMethodName            = "/PushService/FsAlarmPush"
-	PushService_WebFsAlarmRobotSet_FullMethodName     = "/PushService/WebFsAlarmRobotSet"
-	PushService_WebFsAlarmRobotListGet_FullMethodName = "/PushService/WebFsAlarmRobotListGet"
-	PushService_WebFsAlarmRobotDelete_FullMethodName  = "/PushService/WebFsAlarmRobotDelete"
+	FeiShuService_WebFsAlarmPush_FullMethodName         = "/FeiShuService/WebFsAlarmPush"
+	FeiShuService_FsAlarmPush_FullMethodName            = "/FeiShuService/FsAlarmPush"
+	FeiShuService_WebFsAlarmRobotSet_FullMethodName     = "/FeiShuService/WebFsAlarmRobotSet"
+	FeiShuService_WebFsAlarmRobotListGet_FullMethodName = "/FeiShuService/WebFsAlarmRobotListGet"
+	FeiShuService_WebFsAlarmRobotDelete_FullMethodName  = "/FeiShuService/WebFsAlarmRobotDelete"
 )
 
-// PushServiceClient is the client API for PushService service.
+// FeiShuServiceClient is the client API for FeiShuService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type PushServiceClient interface {
-	// 查询系统配置信息
-	PushInviteMessage(ctx context.Context, in *PushInvitedMessageRequest, opts ...grpc.CallOption) (*PushInvitedMessageResponse, error)
-	// service 2
+type FeiShuServiceClient interface {
 	// 飞书告警消息转发
 	WebFsAlarmPush(ctx context.Context, in *FsAlarmPushRequest, opts ...grpc.CallOption) (*FsAlarmPushResponse, error)
 	// 飞书告警消息转发
@@ -44,6 +40,242 @@ type PushServiceClient interface {
 	WebFsAlarmRobotListGet(ctx context.Context, in *WebFsAlarmRobotListGetRequest, opts ...grpc.CallOption) (*WebFsAlarmRobotListGetResponse, error)
 	// 飞书告警机器人信息删除
 	WebFsAlarmRobotDelete(ctx context.Context, in *WebFsAlarmRobotDeleteRequest, opts ...grpc.CallOption) (*WebFsAlarmRobotDeleteResponse, error)
+}
+
+type feiShuServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewFeiShuServiceClient(cc grpc.ClientConnInterface) FeiShuServiceClient {
+	return &feiShuServiceClient{cc}
+}
+
+func (c *feiShuServiceClient) WebFsAlarmPush(ctx context.Context, in *FsAlarmPushRequest, opts ...grpc.CallOption) (*FsAlarmPushResponse, error) {
+	out := new(FsAlarmPushResponse)
+	err := c.cc.Invoke(ctx, FeiShuService_WebFsAlarmPush_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *feiShuServiceClient) FsAlarmPush(ctx context.Context, in *FsAlarmPushRequest, opts ...grpc.CallOption) (*FsAlarmPushResponse, error) {
+	out := new(FsAlarmPushResponse)
+	err := c.cc.Invoke(ctx, FeiShuService_FsAlarmPush_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *feiShuServiceClient) WebFsAlarmRobotSet(ctx context.Context, in *WebFsAlarmRobotSetRequest, opts ...grpc.CallOption) (*WebFsAlarmRobotSetResponse, error) {
+	out := new(WebFsAlarmRobotSetResponse)
+	err := c.cc.Invoke(ctx, FeiShuService_WebFsAlarmRobotSet_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *feiShuServiceClient) WebFsAlarmRobotListGet(ctx context.Context, in *WebFsAlarmRobotListGetRequest, opts ...grpc.CallOption) (*WebFsAlarmRobotListGetResponse, error) {
+	out := new(WebFsAlarmRobotListGetResponse)
+	err := c.cc.Invoke(ctx, FeiShuService_WebFsAlarmRobotListGet_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *feiShuServiceClient) WebFsAlarmRobotDelete(ctx context.Context, in *WebFsAlarmRobotDeleteRequest, opts ...grpc.CallOption) (*WebFsAlarmRobotDeleteResponse, error) {
+	out := new(WebFsAlarmRobotDeleteResponse)
+	err := c.cc.Invoke(ctx, FeiShuService_WebFsAlarmRobotDelete_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// FeiShuServiceServer is the server API for FeiShuService service.
+// All implementations must embed UnimplementedFeiShuServiceServer
+// for forward compatibility
+type FeiShuServiceServer interface {
+	// 飞书告警消息转发
+	WebFsAlarmPush(context.Context, *FsAlarmPushRequest) (*FsAlarmPushResponse, error)
+	// 飞书告警消息转发
+	FsAlarmPush(context.Context, *FsAlarmPushRequest) (*FsAlarmPushResponse, error)
+	// 飞书告警机器人信息设置
+	WebFsAlarmRobotSet(context.Context, *WebFsAlarmRobotSetRequest) (*WebFsAlarmRobotSetResponse, error)
+	// 飞书告警机器人信息列表获取
+	WebFsAlarmRobotListGet(context.Context, *WebFsAlarmRobotListGetRequest) (*WebFsAlarmRobotListGetResponse, error)
+	// 飞书告警机器人信息删除
+	WebFsAlarmRobotDelete(context.Context, *WebFsAlarmRobotDeleteRequest) (*WebFsAlarmRobotDeleteResponse, error)
+	mustEmbedUnimplementedFeiShuServiceServer()
+}
+
+// UnimplementedFeiShuServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedFeiShuServiceServer struct {
+}
+
+func (UnimplementedFeiShuServiceServer) WebFsAlarmPush(context.Context, *FsAlarmPushRequest) (*FsAlarmPushResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method WebFsAlarmPush not implemented")
+}
+func (UnimplementedFeiShuServiceServer) FsAlarmPush(context.Context, *FsAlarmPushRequest) (*FsAlarmPushResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FsAlarmPush not implemented")
+}
+func (UnimplementedFeiShuServiceServer) WebFsAlarmRobotSet(context.Context, *WebFsAlarmRobotSetRequest) (*WebFsAlarmRobotSetResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method WebFsAlarmRobotSet not implemented")
+}
+func (UnimplementedFeiShuServiceServer) WebFsAlarmRobotListGet(context.Context, *WebFsAlarmRobotListGetRequest) (*WebFsAlarmRobotListGetResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method WebFsAlarmRobotListGet not implemented")
+}
+func (UnimplementedFeiShuServiceServer) WebFsAlarmRobotDelete(context.Context, *WebFsAlarmRobotDeleteRequest) (*WebFsAlarmRobotDeleteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method WebFsAlarmRobotDelete not implemented")
+}
+func (UnimplementedFeiShuServiceServer) mustEmbedUnimplementedFeiShuServiceServer() {}
+
+// UnsafeFeiShuServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to FeiShuServiceServer will
+// result in compilation errors.
+type UnsafeFeiShuServiceServer interface {
+	mustEmbedUnimplementedFeiShuServiceServer()
+}
+
+func RegisterFeiShuServiceServer(s grpc.ServiceRegistrar, srv FeiShuServiceServer) {
+	s.RegisterService(&FeiShuService_ServiceDesc, srv)
+}
+
+func _FeiShuService_WebFsAlarmPush_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FsAlarmPushRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FeiShuServiceServer).WebFsAlarmPush(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FeiShuService_WebFsAlarmPush_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FeiShuServiceServer).WebFsAlarmPush(ctx, req.(*FsAlarmPushRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FeiShuService_FsAlarmPush_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FsAlarmPushRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FeiShuServiceServer).FsAlarmPush(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FeiShuService_FsAlarmPush_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FeiShuServiceServer).FsAlarmPush(ctx, req.(*FsAlarmPushRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FeiShuService_WebFsAlarmRobotSet_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WebFsAlarmRobotSetRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FeiShuServiceServer).WebFsAlarmRobotSet(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FeiShuService_WebFsAlarmRobotSet_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FeiShuServiceServer).WebFsAlarmRobotSet(ctx, req.(*WebFsAlarmRobotSetRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FeiShuService_WebFsAlarmRobotListGet_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WebFsAlarmRobotListGetRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FeiShuServiceServer).WebFsAlarmRobotListGet(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FeiShuService_WebFsAlarmRobotListGet_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FeiShuServiceServer).WebFsAlarmRobotListGet(ctx, req.(*WebFsAlarmRobotListGetRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _FeiShuService_WebFsAlarmRobotDelete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WebFsAlarmRobotDeleteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FeiShuServiceServer).WebFsAlarmRobotDelete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FeiShuService_WebFsAlarmRobotDelete_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FeiShuServiceServer).WebFsAlarmRobotDelete(ctx, req.(*WebFsAlarmRobotDeleteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// FeiShuService_ServiceDesc is the grpc.ServiceDesc for FeiShuService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var FeiShuService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "FeiShuService",
+	HandlerType: (*FeiShuServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "WebFsAlarmPush",
+			Handler:    _FeiShuService_WebFsAlarmPush_Handler,
+		},
+		{
+			MethodName: "FsAlarmPush",
+			Handler:    _FeiShuService_FsAlarmPush_Handler,
+		},
+		{
+			MethodName: "WebFsAlarmRobotSet",
+			Handler:    _FeiShuService_WebFsAlarmRobotSet_Handler,
+		},
+		{
+			MethodName: "WebFsAlarmRobotListGet",
+			Handler:    _FeiShuService_WebFsAlarmRobotListGet_Handler,
+		},
+		{
+			MethodName: "WebFsAlarmRobotDelete",
+			Handler:    _FeiShuService_WebFsAlarmRobotDelete_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "message.proto",
+}
+
+const (
+	PushService_PushInviteMessage_FullMethodName = "/PushService/PushInviteMessage"
+)
+
+// PushServiceClient is the client API for PushService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type PushServiceClient interface {
+	// 查询系统配置信息
+	PushInviteMessage(ctx context.Context, in *PushInvitedMessageRequest, opts ...grpc.CallOption) (*PushInvitedMessageResponse, error)
 }
 
 type pushServiceClient struct {
@@ -63,68 +295,12 @@ func (c *pushServiceClient) PushInviteMessage(ctx context.Context, in *PushInvit
 	return out, nil
 }
 
-func (c *pushServiceClient) WebFsAlarmPush(ctx context.Context, in *FsAlarmPushRequest, opts ...grpc.CallOption) (*FsAlarmPushResponse, error) {
-	out := new(FsAlarmPushResponse)
-	err := c.cc.Invoke(ctx, PushService_WebFsAlarmPush_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *pushServiceClient) FsAlarmPush(ctx context.Context, in *FsAlarmPushRequest, opts ...grpc.CallOption) (*FsAlarmPushResponse, error) {
-	out := new(FsAlarmPushResponse)
-	err := c.cc.Invoke(ctx, PushService_FsAlarmPush_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *pushServiceClient) WebFsAlarmRobotSet(ctx context.Context, in *WebFsAlarmRobotSetRequest, opts ...grpc.CallOption) (*WebFsAlarmRobotSetResponse, error) {
-	out := new(WebFsAlarmRobotSetResponse)
-	err := c.cc.Invoke(ctx, PushService_WebFsAlarmRobotSet_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *pushServiceClient) WebFsAlarmRobotListGet(ctx context.Context, in *WebFsAlarmRobotListGetRequest, opts ...grpc.CallOption) (*WebFsAlarmRobotListGetResponse, error) {
-	out := new(WebFsAlarmRobotListGetResponse)
-	err := c.cc.Invoke(ctx, PushService_WebFsAlarmRobotListGet_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *pushServiceClient) WebFsAlarmRobotDelete(ctx context.Context, in *WebFsAlarmRobotDeleteRequest, opts ...grpc.CallOption) (*WebFsAlarmRobotDeleteResponse, error) {
-	out := new(WebFsAlarmRobotDeleteResponse)
-	err := c.cc.Invoke(ctx, PushService_WebFsAlarmRobotDelete_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // PushServiceServer is the server API for PushService service.
 // All implementations must embed UnimplementedPushServiceServer
 // for forward compatibility
 type PushServiceServer interface {
 	// 查询系统配置信息
 	PushInviteMessage(context.Context, *PushInvitedMessageRequest) (*PushInvitedMessageResponse, error)
-	// service 2
-	// 飞书告警消息转发
-	WebFsAlarmPush(context.Context, *FsAlarmPushRequest) (*FsAlarmPushResponse, error)
-	// 飞书告警消息转发
-	FsAlarmPush(context.Context, *FsAlarmPushRequest) (*FsAlarmPushResponse, error)
-	// 飞书告警机器人信息设置
-	WebFsAlarmRobotSet(context.Context, *WebFsAlarmRobotSetRequest) (*WebFsAlarmRobotSetResponse, error)
-	// 飞书告警机器人信息列表获取
-	WebFsAlarmRobotListGet(context.Context, *WebFsAlarmRobotListGetRequest) (*WebFsAlarmRobotListGetResponse, error)
-	// 飞书告警机器人信息删除
-	WebFsAlarmRobotDelete(context.Context, *WebFsAlarmRobotDeleteRequest) (*WebFsAlarmRobotDeleteResponse, error)
 	mustEmbedUnimplementedPushServiceServer()
 }
 
@@ -134,21 +310,6 @@ type UnimplementedPushServiceServer struct {
 
 func (UnimplementedPushServiceServer) PushInviteMessage(context.Context, *PushInvitedMessageRequest) (*PushInvitedMessageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PushInviteMessage not implemented")
-}
-func (UnimplementedPushServiceServer) WebFsAlarmPush(context.Context, *FsAlarmPushRequest) (*FsAlarmPushResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method WebFsAlarmPush not implemented")
-}
-func (UnimplementedPushServiceServer) FsAlarmPush(context.Context, *FsAlarmPushRequest) (*FsAlarmPushResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method FsAlarmPush not implemented")
-}
-func (UnimplementedPushServiceServer) WebFsAlarmRobotSet(context.Context, *WebFsAlarmRobotSetRequest) (*WebFsAlarmRobotSetResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method WebFsAlarmRobotSet not implemented")
-}
-func (UnimplementedPushServiceServer) WebFsAlarmRobotListGet(context.Context, *WebFsAlarmRobotListGetRequest) (*WebFsAlarmRobotListGetResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method WebFsAlarmRobotListGet not implemented")
-}
-func (UnimplementedPushServiceServer) WebFsAlarmRobotDelete(context.Context, *WebFsAlarmRobotDeleteRequest) (*WebFsAlarmRobotDeleteResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method WebFsAlarmRobotDelete not implemented")
 }
 func (UnimplementedPushServiceServer) mustEmbedUnimplementedPushServiceServer() {}
 
@@ -181,96 +342,6 @@ func _PushService_PushInviteMessage_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PushService_WebFsAlarmPush_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(FsAlarmPushRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PushServiceServer).WebFsAlarmPush(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PushService_WebFsAlarmPush_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PushServiceServer).WebFsAlarmPush(ctx, req.(*FsAlarmPushRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PushService_FsAlarmPush_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(FsAlarmPushRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PushServiceServer).FsAlarmPush(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PushService_FsAlarmPush_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PushServiceServer).FsAlarmPush(ctx, req.(*FsAlarmPushRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PushService_WebFsAlarmRobotSet_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(WebFsAlarmRobotSetRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PushServiceServer).WebFsAlarmRobotSet(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PushService_WebFsAlarmRobotSet_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PushServiceServer).WebFsAlarmRobotSet(ctx, req.(*WebFsAlarmRobotSetRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PushService_WebFsAlarmRobotListGet_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(WebFsAlarmRobotListGetRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PushServiceServer).WebFsAlarmRobotListGet(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PushService_WebFsAlarmRobotListGet_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PushServiceServer).WebFsAlarmRobotListGet(ctx, req.(*WebFsAlarmRobotListGetRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PushService_WebFsAlarmRobotDelete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(WebFsAlarmRobotDeleteRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PushServiceServer).WebFsAlarmRobotDelete(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PushService_WebFsAlarmRobotDelete_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PushServiceServer).WebFsAlarmRobotDelete(ctx, req.(*WebFsAlarmRobotDeleteRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // PushService_ServiceDesc is the grpc.ServiceDesc for PushService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -282,80 +353,136 @@ var PushService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "PushInviteMessage",
 			Handler:    _PushService_PushInviteMessage_Handler,
 		},
-		{
-			MethodName: "WebFsAlarmPush",
-			Handler:    _PushService_WebFsAlarmPush_Handler,
-		},
-		{
-			MethodName: "FsAlarmPush",
-			Handler:    _PushService_FsAlarmPush_Handler,
-		},
-		{
-			MethodName: "WebFsAlarmRobotSet",
-			Handler:    _PushService_WebFsAlarmRobotSet_Handler,
-		},
-		{
-			MethodName: "WebFsAlarmRobotListGet",
-			Handler:    _PushService_WebFsAlarmRobotListGet_Handler,
-		},
-		{
-			MethodName: "WebFsAlarmRobotDelete",
-			Handler:    _PushService_WebFsAlarmRobotDelete_Handler,
-		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "message.proto",
 }
 
-const ()
+const (
+	PullService_PullProtoMessage1_FullMethodName = "/PullService/PullProtoMessage1"
+	PullService_PullProtoMessage2_FullMethodName = "/PullService/PullProtoMessage2"
+)
 
-// FeiShuServiceClient is the client API for FeiShuService service.
+// PullServiceClient is the client API for PullService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type FeiShuServiceClient interface {
+type PullServiceClient interface {
+	PullProtoMessage1(ctx context.Context, in *PushInvitedMessageRequest, opts ...grpc.CallOption) (*PushInvitedMessageResponse, error)
+	PullProtoMessage2(ctx context.Context, in *PushInvitedMessageRequest, opts ...grpc.CallOption) (*PushInvitedMessageResponse, error)
 }
 
-type feiShuServiceClient struct {
+type pullServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewFeiShuServiceClient(cc grpc.ClientConnInterface) FeiShuServiceClient {
-	return &feiShuServiceClient{cc}
+func NewPullServiceClient(cc grpc.ClientConnInterface) PullServiceClient {
+	return &pullServiceClient{cc}
 }
 
-// FeiShuServiceServer is the server API for FeiShuService service.
-// All implementations must embed UnimplementedFeiShuServiceServer
+func (c *pullServiceClient) PullProtoMessage1(ctx context.Context, in *PushInvitedMessageRequest, opts ...grpc.CallOption) (*PushInvitedMessageResponse, error) {
+	out := new(PushInvitedMessageResponse)
+	err := c.cc.Invoke(ctx, PullService_PullProtoMessage1_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *pullServiceClient) PullProtoMessage2(ctx context.Context, in *PushInvitedMessageRequest, opts ...grpc.CallOption) (*PushInvitedMessageResponse, error) {
+	out := new(PushInvitedMessageResponse)
+	err := c.cc.Invoke(ctx, PullService_PullProtoMessage2_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// PullServiceServer is the server API for PullService service.
+// All implementations must embed UnimplementedPullServiceServer
 // for forward compatibility
-type FeiShuServiceServer interface {
-	mustEmbedUnimplementedFeiShuServiceServer()
+type PullServiceServer interface {
+	PullProtoMessage1(context.Context, *PushInvitedMessageRequest) (*PushInvitedMessageResponse, error)
+	PullProtoMessage2(context.Context, *PushInvitedMessageRequest) (*PushInvitedMessageResponse, error)
+	mustEmbedUnimplementedPullServiceServer()
 }
 
-// UnimplementedFeiShuServiceServer must be embedded to have forward compatible implementations.
-type UnimplementedFeiShuServiceServer struct {
+// UnimplementedPullServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedPullServiceServer struct {
 }
 
-func (UnimplementedFeiShuServiceServer) mustEmbedUnimplementedFeiShuServiceServer() {}
+func (UnimplementedPullServiceServer) PullProtoMessage1(context.Context, *PushInvitedMessageRequest) (*PushInvitedMessageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PullProtoMessage1 not implemented")
+}
+func (UnimplementedPullServiceServer) PullProtoMessage2(context.Context, *PushInvitedMessageRequest) (*PushInvitedMessageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PullProtoMessage2 not implemented")
+}
+func (UnimplementedPullServiceServer) mustEmbedUnimplementedPullServiceServer() {}
 
-// UnsafeFeiShuServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to FeiShuServiceServer will
+// UnsafePullServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to PullServiceServer will
 // result in compilation errors.
-type UnsafeFeiShuServiceServer interface {
-	mustEmbedUnimplementedFeiShuServiceServer()
+type UnsafePullServiceServer interface {
+	mustEmbedUnimplementedPullServiceServer()
 }
 
-func RegisterFeiShuServiceServer(s grpc.ServiceRegistrar, srv FeiShuServiceServer) {
-	s.RegisterService(&FeiShuService_ServiceDesc, srv)
+func RegisterPullServiceServer(s grpc.ServiceRegistrar, srv PullServiceServer) {
+	s.RegisterService(&PullService_ServiceDesc, srv)
 }
 
-// FeiShuService_ServiceDesc is the grpc.ServiceDesc for FeiShuService service.
+func _PullService_PullProtoMessage1_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PushInvitedMessageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PullServiceServer).PullProtoMessage1(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PullService_PullProtoMessage1_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PullServiceServer).PullProtoMessage1(ctx, req.(*PushInvitedMessageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PullService_PullProtoMessage2_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PushInvitedMessageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PullServiceServer).PullProtoMessage2(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PullService_PullProtoMessage2_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PullServiceServer).PullProtoMessage2(ctx, req.(*PushInvitedMessageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// PullService_ServiceDesc is the grpc.ServiceDesc for PullService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var FeiShuService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "FeiShuService",
-	HandlerType: (*FeiShuServiceServer)(nil),
-	Methods:     []grpc.MethodDesc{},
-	Streams:     []grpc.StreamDesc{},
-	Metadata:    "message.proto",
+var PullService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "PullService",
+	HandlerType: (*PullServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "PullProtoMessage1",
+			Handler:    _PullService_PullProtoMessage1_Handler,
+		},
+		{
+			MethodName: "PullProtoMessage2",
+			Handler:    _PullService_PullProtoMessage2_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "message.proto",
 }
 
 const (

@@ -16,15 +16,16 @@ func InitRouters() {
 		protoPath := dir + "/" + protos[i] + ".proto"
 		protoFile := FilterFile(protoPath)
 		ms := ReadProto(protoFile)
-		handles += `handler_` + protos[i] + ` "demo/gin/handlers/` + protos[i] + `"
-		`
+
 		for _, v := range ms {
+			handles += `handler_` + protos[i] + `_` + v["serviceName"] + ` "demo/gin/handlers/` + protos[i] + `_` + v["serviceName"] + `"
+			`
 			if strings.Contains(config.MSGPACK_URI, strings.ToUpper(v["uri"])) {
 				//通用msgpack协议入口，服务端根据uri跳转到对应的服务处理
-				uris += `r.` + v["method"] + `("` + v["uri"] + `", handler_msgpack.MsgPackProtocol)
+				uris += `r.` + v["method"] + `("` + v["uri"] + `", handler_msgpack_MsgpackHttp.MsgPackProtocol)
 				`
 			} else {
-				uris += `r.` + v["method"] + `("` + v["uri"] + `", handler_` + protos[i] + `.` + v["rpcName"] + `)
+				uris += `r.` + v["method"] + `("` + v["uri"] + `", handler_` + protos[i] + `_` + v["serviceName"] + `.` + v["rpcName"] + `)
 				`
 			}
 		}
