@@ -7,7 +7,6 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -21,11 +20,7 @@ func SetLock(lockName string, owner string, lockTTL int64) (primitive.M, error) 
 	var result bson.M
 	options := options.FindOneAndUpdate().SetUpsert(true).SetReturnDocument(options.After)
 	if err := FindOneAndUpdate(config.COLLECTION, filter, update, &result, options); err != nil {
-		if err == mongo.ErrNoDocuments {
-			// 未找到符合条件的文档
-		} else {
-			return nil, err
-		}
+		return nil, err
 	}
 	return result, nil
 }

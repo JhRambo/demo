@@ -76,7 +76,7 @@ func main() {
 
 	owner := "100.1000" //锁拥有者
 	// 6.分布式锁
-	lockRes, err := utils.SetLock("node1", owner, config.LOCKTTL)
+	lockRes, err := utils.SetLock("node1", owner, int64(config.LOCKTTL))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -88,18 +88,21 @@ func main() {
 		}
 		if ok {
 			//删除成功
-			// utils.SetLock("node1", owner, config.LOCKTTL)
+			utils.SetLock("node1", owner, int64(config.LOCKTTL))
+			goto A
 		}
 		log.Fatal("node1 is already locked by another client")
 	} else {
-
+		goto A
 	}
 
+A:
+	// time.Sleep(100 * time.Second)
 	// 构造修改文档
 	filter := bson.M{"docId": "100", "userId": "1000"}
 	update := bson.M{
 		"$set": bson.M{
-			"data.node1.room.style": "乡村3",
+			"data.node1.room.style": "乡村300",
 		},
 	}
 	// 执行修改操作
