@@ -112,7 +112,7 @@ func FindOne(collectionName string, filter bson.M, result interface{}) error {
 	return nil
 }
 
-// 查找指定字段的数据
+// 查找指定字段的数据或过滤不查询字段
 func FindOneProjection(collectionName string, filter bson.M, result interface{}, projection interface{}) error {
 	collection := GetCollection(collectionName)
 	ctx, cancel := WithTimeout(5 * time.Second)
