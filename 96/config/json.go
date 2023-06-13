@@ -1,25 +1,77 @@
 package config
 
 var JsonData = `{
-	"docId": "100",
-	"userId": "1000",
+	"configId": 1,
+	"spaceId": 1,
+	"eid": 1000,
 	"data": {
 		"node1": {
-			"space": {
-				"sp1": {
-					"size": "10",
-					"color": "red"
+			"baseInfo": {
+				"type": "模型",
+				"owner": 1,
+				"level": 1,
+				"name": "节点名称字符串",
+				"description": "描述信息字符串"
+			},
+			"transformInfo": {
+				"scale": {
+					"x": 1.1,
+					"y": 1.1,
+					"z": 1.1
 				},
-				"sp2": {
-					"size": "20",
-					"color": "blue"
+				"position": {
+					"x": 1.1,
+					"y": 1.1,
+					"z": 1.1
+				},
+				"rotation": {
+					"x": 1.1,
+					"y": 1.1,
+					"z": 1.1
 				}
 			},
-			"room": {
-				"size": "100",
-				"style": "古风",
-				"background": "pink"
+			"edit": true,
+			"moveTotal": true,
+			"rotator": true,
+			"isScale": true,
+			"coordinateSwith": true,
+			"anchorPoint": true,
+			"resetGroup": true,
+			"overall": true,
+			"recovery": true,
+			"drag": true
+		},
+		"node2": {
+			"baseInfo": {
+				"type": "导航台",
+				"owner": 1,
+				"level": 1,
+				"name": "节点名称字符串",
+				"description": "描述信息字符串"
+			},
+			"transformInfo": {
+				"scale": {
+					"x": 1.1,
+					"y": 1.1,
+					"z": 1.1
+				},
+				"position": {
+					"x": 1.1,
+					"y": 1.1,
+					"z": 1.1
+				},
+				"rotation": {
+					"x": 1.1,
+					"y": 1.1,
+					"z": 1.1
+				}
 			}
+		}
+	},
+	"basedata": {
+		"light": {
+			"yaw": 36.1,
+			"pitch": -90.0
 		}
 	}
 }`

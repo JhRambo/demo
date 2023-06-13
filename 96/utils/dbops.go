@@ -2,6 +2,7 @@ package utils
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -15,6 +16,7 @@ var err error
 
 // 创建连接
 func Connect(url string, dbName string) error {
+	fmt.Println("connect ok!")
 	// 设置连接超时时间
 	ctx, cancel := WithTimeout(10 * time.Second)
 	defer cancel()
@@ -33,6 +35,7 @@ func Connect(url string, dbName string) error {
 
 // 关闭连接
 func Disconnect() error {
+	fmt.Println("disconnect ok!")
 	if client == nil {
 		return nil
 	}
@@ -109,6 +112,25 @@ func FindOne(collectionName string, filter bson.M, result interface{}) error {
 	return nil
 }
 
+// 查找指定字段的数据
+func FindOneProjection(collectionName string, filter bson.M, result interface{}, projection interface{}) error {
+	collection := GetCollection(collectionName)
+	ctx, cancel := WithTimeout(5 * time.Second)
+	defer cancel()
+
+	err := collection.FindOne(ctx, filter, options.FindOne().SetProjection(projection)).Decode(result)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			fmt.Println("No documents found for the specified filter")
+		} else {
+			fmt.Printf("Error decoding result from MongoDB: %s\n", err)
+		}
+		return err
+	}
+
+	return nil
+}
+
 // 查找所有数据
 func FindAll(collectionName string, filter bson.M, result interface{}) error {
 	collection := GetCollection(collectionName)
@@ -134,6 +156,26 @@ func FindOneAndUpdate(collectionName string, filter bson.M, update bson.M, resul
 	defer cancel()
 
 	err := collection.FindOneAndUpdate(ctx, filter, update, options).Decode(result)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// 创建索引
+func CreateIndexes(collectionName string, keys bson.D, unique bool) error {
+	collection := GetCollection(collectionName)
+	ctx, cancel := WithTimeout(5 * time.Second)
+	defer cancel()
+
+	// 指定索引选项
+	index := mongo.IndexModel{
+		Keys:    keys,
+		Options: options.Index().SetUnique(unique),
+	}
+
+	_, err := collection.Indexes().CreateOne(ctx, index)
 	if err != nil {
 		return err
 	}
