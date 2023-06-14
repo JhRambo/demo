@@ -4,14 +4,11 @@ var JsonData = `{
 	"configId": 1,
 	"spaceId": 1,
 	"eid": 1000,
-	"data": {
+	"nodeList": {
 		"node1": {
 			"baseInfo": {
 				"type": "模型",
-				"owner": 1,
-				"level": 1,
-				"name": "节点名称字符串",
-				"description": "描述信息字符串"
+				"level": 1
 			},
 			"transformInfo": {
 				"scale": {
@@ -31,23 +28,17 @@ var JsonData = `{
 		"node2": {
 			"baseInfo": {
 				"type": "导航台",
-				"owner": 1,
-				"level": 1,
-				"name": "节点名称字符串",
-				"description": "描述信息字符串"
+				"level": 1
 			},
 			"slices":[{
 				"a":1,
-				"b":2,
-				"c":3
+				"b":2
 			},{
 				"a":"string",
-				"b":"string",
-				"c":"string"
+				"b":"string"
 			},{
-				"a":[30001,3002],
-				"b":"string",
-				"c":"string"
+				"a":[30001,30002],
+				"b":"string"
 			}]
 		}
 	},
