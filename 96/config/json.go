@@ -4,11 +4,11 @@ var JsonData = `{
 	"configId": 1,
 	"spaceId": 1,
 	"eid": 1000,
-	"nodeList": {
-		"node1": {
+	"nodeList": [{
+			"id": "uuid1",
 			"baseInfo": {
-				"type": "模型",
-				"level": 1
+				"name": "节点名称1",
+				"description": "详细描述信息1"
 			},
 			"transformInfo": {
 				"scale": {
@@ -17,31 +17,36 @@ var JsonData = `{
 					"z": 1.1
 				},
 				"position": {
-					"x": 1.1,
-					"y": 1.1,
-					"z": 1.1
+					"x": 2.2,
+					"y": 2.2,
+					"z": 2.2
+				},
+				"rotation": {
+					"x": 3.3,
+					"y": 3.3,
+					"z": 3.3
 				}
 			},
-			"edit": true,
-			"moveTotal": true
+			"type": "模型",
+			"level": 1
 		},
-		"node2": {
+		{
+			"id": "uuid2",
 			"baseInfo": {
-				"type": "导航台",
-				"level": 1
+				"name": "节点名称2",
+				"description": "详细描述信息2"
 			},
-			"slices":[{
-				"a":1,
-				"b":2
-			},{
-				"a":"string",
-				"b":"string"
-			},{
-				"a":[30001,30002],
-				"b":"string"
-			}]
+			"slices": [{
+				"a": 1,
+				"b": 2
+			}, {
+				"a": [30001, 30002],
+				"b": "xyz"
+			}],
+			"type": "造型",
+			"level": 2
 		}
-	},
+	],
 	"basedata": {
 		"light": {
 			"yaw": 36.1,

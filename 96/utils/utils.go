@@ -20,8 +20,8 @@ func UpdateOwner() bool {
 // 提取path路径
 func OperateStr(path string) ([]string, error) {
 	sliceStr := strings.Split(path, ".")
-	if len(sliceStr) < 3 {
-		return nil, fmt.Errorf("path格式不对，至少3级")
+	if len(sliceStr) < 2 {
+		return nil, fmt.Errorf("path层级不对，至少需要2级")
 	}
 	return sliceStr, nil
 }
@@ -87,7 +87,7 @@ func Update(path []string, data []interface{}, action []string, configId int64, 
 		}
 		// 6.分布式锁
 		lockPath := ""
-		if len(paths) == 3 {
+		if len(paths) == 2 {
 			lockPath = paths[0] + "." + paths[1]
 		} else {
 			lockPath = paths[0] + "." + paths[1] + "." + paths[2]
@@ -110,13 +110,13 @@ func Update(path []string, data []interface{}, action []string, configId int64, 
 				SetLock(lockPath, owner, int64(config.LOCKTTL))
 				goto A
 			}
-			return resp, fmt.Errorf("node is already locked by another client")
+			return resp, fmt.Errorf("current path is already locked by another client")
 		} else {
 			goto A
 		}
 	A:
 		// 模拟请求耗时操作
-		time.Sleep(30 * time.Second)
+		// time.Sleep(30 * time.Second)
 		// 构造查询条件
 		filter := bson.M{"$and": []bson.M{
 			{"configId": configId, "spaceId": spaceId, "eid": owner},
