@@ -66,7 +66,7 @@ func Create() (*config.Response, error) {
 
 owner锁拥有者 eid
 */
-func Update(path []string, data []interface{}, action []string, configId int64, spaceId int64, owner int64) (*config.Response, error) {
+func Update(configId int64, data []map[string]string, owner int64) (*config.Response, error) {
 	resp := &config.Response{
 		Code: 0,
 	}
@@ -79,8 +79,9 @@ func Update(path []string, data []interface{}, action []string, configId int64, 
 	defer Disconnect()
 
 	logs := make([]map[string]interface{}, 0)
-	for k, v := range path {
-		paths, err := OperateStr(v)
+	for _, v := range data {
+		path := v["path"]
+		paths, err := OperateStr(path)
 		if err != nil {
 			resp.Message = err.Error()
 			return resp, err
@@ -98,7 +99,6 @@ func Update(path []string, data []interface{}, action []string, configId int64, 
 			resp.Message = err.Error()
 			return resp, err
 		}
-
 		if lockRes["owner"] != owner { //判断是否是当前owner
 			ok, err := CheckLock(lockPath)
 			if err != nil {
@@ -119,20 +119,26 @@ func Update(path []string, data []interface{}, action []string, configId int64, 
 		// time.Sleep(30 * time.Second)
 		// 构造查询条件
 		filter := bson.M{"$and": []bson.M{
-			{"configId": configId, "spaceId": spaceId, "eid": owner},
-			{v: bson.M{"$exists": true}},
+			{"configId": configId, "eid": owner},
+			{path: bson.M{"$exists": true}},
 		}}
 		update := bson.M{}
-		if action[k] == "d" { //删除
+		if v["action"] == "d" { //删除
+			// TODO=============================
+			// update = bson.M{
+			// 	"$unset": bson.M{
+			// 		path: "",
+			// 	},
+			// }
 			update = bson.M{
-				"$unset": bson.M{
-					v: "",
+				"$pull": bson.M{
+					path: "",
 				},
 			}
 		} else {
 			update = bson.M{
 				"$set": bson.M{
-					v: data[k],
+					path: v["value"],
 				},
 			}
 		}
@@ -140,15 +146,19 @@ func Update(path []string, data []interface{}, action []string, configId int64, 
 		actionType := "" //操作类型
 		result, err := UpdateOne(config.COLLECTION, filter, update)
 		if err != nil {
+			// 释放锁
+			UnLock(lockPath, owner)
 			resp.Message = err.Error()
 			return resp, err
 		}
 		// 判断更新结果
-		if action[k] == "d" { //删除
-			// if result.ModifiedCount == 0 {
-			// 	resp.Message = "Not found field!"
-			// 	return resp, nil
-			// }
+		if v["action"] == "d" { //删除
+			if result.ModifiedCount == 0 {
+				// 释放锁
+				UnLock(lockPath, owner)
+				resp.Message = "Not found field!"
+				return resp, nil
+			}
 			actionType = "delete"
 			resp.Message = "Deleted field!"
 		} else {
@@ -157,8 +167,10 @@ func Update(path []string, data []interface{}, action []string, configId int64, 
 				resp.Message = "Updated field!"
 			} else {
 				// 如果不存在，则插入新字段
-				_, err = UpdateOne(config.COLLECTION, bson.M{"configId": configId, "spaceId": spaceId, "eid": owner}, update)
+				_, err = UpdateOne(config.COLLECTION, bson.M{"configId": configId, "eid": owner}, update)
 				if err != nil {
+					// 释放锁
+					UnLock(lockPath, owner)
 					resp.Message = err.Error()
 					return resp, err
 				}
@@ -167,8 +179,9 @@ func Update(path []string, data []interface{}, action []string, configId int64, 
 			}
 		}
 		logs = append(logs, map[string]interface{}{
-			"actiontype": actionType,
-			"info":       fmt.Sprintf("%v:%v:%v", v, data[k], actionType),
+			"actionType": actionType,
+			"nodeId":     string(v["nodeId"]),
+			"info":       fmt.Sprintf("%v:%v:%v", path, v["value"], actionType),
 		})
 		// 释放锁
 		UnLock(lockPath, owner)
@@ -178,7 +191,7 @@ func Update(path []string, data []interface{}, action []string, configId int64, 
 	key := fmt.Sprintf("configId_%d", configId)
 	recordLogsNum := IncrLogs(key)
 	if recordLogsNum > 0 && (recordLogsNum%config.RECORDLOGSNUM) == 0 {
-		//赋值一份最新的文档到新的集合中
+		//复制一份最新的文档到新的集合中
 		var curLog map[string]interface{}
 		filter := bson.M{"configId": configId}
 		projection := bson.M{"_id": 0}
@@ -201,7 +214,7 @@ func RecordLogs(configId int64, content interface{}) {
 		"createAt": time.Now().Format("2006-01-02 15:04:05"),
 		"content":  content,
 	}
-	_, err = InsertOne(config.RECORDLOGS, recordlogsData)
+	_, err := InsertOne(config.RECORDLOGS, recordlogsData)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -225,8 +238,5 @@ func IncrLogs(key string) int64 {
 	})
 	// 使用 INCR 命令将指定键的值自增 1
 	result, _ := rdb.Incr(key).Result()
-	// if err != nil {
-	// 	panic(err)
-	// }
 	return result
 }

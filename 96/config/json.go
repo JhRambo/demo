@@ -6,8 +6,10 @@ var JsonData = `{
 	"eid": 1000,
 	"nodeList": [{
 			"id": "uuid1",
+			"type": 1,
+			"level": 1,
 			"baseInfo": {
-				"name": "节点名称1",
+				"name": "基础信息1",
 				"description": "详细描述信息1"
 			},
 			"transformInfo": {
@@ -26,31 +28,41 @@ var JsonData = `{
 					"y": 3.3,
 					"z": 3.3
 				}
-			},
-			"type": "模型",
-			"level": 1
+			}
 		},
 		{
 			"id": "uuid2",
+			"type": 2,
+			"level": 2,
 			"baseInfo": {
-				"name": "节点名称2",
+				"name": "基础信息2",
 				"description": "详细描述信息2"
 			},
 			"slices": [{
 				"a": 1,
 				"b": 2
 			}, {
-				"a": [30001, 30002],
+				"a": "abc",
 				"b": "xyz"
-			}],
-			"type": "造型",
-			"level": 2
+			}]
 		}
 	],
 	"basedata": {
 		"light": {
 			"yaw": 36.1,
 			"pitch": -90.0
+		},
+		"globalMusic": {
+			"playType": 1,
+			"fileInfoList": []
+		},
+		"guide": {
+			"fileInfoList": []
+		},
+		"others": {
+			"x": 1,
+			"y": 2,
+			"z": 3
 		}
 	}
 }`
