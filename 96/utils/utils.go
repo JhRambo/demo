@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 
@@ -18,12 +19,15 @@ func UpdateOwner() bool {
 }
 
 // 提取path路径
-func OperateStr(path string) ([]string, error) {
-	sliceStr := strings.Split(path, ".")
-	if len(sliceStr) < 2 {
-		return nil, fmt.Errorf("path层级不对，至少需要2级")
+func OperateStr(path interface{}) ([]string, error) {
+	if v, ok := path.(string); ok {
+		sliceStr := strings.Split(v, ".")
+		if len(sliceStr) < 1 {
+			return nil, fmt.Errorf("path不能为空")
+		}
+		return sliceStr, nil
 	}
-	return sliceStr, nil
+	return nil, nil
 }
 
 // 初始化对象资源
@@ -66,7 +70,7 @@ func Create() (*config.Response, error) {
 
 owner锁拥有者 eid
 */
-func Update(configId int64, data []map[string]string, owner int64) (*config.Response, error) {
+func Update(configId int64, data []map[string]interface{}, owner int64) (*config.Response, error) {
 	resp := &config.Response{
 		Code: 0,
 	}
@@ -80,39 +84,50 @@ func Update(configId int64, data []map[string]string, owner int64) (*config.Resp
 
 	logs := make([]map[string]interface{}, 0)
 	for _, v := range data {
-		path := v["path"]
+		upData := v["data"]
+		var path string
+		if value, ok := v["path"].(string); ok {
+			path = value
+		}
 		paths, err := OperateStr(path)
 		if err != nil {
 			resp.Message = err.Error()
 			return resp, err
 		}
-		// 6.分布式锁
+		operateType := paths[0] //操作类型，目前只有两种nodeList basedata
+		if operateType == "nodeList" {
+			//先查找节点
+			filter := bson.M{"configId": configId, "eid": owner, "nodeList.id": v["id"]}
+			var nodeRes interface{}
+			FindOne(config.COLLECTION, filter, &nodeRes)
+			fmt.Println(nodeRes)
+		}
+
 		lockPath := ""
-		if len(paths) == 2 {
+		if len(paths) > 1 {
+			// 6.分布式锁
 			lockPath = paths[0] + "." + paths[1]
-		} else {
-			lockPath = paths[0] + "." + paths[1] + "." + paths[2]
-		}
-		lockPath = fmt.Sprintf("%d"+"."+lockPath, configId)
-		lockRes, err := SetLock(lockPath, owner, int64(config.LOCKTTL))
-		if err != nil {
-			resp.Message = err.Error()
-			return resp, err
-		}
-		if lockRes["owner"] != owner { //判断是否是当前owner
-			ok, err := CheckLock(lockPath)
+			lockPath = fmt.Sprintf("%d"+"."+lockPath, configId)
+			lockRes, err := SetLock(lockPath, owner, int64(config.LOCKTTL))
 			if err != nil {
 				resp.Message = err.Error()
 				return resp, err
 			}
-			if ok {
-				//删除成功，重新加锁
-				SetLock(lockPath, owner, int64(config.LOCKTTL))
+			if lockRes["owner"] != owner { //判断是否是当前owner
+				ok, err := CheckLock(lockPath)
+				if err != nil {
+					resp.Message = err.Error()
+					return resp, err
+				}
+				if ok {
+					//删除成功，重新加锁
+					SetLock(lockPath, owner, int64(config.LOCKTTL))
+					goto A
+				}
+				return resp, fmt.Errorf("current path is already locked by another client")
+			} else {
 				goto A
 			}
-			return resp, fmt.Errorf("current path is already locked by another client")
-		} else {
-			goto A
 		}
 	A:
 		// 模拟请求耗时操作
@@ -124,21 +139,69 @@ func Update(configId int64, data []map[string]string, owner int64) (*config.Resp
 		}}
 		update := bson.M{}
 		if v["action"] == "d" { //删除
-			// TODO=============================
-			// update = bson.M{
-			// 	"$unset": bson.M{
-			// 		path: "",
-			// 	},
-			// }
-			update = bson.M{
-				"$pull": bson.M{
-					path: "",
+			if _, err := strconv.Atoi(paths[len(paths)-1]); err == nil { //判断path最后一个字符串是否是整型数字，如果是则说明当前操作的是数组
+				// 删除子数组========================================
+				path_p := ""
+				lastDotIndex := strings.LastIndex(path, ".")
+				if lastDotIndex > 0 {
+					path_p = path[:lastDotIndex]
+				} else {
+					if len(paths) > 1 {
+						// 释放锁
+						UnLock(lockPath, owner)
+					}
+					resp.Message = err.Error()
+					return resp, err
+				}
+				_, err = UpdateOne(config.COLLECTION, filter, bson.M{
+					"$unset": bson.M{
+						path: 1,
+					}})
+				if err != nil {
+					if len(paths) > 1 {
+						// 释放锁
+						UnLock(lockPath, owner)
+					}
+					resp.Message = err.Error()
+					return resp, err
+				}
+				update = bson.M{"$pull": bson.M{
+					path_p: nil,
+				}}
+			} else {
+				update = bson.M{
+					"$unset": bson.M{
+						path: 1,
+					},
+				}
+			}
+		} else if v["action"] == "e" { //数组调整顺序
+			var slices bson.M
+			// 构造聚合管道
+			pipeline := []bson.M{
+				{
+					"$match": bson.M{"configId": configId, "eid": owner},
 				},
+				{
+					"$project": bson.M{
+						path:  1,
+						"_id": 0,
+					},
+				},
+			}
+			err = Aggregate(config.COLLECTION, pipeline, slices)
+			if err != nil {
+				if len(paths) > 1 {
+					// 释放锁
+					UnLock(lockPath, owner)
+				}
+				resp.Message = err.Error()
+				return resp, err
 			}
 		} else {
 			update = bson.M{
 				"$set": bson.M{
-					path: v["value"],
+					path: upData,
 				},
 			}
 		}
@@ -146,16 +209,20 @@ func Update(configId int64, data []map[string]string, owner int64) (*config.Resp
 		actionType := "" //操作类型
 		result, err := UpdateOne(config.COLLECTION, filter, update)
 		if err != nil {
-			// 释放锁
-			UnLock(lockPath, owner)
+			if len(paths) > 1 {
+				// 释放锁
+				UnLock(lockPath, owner)
+			}
 			resp.Message = err.Error()
 			return resp, err
 		}
 		// 判断更新结果
 		if v["action"] == "d" { //删除
 			if result.ModifiedCount == 0 {
-				// 释放锁
-				UnLock(lockPath, owner)
+				if len(paths) > 1 {
+					// 释放锁
+					UnLock(lockPath, owner)
+				}
 				resp.Message = "Not found field!"
 				return resp, nil
 			}
@@ -169,8 +236,10 @@ func Update(configId int64, data []map[string]string, owner int64) (*config.Resp
 				// 如果不存在，则插入新字段
 				_, err = UpdateOne(config.COLLECTION, bson.M{"configId": configId, "eid": owner}, update)
 				if err != nil {
-					// 释放锁
-					UnLock(lockPath, owner)
+					if len(paths) > 1 {
+						// 释放锁
+						UnLock(lockPath, owner)
+					}
 					resp.Message = err.Error()
 					return resp, err
 				}
@@ -180,11 +249,13 @@ func Update(configId int64, data []map[string]string, owner int64) (*config.Resp
 		}
 		logs = append(logs, map[string]interface{}{
 			"actionType": actionType,
-			"nodeId":     string(v["nodeId"]),
-			"info":       fmt.Sprintf("%v:%v:%v", path, v["value"], actionType),
+			"typeId":     v["typeId"],
+			"info":       fmt.Sprintf("%v:%v:%v", path, upData, actionType),
 		})
-		// 释放锁
-		UnLock(lockPath, owner)
+		if len(paths) > 1 {
+			// 释放锁
+			UnLock(lockPath, owner)
+		}
 	}
 	// 记录操作日志
 	RecordLogs(configId, logs)
@@ -194,7 +265,7 @@ func Update(configId int64, data []map[string]string, owner int64) (*config.Resp
 		//复制一份最新的文档到新的集合中
 		var curLog map[string]interface{}
 		filter := bson.M{"configId": configId}
-		projection := bson.M{"_id": 0}
+		projection := bson.M{"_id": 0} //过滤_id字段
 		FindOneProjection(config.COLLECTION, filter, &curLog, projection)
 		curLog["createAt"] = time.Now().Format("2006-01-02 15:04:05")
 		_, err = InsertOne(config.COLLECTION_LOGS, curLog)
@@ -239,4 +310,36 @@ func IncrLogs(key string) int64 {
 	// 使用 INCR 命令将指定键的值自增 1
 	result, _ := rdb.Incr(key).Result()
 	return result
+}
+
+func makeSliceUpdater(path string, indexes []int) []interface{} {
+	var updater []interface{}
+	updater = append(updater, "$map")
+	updater = append(updater, bson.M{
+		"input": bson.M{"$literal": bson.A{bson.M{}}},
+		"as":    "this",
+		"in": bson.M{
+			"$arrayElemAt": []interface{}{
+				bson.M{
+					"$arrayElemAt": []interface{}{fmt.Sprintf("$%v", path), "$$this"},
+				},
+				bson.M{
+					"$indexOfArray": []interface{}{indexes, "$$this"},
+				},
+			},
+		},
+	})
+	updater = append(updater, bson.M{"$sort": bson.M{"this": 1}})
+	updater = append(updater, "$map")
+	updater = append(updater, bson.M{
+		"input": bson.M{"$range": []interface{}{0, len(indexes)}},
+		"as":    "i",
+		"in": bson.M{
+			"$arrayElemAt": []interface{}{
+				fmt.Sprintf("$%v", path),
+				bson.M{"$arrayElemAt": []interface{}{"$$arr", "$$i"}},
+			},
+		},
+	})
+	return []interface{}{updater}
 }

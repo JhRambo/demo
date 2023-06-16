@@ -131,6 +131,32 @@ func FindOneProjection(collectionName string, filter bson.M, result interface{},
 	return nil
 }
 
+// 聚合查询
+func Aggregate(collectionName string, pipeline []bson.M, result bson.M) error {
+	collection := GetCollection(collectionName)
+	ctx, cancel := WithTimeout(5 * time.Second)
+	defer cancel()
+
+	// 执行聚合操作
+	cursor, err := collection.Aggregate(ctx, pipeline)
+	if err != nil {
+		return err
+	}
+	defer cursor.Close(ctx)
+
+	// 迭代游标并处理查询结果
+	for cursor.Next(context.Background()) {
+		if err := cursor.Decode(&result); err != nil {
+			return err
+		}
+	}
+	if err := cursor.Err(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // 查找所有数据
 func FindAll(collectionName string, filter bson.M, result interface{}) error {
 	collection := GetCollection(collectionName)

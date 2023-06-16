@@ -15,312 +15,70 @@ func main() {
 	// }
 	// fmt.Printf("%#v", resp)
 
-	// //更新字段1 操作值类型或object类型 新增字段 ok
-	// jsons := `[{
-	// 	"path": "basedata.light.x",
-	// 	"value": "111.1",
-	// 	"action": "",
-	// 	"nodeId": "light"
-	// }]`
-	// var dd []map[string]string
-	// json.Unmarshal([]byte(jsons), &dd)
-	// data := make([]map[string]string, 0)
-	// for _, v := range dd {
-	// 	data = append(data, v)
-	// }
-	// eid := int64(1000)
-	// configId := int64(1)
-	// resp, err := utils.Update(configId, data, eid)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Printf("%#v", resp)
-
-	// //更新字段2 操作值类型或object类型 新增字段 ok
-	// jsons := `[{
-	// 	"path": "basedata.light.y",
-	// 	"value": "222.2",
-	// 	"action": "",
-	// 	"nodeId": "light"
-	// }, {
-	// 	"path": "basedata.desc",
-	// 	"value": "basedata描述内容",
-	// 	"action": "",
-	// 	"nodeId": "desc"
-	// }]`
-	// var dd []map[string]string
-	// json.Unmarshal([]byte(jsons), &dd)
-	// data := make([]map[string]string, 0)
-	// for _, v := range dd {
-	// 	data = append(data, v)
-	// }
-	// eid := int64(1000)
-	// configId := int64(1)
-	// resp, err := utils.Update(configId, data, eid)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Printf("%#v", resp)
-
-	// //更新字段3 操作值类型或object类型 新增字段 ok
-	// jsons := `[{
-	// 	"path": "basedata.light.y",
-	// 	"value": "[11,00]",
-	// 	"action": "",
-	// 	"nodeId": "light"
-	// }, {
-	// 	"path": "basedata.desc",
-	// 	"value": "啦啦啦啦啦啦啦啦啦",
-	// 	"action": "",
-	// 	"nodeId": "desc"
-	// }]`
-	// var dd []map[string]string
-	// json.Unmarshal([]byte(jsons), &dd)
-	// data := make([]map[string]string, 0)
-	// for _, v := range dd {
-	// 	data = append(data, v)
-	// }
-	// eid := int64(1000)
-	// configId := int64(1)
-	// resp, err := utils.Update(configId, data, eid)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Printf("%#v", resp)
-
-	// //更新字段4 操作值类型或object类型 删除字段 ok
-	// jsons := `[{
-	// 	"path": "basedata.light.y",
-	// 	"value": "",
-	// 	"action": "d",
-	// 	"nodeId": "light"
-	// }]`
-	// var dd []map[string]string
-	// json.Unmarshal([]byte(jsons), &dd)
-	// data := make([]map[string]string, 0)
-	// for _, v := range dd {
-	// 	data = append(data, v)
-	// }
-	// eid := int64(1000)
-	// configId := int64(1)
-	// resp, err := utils.Update(configId, data, eid)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Printf("%#v", resp)
-
-	// //更新字段5 操作数组 修改值内容 ok
-	// jsons := `[{
-	// 	"path": "nodeList.1.slices.0.a",
-	// 	"value": "111111",
-	// 	"action": "",
-	// 	"nodeId" : "1"
-	// },{
-	// 	"path": "nodeList.0.baseInfo.description",
-	// 	"value": "baseinfo的描述内容====================",
-	// 	"action": "",
-	// 	"nodeId" : "0"
-	// }]`
-	// var dd []map[string]string
-	// json.Unmarshal([]byte(jsons), &dd)
-	// data := make([]map[string]string, 0)
-	// for _, v := range dd {
-	// 	data = append(data, v)
-	// }
-	// eid := int64(1000)
-	// configId := int64(1)
-	// resp, err := utils.Update(configId, data, eid)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Printf("%#v", resp)
-
-	// //更新字段6 操作数组 新增字段 ok
-	// jsons := `[{
-	// 	"path": "nodeList.1.slices.0.c",
-	// 	"value": "x",
-	// 	"action": "",
-	// 	"nodeId": "1"
-	// },{
-	// 	"path": "nodeList.1.slices.1.c",
-	// 	"value": "y",
-	// 	"action": "",
-	// 	"nodeId": "1"
-	// }]`
-	// var dd []map[string]string
-	// json.Unmarshal([]byte(jsons), &dd)
-	// data := make([]map[string]string, 0)
-	// for _, v := range dd {
-	// 	data = append(data, v)
-	// }
-	// eid := int64(1000)
-	// configId := int64(1)
-	// resp, err := utils.Update(configId, data, eid)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Printf("%#v", resp)
-
-	// //更新字段7 操作数组 删除字段 ok
-	// jsons := `[{
-	// 	"path": "nodeList.1.slices.0.c",
-	// 	"value": "",
-	// 	"action": "d",
-	// 	"nodeId": "1"
-	// },{
-	// 	"path": "nodeList.1.slices.1.c",
-	// 	"value": "",
-	// 	"action": "d",
-	// 	"nodeId": "1"
-	// },{
-	// 	"path": "nodeList.1.slices.2.c",
-	// 	"value": "",
-	// 	"action": "d",
-	// 	"nodeId": "1"
-	// }]`
-	// var dd []map[string]string
-	// json.Unmarshal([]byte(jsons), &dd)
-	// data := make([]map[string]string, 0)
-	// for _, v := range dd {
-	// 	data = append(data, v)
-	// }
-	// eid := int64(1000)
-	// configId := int64(1)
-	// resp, err := utils.Update(configId, data, eid)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Printf("%#v", resp)
-
-	// //更新字段8 操作数组或值类型或object类型 不同类型同时更新字段 ok
+	//更新字段1 操作object类型，更新单个值 ok
 	// jsons := `[{
 	// 	"path": "basedata.light.yaw",
-	// 	"value": "11",
+	// 	"data": "111111111",
 	// 	"action": "",
-	// 	"nodeId": "light"
-	// }, {
-	// 	"path": "basedata.light.x",
-	// 	"value": "22",
+	// 	"id":"light",
+	// 	"typeId": "light"
+	// }]`
+
+	// //更新字段2 操作object类型，更新整个结构体 ok
+	// jsons := `[{
+	// 	"path": "basedata.light",
+	// 	"data": {
+	// 		"yaw": 1111111,
+	// 		"pitch": 222222
+	// 	},
 	// 	"action": "",
-	// 	"nodeId": "light"
-	// }, {
-	// 	"path": "nodeList.1.level",
-	// 	"value": "",
+	// 	"id":"light",
+	// 	"typeId": "light"
+	// }]`
+
+	// //更新字段3 操作object类型，新增结构体 ok
+	// jsons := `[{
+	// 	"path": "basedata.space",
+	// 	"data": {
+	// 		"x": 1111111,
+	// 		"y": 2222222,
+	// 		"z": 3333333
+	// 	},
+	// 	"action": "",
+	// 	"id":"space",
+	// 	"typeId": "space"
+	// }]`
+
+	// //更新字段4 操作object类型，删除结构体 ok
+	// jsons := `[{
+	// 	"path": "basedata.space",
+	// 	"data": "",
 	// 	"action": "d",
-	// 	"nodeId": "1"
+	// 	"id":"space",
+	// 	"typeId": "space"
 	// }]`
-	// var dd []map[string]string
-	// json.Unmarshal([]byte(jsons), &dd)
-	// data := make([]map[string]string, 0)
-	// for _, v := range dd {
-	// 	data = append(data, v)
-	// }
-	// eid := int64(1000)
-	// configId := int64(1)
-	// resp, err := utils.Update(configId, data, eid)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Printf("%#v", resp)
 
-	// //更新字段9 操作数组 更新&删除字段混合操作 ok
+	// //更新字段5 操作object类型，删除结构体某个字段 ok
 	// jsons := `[{
-	// 	"path": "nodeList.1.slices.0.c",
-	// 	"value": "11",
-	// 	"action": "",
-	// 	"nodeId": "1"
-	// }, {
-	// 	"path": "nodeList.1.slices.1.c",
-	// 	"value": "22",
-	// 	"action": "",
-	// 	"nodeId": "1"
-	// }, {
-	// 	"path": "nodeList.1.slices.0.x",
-	// 	"value": "",
+	// 	"path": "basedata.light.yaw",
+	// 	"data": "",
 	// 	"action": "d",
-	// 	"nodeId": "1"
+	// 	"id":"light",
+	// 	"typeId": "light"
 	// }]`
-	// var dd []map[string]string
-	// json.Unmarshal([]byte(jsons), &dd)
-	// data := make([]map[string]string, 0)
-	// for _, v := range dd {
-	// 	data = append(data, v)
-	// }
-	// eid := int64(1000)
-	// configId := int64(1)
-	// resp, err := utils.Update(configId, data, eid)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Printf("%#v", resp)
 
-	// //更新字段10 操作值类型或object类型 新增字段（值为结构体）TODO 批量更新处理
-	// jsons := `[{
-	// 	"path": "basedata.others.x",
-	// 	"value": "11",
-	// 	"action": "",
-	// 	"nodeId": "others"
-	// }, {
-	// 	"path": "basedata.others.y",
-	// 	"value": "22",
-	// 	"action": "",
-	// 	"nodeId": "others"
-	// }, {
-	// 	"path": "basedata.others.z",
-	// 	"value": "33",
-	// 	"action": "",
-	// 	"nodeId": "others"
-	// }]`
-	// var dd []map[string]string
-	// json.Unmarshal([]byte(jsons), &dd)
-	// data := make([]map[string]string, 0)
-	// for _, v := range dd {
-	// 	data = append(data, v)
-	// }
-	// eid := int64(1000)
-	// configId := int64(1)
-	// resp, err := utils.Update(configId, data, eid)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Printf("%#v", resp)
-
-	// //更新字段11 操作数组类型 批量更新处理
-	// jsons := `[{
-	// 	"path": "nodeList.1.slices.0.c",
-	// 	"value": "111",
-	// 	"action": "",
-	// 	"nodeId": "11"
-	// }, {
-	// 	"path": "nodeList.1.slices.1.c",
-	// 	"value": "222",
-	// 	"action": "",
-	// 	"nodeId": "22"
-	// }]`
-	// var dd []map[string]string
-	// json.Unmarshal([]byte(jsons), &dd)
-	// data := make([]map[string]string, 0)
-	// for _, v := range dd {
-	// 	data = append(data, v)
-	// }
-	// eid := int64(1000)
-	// configId := int64(1)
-	// resp, err := utils.Update(configId, data, eid)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Printf("%#v", resp)
-
-	//更新字段12 操作数组类型 调整顺序
+	//更新字段6 操作数组类型，更新单个值 ok
 	jsons := `[{
-		"path": "nodeList.1.slices.3",
-		"value": "111",
-		"action": "d",
-		"nodeId": "n"
+		"path": "nodeList.baseInfo.name",
+		"data": "我是哪个节点1111111111",
+		"action": "",
+		"id":"uuid2",
+		"typeId": "1"
 	}]`
-	var dd []map[string]string
+
+	var dd []map[string]interface{}
 	json.Unmarshal([]byte(jsons), &dd)
-	data := make([]map[string]string, 0)
+	data := make([]map[string]interface{}, 0)
 	for _, v := range dd {
 		data = append(data, v)
 	}
@@ -331,4 +89,5 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Printf("%#v", resp)
+
 }
