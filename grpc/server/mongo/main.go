@@ -108,6 +108,7 @@ func (s *Server) Get(ctx context.Context, req *pb.GetHttpRequest) (*pb.GetHttpRe
 	return resp, nil
 }
 
+// 更新对象资源
 func (s *Server) Update(ctx context.Context, req *pb.UpdateHttpRequest) (*pb.UpdateHttpResponse, error) {
 	resp := &pb.UpdateHttpResponse{
 		Code: 0,
