@@ -96,11 +96,13 @@ func Update(configId int64, data []map[string]interface{}, owner int64) (*config
 		}
 		operateType := paths[0] //操作类型，目前只有两种nodeList basedata
 		if operateType == "nodeList" {
-			//先查找节点
+			nodeInfo := fmt.Sprintf("%v.$.%v", operateType, "baseInfo.name")
 			filter := bson.M{"configId": configId, "eid": owner, "nodeList.id": v["id"]}
-			var nodeRes interface{}
-			FindOne(config.COLLECTION, filter, &nodeRes)
-			fmt.Println(nodeRes)
+			update := bson.M{"$set": bson.M{nodeInfo: v["data"]}}
+			UpdateOne(config.COLLECTION, filter, update)
+			return nil, nil
+		} else {
+
 		}
 
 		lockPath := ""

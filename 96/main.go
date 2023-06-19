@@ -70,7 +70,7 @@ func main() {
 	//更新字段6 操作数组类型，更新单个值 ok
 	jsons := `[{
 		"path": "nodeList.baseInfo.name",
-		"data": "我是哪个节点1111111111",
+		"data": "我是哪个节点22222222222222222",
 		"action": "",
 		"id":"uuid2",
 		"typeId": "1"
