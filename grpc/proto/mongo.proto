@@ -1,0 +1,65 @@
+// 协议类型
+syntax = "proto3";
+
+option go_package = "./mongo";
+
+import "google/api/annotations.proto";
+
+// 对外暴露的http协议的接口的服务 restful风格
+service MongoHttp {
+  rpc Update (UpdateHttpRequest) returns (UpdateHttpResponse) {
+    option (google.api.http) = {
+      post: "/update"
+      body: "*"
+    };
+  }
+  rpc Create (CreateHttpRequest) returns (CreateHttpResponse) {
+    option (google.api.http) = {
+      post: "/create"
+      body: "*"
+    };
+  }
+  rpc Get (GetHttpRequest) returns (GetHttpResponse) {
+    option (google.api.http) = {
+      post: "/get"
+      body: "*"
+    };
+  }
+}
+
+message GetHttpRequest {
+  int64 configId = 1;
+}
+
+message GetHttpResponse {
+  int32 code = 1;
+  string message = 2;
+  string data = 3;
+}
+
+message CreateHttpRequest {
+  int64 configId = 1;
+  int64 spaceId = 2;
+  int64 eid = 3;
+  string data = 4;
+}
+message CreateHttpResponse {
+  int32 code = 1;
+  string message = 2;
+}
+
+message UpdateHttpRequest {
+  int64 configId = 1;
+  repeated UpdateSpaceRes data = 2;
+}
+message UpdateSpaceRes {
+  string path = 1;
+  string data = 2;
+  string id = 3;
+  string action = 4;
+  string typeId = 5;
+}
+message UpdateHttpResponse {
+  int32 code = 1;
+  string message = 2;
+}
