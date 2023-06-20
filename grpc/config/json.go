@@ -25,6 +25,9 @@ var JsonData = `{
 					"y": 3.3,
 					"z": 3.3
 				}
+			},
+			"fileInfo": {
+
 			}
 		},
 		{
@@ -52,19 +55,9 @@ var JsonData = `{
 					"z": 3.3
 				}
 			},
-			"slices": [{
-				"a": 111,
-				"b": 111,
-				"c": 111
-			}, {
-				"a": 222,
-				"b": 222,
-				"c": 222
-			}, {
-				"a": 333,
-				"b": 333,
-				"c": 333
-			}]
+			"fileInfo": {
+
+			}
 		}
 	],
 	"basedata": {
@@ -78,13 +71,6 @@ var JsonData = `{
 		},
 		"guide": {
 			"fileInfoList": []
-		},
-		"others": {
-			"x": 1,
-			"y": 2,
-			"z": 3
 		}
 	}
 }`
-
-// mongod.exe --dbpath D:\mongodb-windows-x86_64-6.0.5\data --logpath D:\mongodb-windows-x86_64-6.0.5\logs\mongodb.log

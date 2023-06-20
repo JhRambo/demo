@@ -54,7 +54,7 @@ func WithTimeout(timeout time.Duration) (context.Context, context.CancelFunc) {
 	return context.WithTimeout(context.Background(), timeout)
 }
 
-// 新增
+// 新增 ok
 func InsertOne(collectionName string, document interface{}) (*mongo.InsertOneResult, error) {
 	collection := GetCollection(collectionName)
 	ctx, cancel := WithTimeout(5 * time.Second)
@@ -68,7 +68,7 @@ func InsertOne(collectionName string, document interface{}) (*mongo.InsertOneRes
 	return result, nil
 }
 
-// 更新
+// 更新 ok
 func UpdateOne(collectionName string, filter bson.M, update bson.M) (*mongo.UpdateResult, error) {
 	collection := GetCollection(collectionName)
 	ctx, cancel := WithTimeout(5 * time.Second)
@@ -110,7 +110,7 @@ func FindOne(collectionName string, filter bson.M, result interface{}) error {
 	return nil
 }
 
-// 查找指定字段的数据或过滤不查询字段
+// 查找指定字段的数据或过滤不查询字段 ok
 func FindOneProjection(collectionName string, filter bson.M, result interface{}, projection interface{}) error {
 	collection := GetCollection(collectionName)
 	ctx, cancel := WithTimeout(5 * time.Second)
@@ -155,7 +155,7 @@ func Aggregate(collectionName string, pipeline []bson.M, result bson.M) error {
 	return nil
 }
 
-// 查找所有数据
+// 查找所有数据 ok
 func FindAll(collectionName string, filter bson.M, result interface{}) error {
 	collection := GetCollection(collectionName)
 	ctx, cancel := WithTimeout(5 * time.Second)

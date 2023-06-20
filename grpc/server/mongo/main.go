@@ -45,8 +45,12 @@ func (s *Server) Create(ctx context.Context, req *pb.CreateHttpRequest) (*pb.Cre
 	// 关闭连接
 	defer mongo.Disconnect()
 
-	jsonString := config.JsonData
-	// jsonString := req.Data //实际请求
+	// jsonString := config.JsonData
+	jsonString := req.Data //实际请求
+
+	// fmt.Println(jsonString)
+	// return nil, nil
+
 	var data map[string]interface{}
 	err = json.Unmarshal([]byte(jsonString), &data)
 	if err != nil {
