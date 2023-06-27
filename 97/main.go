@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	jsonData := `{"nodeList": [],"basedata": {}}`
+	jsonData := `{"nodeList": [],"baseData": {}}`
 	bytes, _ := json.Marshal(jsonData)
 	jsonString := string(bytes)
 	fmt.Println(jsonString)
