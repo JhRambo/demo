@@ -35,5 +35,5 @@ func main() {
 		go fn2()
 	}
 	wg.Wait()
-	println("main函数退出...")
+	fmt.Println("main函数退出...")
 }
