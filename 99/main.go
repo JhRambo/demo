@@ -19,6 +19,13 @@ type RoomConnectionPool struct {
 	mutex       sync.Mutex
 }
 
+// 创建房间连接池
+func NewRoomConnectionPool() *RoomConnectionPool {
+	return &RoomConnectionPool{
+		connections: make(map[string][]*WebSocketConnection),
+	}
+}
+
 // 从连接池中获取可用的WebSocket连接
 func (pool *RoomConnectionPool) GetConnection(roomID string) (*WebSocketConnection, bool) {
 	pool.mutex.Lock()
@@ -40,13 +47,6 @@ func (pool *RoomConnectionPool) ReleaseConnection(roomID string, conn *WebSocket
 	defer pool.mutex.Unlock()
 
 	pool.connections[roomID] = append(pool.connections[roomID], conn)
-}
-
-// 创建房间连接池
-func NewRoomConnectionPool() *RoomConnectionPool {
-	return &RoomConnectionPool{
-		connections: make(map[string][]*WebSocketConnection),
-	}
 }
 
 // 处理WebSocket请求

@@ -41,14 +41,12 @@ func main() {
 		select {
 		case <-chStr:
 			fmt.Println("get value from strWorker")
-			return
+			// return
 		case <-chInt:
 			fmt.Println("get value from intWorker")
-			return
+			// return
 		default:
 			log.Fatalln("没有数据了")
-			// log.Println("没有数据了")
-			// return
 		}
 	}
 }
