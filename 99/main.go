@@ -1,9 +1,12 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -19,7 +22,7 @@ type RoomConnectionPool struct {
 	mutex       sync.Mutex
 }
 
-// 创建房间连接池
+// 创建房间连接池，分配内存空间
 func NewRoomConnectionPool() *RoomConnectionPool {
 	return &RoomConnectionPool{
 		connections: make(map[string][]*WebSocketConnection),
@@ -62,7 +65,6 @@ func handleWebSocket(pool *RoomConnectionPool, w http.ResponseWriter, r *http.Re
 		log.Println("WebSocket upgrade error:", err)
 		return
 	}
-
 	// 获取房间ID
 	roomID := r.URL.Query().Get("roomID")
 
@@ -81,31 +83,38 @@ func handleWebSocket(pool *RoomConnectionPool, w http.ResponseWriter, r *http.Re
 		pool.ReleaseConnection(roomID, wsConn)
 	}()
 
-	// 将连接添加到对应房间的连接池中
-	pool.mutex.Lock()
-	pool.connections[roomID] = append(pool.connections[roomID], wsConn)
-	pool.mutex.Unlock()
-
-	// 在连接关闭时将其从连接池中移除
-	defer func() {
-		pool.mutex.Lock()
-		defer pool.mutex.Unlock()
-		conns := pool.connections[roomID]
-		for i, c := range conns {
-			if c.Conn == conn {
-				pool.connections[roomID] = append(conns[:i], conns[i+1:]...)
-				break
-			}
-		}
-	}()
-
 	// 保持WebSocket连接打开
 	for {
-		_, _, err := conn.ReadMessage()
+		messageType, p, err := conn.ReadMessage() //接收客户端传输的数据
 		if err != nil {
-			log.Println("WebSocket read error:", err)
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway) {
+				log.Println("WebSocket read error:", err)
+			} else {
+				log.Println("WebSocket connection closed:", err)
+			}
 			break
 		}
+		fmt.Println("Received message:", string(p))
+		switch messageType {
+		case websocket.TextMessage:
+			// 处理接收到的文本消息 p
+			var data map[string]interface{}
+			json.Unmarshal(p, &data)
+			data["createAt"] = time.Now().Format("2006-01-02 15:04:05")
+			bytes, _ := json.Marshal(data)
+			sendToRoom(pool, roomID, bytes)
+		case websocket.BinaryMessage:
+			// 处理接收到的二进制消息 p
+		case websocket.CloseMessage:
+			// 处理关闭连接的逻辑
+		case websocket.PingMessage:
+			// 处理接收到的 Ping 消息
+		case websocket.PongMessage:
+			// 处理接收到的 Pong 消息
+		default:
+			// 处理未知的消息类型
+		}
+
 	}
 }
 
