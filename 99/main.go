@@ -1,12 +1,10 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"sync"
-	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -44,8 +42,8 @@ func (pool *RoomConnectionPool) GetConnection(roomID string) (*WebSocketConnecti
 	return nil, false
 }
 
-// 将WebSocket连接释放回连接池
-func (pool *RoomConnectionPool) ReleaseConnection(roomID string, conn *WebSocketConnection) {
+// 设置WebSocket连接池
+func (pool *RoomConnectionPool) SetConnection(roomID string, conn *WebSocketConnection) {
 	pool.mutex.Lock()
 	defer pool.mutex.Unlock()
 
@@ -69,19 +67,16 @@ func handleWebSocket(pool *RoomConnectionPool, w http.ResponseWriter, r *http.Re
 	roomID := r.URL.Query().Get("roomID")
 
 	// 从连接池中获取可用的WebSocket连接
-	wsConn, ok := pool.GetConnection(roomID)
-	if !ok {
-		// 如果没有可用的连接，则创建一个新的连接并添加到连接池中
-		wsConn = &WebSocketConnection{Conn: conn}
-	} else {
-		// 如果有可用的连接，则重用现有的连接
-		wsConn.Conn = conn
-	}
+	wsConn, _ := pool.GetConnection(roomID)
+	// if !ok {
+	// 如果没有可用的连接，则创建一个新的连接并添加到连接池中
+	wsConn = &WebSocketConnection{Conn: conn}
+	// } else {
+	// 	// 如果有可用的连接，则重用现有的连接
+	// 	wsConn.Conn = conn
+	// }
 
-	// 在连接关闭时将其释放回连接池
-	defer func() {
-		pool.ReleaseConnection(roomID, wsConn)
-	}()
+	pool.SetConnection(roomID, wsConn)
 
 	// 保持WebSocket连接打开
 	for {
@@ -97,12 +92,7 @@ func handleWebSocket(pool *RoomConnectionPool, w http.ResponseWriter, r *http.Re
 		fmt.Println("Received message:", string(p))
 		switch messageType {
 		case websocket.TextMessage:
-			// 处理接收到的文本消息 p
-			var data map[string]interface{}
-			json.Unmarshal(p, &data)
-			data["createAt"] = time.Now().Format("2006-01-02 15:04:05")
-			bytes, _ := json.Marshal(data)
-			sendToRoom(pool, roomID, bytes)
+			sendToRoom(pool, roomID, p)
 		case websocket.BinaryMessage:
 			// 处理接收到的二进制消息 p
 		case websocket.CloseMessage:
@@ -114,7 +104,6 @@ func handleWebSocket(pool *RoomConnectionPool, w http.ResponseWriter, r *http.Re
 		default:
 			// 处理未知的消息类型
 		}
-
 	}
 }
 
@@ -124,6 +113,7 @@ func sendToRoom(pool *RoomConnectionPool, roomID string, message []byte) {
 	defer pool.mutex.Unlock()
 
 	connections := pool.connections[roomID]
+	fmt.Println(len(connections))
 	for _, conn := range connections {
 		if err := conn.Conn.WriteMessage(websocket.TextMessage, message); err != nil {
 			log.Println("WebSocket write error:", err)
