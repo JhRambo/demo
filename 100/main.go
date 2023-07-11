@@ -8,17 +8,10 @@ import (
 	"github.com/vmihailenco/msgpack/v5"
 )
 
-type NewCreateSpaceResHttpRequest struct {
-	Token    string `json:"token"`
-	ConfigId int32  `json:"configId"`
-	SpaceId  int32  `json:"spaceId"`
-	Eid      int32  `json:"eid"`
-	Data     string `json:"data"`
-}
-
-type MsgpackHttpRequest struct {
-	Key  string `json:"key"`
-	Data []byte `json:"val"`
+type MsgpackRequest struct {
+	MessageId string `json:"messageId"`
+	Path      string `json:"path"`
+	Data      string `json:"data"`
 }
 
 var conn *websocket.Conn
@@ -35,36 +28,20 @@ func sendMsgpackData(data []byte) error {
 }
 
 func main() {
-	url := "ws://192.168.10.103:38902/sync/ws/space/get?spaceId=1&configId=1" // 替换为实际的 WebSocket URL
+	url := "ws://192.168.10.103:38902/sync/ws/space/res/get?spaceId=1&configId=1&token=111" // 替换为实际的 WebSocket URL
 
 	err := connectWebSocket(url)
 	if err != nil {
 		log.Fatal("Failed to connect to WebSocket:", err)
 	}
-	defer conn.Close()
 
-	req := NewCreateSpaceResHttpRequest{
-		Token:    "111",
-		ConfigId: 1,
-		SpaceId:  1,
-		Eid:      1,
-		Data:     "{\"nodeList\": [],\"baseData\": {}}",
-	}
-	data, err := msgpack.Marshal(req)
-	if err != nil {
-		log.Fatal("Failed to encode message:", err)
+	message := &MsgpackRequest{
+		Path:      "update",
+		MessageId: "111111111",
+		Data:      "[{\"path\": \"nodeList\",\"data\": \"{\\\"id\\\": \\\"uuid1\\\",\\\"type\\\": 4,\\\"level\\\": 1,\\\"baseInfo\\\": {\\\"name\\\": \\\"基础信息\\\",\\\"description\\\": \\\"详细描述信息3\\\"},\\\"transformInfo\\\": {\\\"scale\\\": {\\\"x\\\": 1.1,\\\"y\\\": 1.1,\\\"z\\\": 1.1},\\\"position\\\": {\\\"x\\\": 2.2,\\\"y\\\": 2.2,\\\"z\\\": 2.2},\\\"rotation\\\": {\\\"x\\\": 3.3,\\\"y\\\": 3.3,\\\"z\\\": 3.3}},\\\"fileInfo\\\": {}}\",\"action\": \"\",\"id\": \"uuid1\",\"typeId\": 4,\"dataType\": 2,\"desc\": \"新增nodeList节点\"},{\"path\": \"nodeList.baseInfo.name\",\"data\": \"node1节点基本信息名称\",\"action\": \"\",\"id\": \"uuid1\",\"typeId\": 4,\"dataType\": 1,\"desc\": \"更新nodeList id:uuid1 node节点 string值类型\"}]",
 	}
 
-	//解析
-	d := &NewCreateSpaceResHttpRequest{}
-	msgpack.Unmarshal(data, d)
-	fmt.Printf("%#v\n", d)
-
-	message := MsgpackHttpRequest{
-		Key:  "/v2/space/res/create",
-		Data: data,
-	}
-
+	// 转成msgpack
 	msgpackData, err := msgpack.Marshal(message)
 	if err != nil {
 		log.Fatal("Failed to encode message:", err)
