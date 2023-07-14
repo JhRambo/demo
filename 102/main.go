@@ -43,5 +43,25 @@ func main() {
 		}
 	}
 
+	// 构建Service注册信息 GRPC
+	service := &api.AgentServiceRegistration{
+		ID:      "my-service-4",
+		Name:    "my-service",
+		Address: "192.168.10.103",
+		Port:    8084,
+		Check: &api.AgentServiceCheck{
+			GRPC:     "192.168.10.103:8084/check", //http,tcp,grpc等
+			Interval: "10s",
+			Timeout:  "30s",
+		},
+	}
+
+	// 服务注册
+	err = client.Agent().ServiceRegister(service)
+	if err != nil {
+		// 错误处理
+		log.Fatalln(err)
+	}
+
 	fmt.Println("success")
 }

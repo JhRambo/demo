@@ -18,6 +18,7 @@ import (
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -52,7 +53,7 @@ func (s *Server) Binary(ctx context.Context, req *pb.MsgpackHttpRequest) (*pb.Ms
 // gw server 监听不同端口
 func main() {
 	ctx := context.Background()
-	log.Println("server gRPC-Gateway on http://0.0.0.0:8081")
+	log.Println("server gRPC-Gateway on http://0.0.0.0:8084")
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", server_port))
 	if err != nil {
 		log.Fatalln("Failed to listen:", err)
@@ -61,6 +62,8 @@ func main() {
 	s := grpc.NewServer()
 	// 注册service到server
 	pb.RegisterMsgpackHttpServer(s, &Server{})
+	//注册consul grpc方式的健康检查服务
+	grpc_health_v1.RegisterHealthServer(s, &HealthImpl{})
 	// 启动gRPC Server
 	go func() {
 		if err := s.Serve(lis); err != nil {
@@ -142,4 +145,21 @@ func grpcHandlerFunc(grpcServer *grpc.Server, httpServer http.Handler) http.Hand
 			httpServer.ServeHTTP(w, r)
 		}
 	}), &http2.Server{})
+}
+
+// HealthImpl 健康检查实现
+// HealthImpl 名字可以自定义，不一定用这个名字，只要结构体实现Check，Watch这两个方法即可，因为底层是实现了HealthServer这个接口
+type HealthImpl struct{}
+
+// Check 实现健康检查接口，这里直接返回健康状态，这里也可以有更复杂的健康检查策略，比如根据服务器负载来返回
+func (h *HealthImpl) Check(ctx context.Context, req *grpc_health_v1.HealthCheckRequest) (*grpc_health_v1.HealthCheckResponse, error) {
+
+	return &grpc_health_v1.HealthCheckResponse{
+		Status: grpc_health_v1.HealthCheckResponse_SERVING,
+	}, nil
+}
+
+// Watch 这个没用，只是为了让HealthImpl实现RegisterHealthServer内部的interface接口
+func (h *HealthImpl) Watch(req *grpc_health_v1.HealthCheckRequest, w grpc_health_v1.Health_WatchServer) error {
+	return nil
 }
