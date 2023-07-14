@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-const port = 8088
+const port = 8081
 
 func main() {
 	c := &controllers.User{}
@@ -17,6 +17,11 @@ func main() {
 	http.HandleFunc("/user/upd", c.Upd)
 	http.HandleFunc("/user/list", c.List)
 	http.HandleFunc("/user/getById", c.GetById)
+	//consul 健康检查
+	http.HandleFunc("/check/health", func(w http.ResponseWriter, r *http.Request) {
+		// time.Sleep(60 * time.Second)
+		log.Println("ok")
+	})
 	log.Println(fmt.Sprintf("server启动中，监听%d端口...", port))
 	if err := http.ListenAndServe(":"+fmt.Sprintf("%d", port), nil); err != nil {
 		log.Println("启动服务失败", err)

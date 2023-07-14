@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"strconv"
 
 	"github.com/hashicorp/consul/api"
 )
@@ -15,26 +17,31 @@ func main() {
 	client, err := api.NewClient(config)
 	if err != nil {
 		// 错误处理
-		fmt.Println(err)
+		log.Fatalln(err)
 	}
 
-	// 构建Service注册信息
-	service := &api.AgentServiceRegistration{
-		ID:      "my-service-1",
-		Name:    "my-service",
-		Address: "192.168.10.103",
-		Port:    38902,
-		Check: &api.AgentServiceCheck{
-			TCP:      "192.168.10.103:38902", //http,tcp,grpc等
-			Interval: "30s",
-			Timeout:  "60s",
-		},
+	for i := 0; i < 3; i++ {
+		// 构建Service注册信息
+		port, _ := strconv.Atoi(fmt.Sprintf("808%d", i))
+		service := &api.AgentServiceRegistration{
+			ID:      fmt.Sprintf("my-service-%d", i),
+			Name:    "my-service",
+			Address: "192.168.10.103",
+			Port:    port,
+			Check: &api.AgentServiceCheck{
+				HTTP:     fmt.Sprintf("http://192.168.10.103:%d/check/health", port), //http,tcp,grpc等
+				Interval: "10s",
+				Timeout:  "30s",
+			},
+		}
+
+		// 服务注册
+		err = client.Agent().ServiceRegister(service)
+		if err != nil {
+			// 错误处理
+			log.Fatalln(err)
+		}
 	}
 
-	// 服务注册
-	err = client.Agent().ServiceRegister(service)
-	if err != nil {
-		// 错误处理
-		fmt.Println(err)
-	}
+	fmt.Println("success")
 }
