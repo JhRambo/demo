@@ -74,7 +74,7 @@ func main() {
 	message := &MsgpackRequest{
 		Path:      "lock",
 		MessageId: "111111",
-		Data:      "[\"uuid33333343\"]",
+		Data:      "[\"uuid4444\",\"uuid333333\"]",
 	}
 
 	// //unlock
