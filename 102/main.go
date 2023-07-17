@@ -21,7 +21,7 @@ func main() {
 	}
 
 	for i := 0; i < 3; i++ {
-		// 构建Service注册信息
+		// 构建Service注册信息 http
 		port, _ := strconv.Atoi(fmt.Sprintf("808%d", i))
 		service := &api.AgentServiceRegistration{
 			ID:      fmt.Sprintf("my-service-%d", i),

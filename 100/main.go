@@ -56,7 +56,7 @@ func receiveMsgpackData() {
 
 // 模拟ws客户端连接服务端
 func main() {
-	url := "ws://192.168.10.103:38902/sync/ws/space/res/get?spaceId=1&configId=1&token=444" // 替换为实际的 WebSocket URL
+	url := "ws://192.168.10.103:38902/sync/ws/space/res/get?spaceId=1&configId=1&token=222" // 替换为实际的 WebSocket URL
 
 	err := connectWebSocket(url)
 	if err != nil {
@@ -70,19 +70,19 @@ func main() {
 	// 	Data:      "[{\"path\": \"nodeList\",\"data\": \"{\\\"id\\\": \\\"uuid1\\\",\\\"type\\\": 4,\\\"level\\\": 1,\\\"baseInfo\\\": {\\\"name\\\": \\\"基础信息\\\",\\\"description\\\": \\\"详细描述信息3\\\"},\\\"transformInfo\\\": {\\\"scale\\\": {\\\"x\\\": 1.1,\\\"y\\\": 1.1,\\\"z\\\": 1.1},\\\"position\\\": {\\\"x\\\": 2.2,\\\"y\\\": 2.2,\\\"z\\\": 2.2},\\\"rotation\\\": {\\\"x\\\": 3.3,\\\"y\\\": 3.3,\\\"z\\\": 3.3}},\\\"fileInfo\\\": {}}\",\"action\": \"\",\"id\": \"uuid1\",\"typeId\": 4,\"dataType\": 2,\"desc\": \"新增nodeList节点\"},{\"path\": \"nodeList.baseInfo.name\",\"data\": \"node1节点基本信息名称\",\"action\": \"\",\"id\": \"uuid1\",\"typeId\": 4,\"dataType\": 1,\"desc\": \"更新nodeList id:uuid1 node节点 string值类型\"}]",
 	// }
 
-	//lock
-	message := &MsgpackRequest{
-		Path:      "lock",
-		MessageId: "111111",
-		Data:      "[\"uuid4444\",\"uuid333333\"]",
-	}
-
-	// //unlock
+	// //lock
 	// message := &MsgpackRequest{
-	// 	Path:      "unlock",
+	// 	Path:      "lock",
 	// 	MessageId: "111111",
-	// 	Data:      "[\"uuid3\",\"uuid4\"]",
+	// 	Data:      "[\"uuid1\",\"uuid2\"]",
 	// }
+
+	//unlock
+	message := &MsgpackRequest{
+		Path:      "unlock",
+		MessageId: "111111",
+		Data:      "[\"uuid3\",\"uuid4\"]",
+	}
 
 	// //rollback
 	// message := &MsgpackRequest{
