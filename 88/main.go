@@ -17,15 +17,22 @@ type User struct {
 // 	Code  string
 // }
 
+type SpaceConfig struct {
+	ConfigId int32
+}
+
 func writeMsg(filename string) (err error) {
-	var user = &User{
-		Name: "张三李四王五老六",
-		Age:  int32(100),
-	}
+	// var user = &User{
+	// 	Name: "张三李四王五老六",
+	// 	Age:  int32(100),
+	// }
 	// var user = &User{
 	// 	Phone: "17611112222",
 	// 	Code:  "111111",
 	// }
+	var user = &SpaceConfig{
+		ConfigId: 1,
+	}
 	data, err := msgpack.Marshal(user)
 	fmt.Printf("%#v\n", data)
 	if err != nil {
@@ -40,7 +47,7 @@ func writeMsg(filename string) (err error) {
 }
 
 func readMsg(filename string) (err error) {
-	var persons User
+	var persons SpaceConfig
 	data, err := ioutil.ReadFile(filename)
 	fmt.Println(data)
 	if err != nil {
@@ -66,8 +73,9 @@ func main() {
 	       可读性差
 	   用于API通信
 	*/
-	filename := "D:/code/demo/doc/hello.dat"
+	// filename := "D:/code/demo/doc/hello.dat"
 	// filename := "D:/code/demo/doc/smslogin.dat"
+	filename := "D:/code/demo/doc/spaceresource.dat"
 	writeMsg(filename)
 	readMsg(filename)
 }

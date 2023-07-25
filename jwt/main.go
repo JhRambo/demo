@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"net/http"
 
 	"demo/jwt/middleware"
@@ -42,6 +41,5 @@ func main() {
 	r.POST("/auth", authHandler)
 	md := &middleware.Auth{}
 	r.GET("/home", md.JwtAuthMiddleware(), homeHandler) //中间件鉴权
-	log.Println("ser is running")
 	r.Run(":8088")
 }
