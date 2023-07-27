@@ -9,33 +9,39 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-type Person struct {
+type UserInfo struct {
 	Name string
 	Age  int
 }
 
-func (p *Person) MarshalBinary() ([]byte, error) {
+func (p *UserInfo) MarshalBinary() ([]byte, error) {
 	// 编组结构体为二进制数据
 	// 在这个例子中，我们使用 JSON 编码
 	return json.Marshal(p)
 }
 
-func (p *Person) UnmarshalBinary(data []byte) error {
+func (p *UserInfo) UnmarshalBinary(data []byte) error {
 	// 解码二进制数据为结构体
 	// 在这个例子中，我们使用 JSON 解码
 	return json.Unmarshal(data, p)
 }
 
-func main() {
+var rdb *redis.Client
+var ttl = time.Duration(1800) * time.Second
+
+func init() {
 	// 创建 Redis 客户端
-	rdb := redis.NewClient(&redis.Options{
+	rdb = redis.NewClient(&redis.Options{
 		Addr:     "localhost:36379",
 		Password: "", // 如果没有密码，则设置为空字符串
 		DB:       0,  // Redis 默认数据库
 	})
 
+}
+
+func main() {
 	// 创建结构体实例
-	person := &Person{
+	person := &UserInfo{
 		Name: "Alice",
 		Age:  33,
 	}
@@ -48,11 +54,10 @@ func main() {
 	// }
 
 	ctx := context.Background()
-
 	key := "persons"
 
 	// 存储结构体到 Redis Set
-	err := rdb.Set(ctx, key, person, time.Duration(1800)*time.Second).Err()
+	err := rdb.Set(ctx, key, person, ttl).Err()
 	if err != nil {
 		fmt.Println("Redis Set error:", err)
 		return
@@ -60,6 +65,16 @@ func main() {
 
 	fmt.Println("Struct stored in Redis Set successfully.")
 
-	val := rdb.Get(ctx, key)
+	val, _ := GetUserInfo(ctx, key)
 	fmt.Println(val)
+}
+
+func GetUserInfo(ctx context.Context, key string) (*UserInfo, error) {
+	var userInfo UserInfo
+	err := rdb.Get(ctx, key).Scan(&userInfo)
+	if err != nil {
+		return nil, err
+	}
+	rdb.Expire(ctx, key, ttl)
+	return &userInfo, nil
 }
