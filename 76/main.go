@@ -16,5 +16,5 @@ func main() {
 	go g1()
 	go g2()
 	log.Println("========================================main")
-	time.Sleep(time.Second * 10) //10秒之后退出main函数
+	time.Sleep(time.Second * 10) //10秒之后退出主进程
 }
