@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-// 切片 map aaaaa  ssssss dddddd
+// 切片 map
 func main() {
 	// 1.切片：
 	var s1 = []string{"zhangsan", "lishi"}
