@@ -1,23 +1,34 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 
 	"github.com/gorilla/websocket"
-	"github.com/vmihailenco/msgpack/v5"
 )
 
 type MsgpackRequest struct {
-	MessageId string `msgpack:"messageId"`
-	Path      string `msgpack:"path"`
-	Data      string `msgpack:"data"`
+	MessageId string      `json:"messageId"`
+	Path      string      `json:"path"`
+	Data      interface{} `json:"data"`
 }
 
 type MsgpackResponse struct {
-	MessageId string `msgpack:"messageId"`
-	Path      string `msgpack:"path"`
-	Data      string `msgpack:"data"`
+	MessageId string      `json:"messageId"`
+	Path      string      `json:"path"`
+	Data      interface{} `json:"data"`
+}
+
+// 更新空间资源通用结构体
+type UpdateSpaceResData struct {
+	Path     string `json:"path"`
+	Data     string `json:"data"`
+	Action   string `json:"action"`
+	Id       string `json:"id"`
+	TypeId   int32  `json:"typeId"`
+	DataType int32  `json:"dataType"` //0.默认string 1.string 2.object或slice 3.数值类型（int float）
+	Desc     string `json:"desc"`     //更新内容描述信息
 }
 
 var conn *websocket.Conn
@@ -31,7 +42,7 @@ func connectWebSocket(url string) error {
 
 // 发送数据到服务端
 func sendMsgpackData(data []byte) error {
-	err := conn.WriteMessage(websocket.BinaryMessage, data)
+	err := conn.WriteMessage(websocket.TextMessage, data)
 	return err
 }
 
@@ -45,7 +56,8 @@ func receiveMsgpackData() {
 		}
 		// 解码为 MsgpackRequest 结构体
 		var receivedMessage MsgpackResponse
-		err = msgpack.Unmarshal(data, &receivedMessage)
+		// err = msgpack.Unmarshal(data, &receivedMessage)
+		err = json.Unmarshal(data, &receivedMessage)
 		if err != nil {
 			log.Println("Failed to decode message:", err)
 			continue
@@ -64,25 +76,54 @@ func main() {
 	}
 
 	// //update
+	// var data = []*UpdateSpaceResData{}
+	// data = append(data, &UpdateSpaceResData{
+	// 	Path:     "nodeList",
+	// 	Data:     "{\"id\": \"uuid2\",\"type\": 4,\"level\": 1,\"baseInfo\": {\"name\": \"基础信息\",\"description\": \"详细描述信息3\"},\"transformInfo\": {\"scale\": {\"x\": 1.1,\"y\": 1.1,\"z\": 1.1},\"position\": {\"x\": 2.2,\"y\": 2.2,\"z\": 2.2},\"rotation\": {\"x\": 3.3,\"y\": 3.3,\"z\": 3.3}},\"fileInfoList\": {},\"modelInfo\":{\"isEdit\":true,\"isTransform\":false}}",
+	// 	Action:   "",
+	// 	Id:       "uuid1",
+	// 	TypeId:   4,
+	// 	DataType: 2,
+	// 	Desc:     "新增nodeList节点",
+	// }, &UpdateSpaceResData{
+	// 	Path:     "nodeList.baseInfo.name",
+	// 	Data:     "node2节点基本信息名称",
+	// 	Action:   "",
+	// 	Id:       "uuid2",
+	// 	TypeId:   4,
+	// 	DataType: 1,
+	// 	Desc:     "更新nodeList id:uuid1 node节点 string值类型",
+	// })
+
+	// //update
+	// var data = []*UpdateSpaceResData{}
+	// data = append(data, &UpdateSpaceResData{
+	// 	Path:     "nodeList.modelInfo.isEdit",
+	// 	Data:     "false",
+	// 	Action:   "",
+	// 	Id:       "uuid1",
+	// 	TypeId:   4,
+	// 	DataType: 4,
+	// 	Desc:     "更新nodeList id:uuid1 node节点 bool值类型",
+	// })
 	// message := &MsgpackRequest{
 	// 	Path:      "update",
 	// 	MessageId: "111111111",
-	// 	// Data:      "[{\"path\": \"nodeList\",\"data\": \"{\\\"id\\\": \\\"uuid1\\\",\\\"type\\\": 4,\\\"level\\\": 1,\\\"baseInfo\\\": {\\\"name\\\": \\\"基础信息\\\",\\\"description\\\": \\\"详细描述信息3\\\"},\\\"transformInfo\\\": {\\\"scale\\\": {\\\"x\\\": 1.1,\\\"y\\\": 1.1,\\\"z\\\": 1.1},\\\"position\\\": {\\\"x\\\": 2.2,\\\"y\\\": 2.2,\\\"z\\\": 2.2},\\\"rotation\\\": {\\\"x\\\": 3.3,\\\"y\\\": 3.3,\\\"z\\\": 3.3}},\\\"fileInfo\\\": {}}\",\"action\": \"\",\"id\": \"uuid1\",\"typeId\": 4,\"dataType\": 2,\"desc\": \"新增nodeList节点\"},{\"path\": \"nodeList.baseInfo.name\",\"data\": \"node1节点基本信息名称\",\"action\": \"\",\"id\": \"uuid1\",\"typeId\": 4,\"dataType\": 1,\"desc\": \"更新nodeList id:uuid1 node节点 string值类型\"}]",
-	// 	Data: "[{\"path\":\"baseData.light\",\"data\":\"{\\\"yaw\\\":666,\\\"pitch\\\":999}\",\"action\":\"\",\"id\":\"light\",\"typeId\":3,\"dataType\":2,\"desc\":\"更新内容描述信息\"}]",
+	// 	Data:      data,
 	// }
 
 	//lock
 	message := &MsgpackRequest{
 		Path:      "lock",
 		MessageId: "111111",
-		Data:      "[\"uuid1\",\"uuid2\"]",
+		Data:      []string{"uuid1", "uuid2"},
 	}
 
 	// //unlock
 	// message := &MsgpackRequest{
 	// 	Path:      "unlock",
 	// 	MessageId: "111111",
-	// 	Data:      "[\"uuid3\",\"uuid4\"]",
+	// 	Data:      []string{"uuid1", "uuid2"},
 	// }
 
 	// //rollback
@@ -99,8 +140,10 @@ func main() {
 	// 	Data:      "位置移动",
 	// }
 
-	// 转成msgpack
-	msgpackData, err := msgpack.Marshal(message)
+	// 转成msgpack bytes
+	// msgpackData, err := msgpack.Marshal(message)
+	// 转成json bytes
+	msgpackData, err := json.Marshal(message)
 	if err != nil {
 		log.Fatal("Failed to encode message:", err)
 	}
