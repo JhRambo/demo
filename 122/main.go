@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
@@ -10,10 +11,10 @@ import (
 func main() {
 	// 设置 MQTT 服务器地址
 	server := "tcp://127.0.0.1:1883"
-	// 设置要发布的主题
-	topic := "mytopic"
 	// 设置客户端ID
-	clientID := "publisher-client"
+	clientID := "subscriber-client"
+	// 设置要订阅的主题
+	topic := "mytopic"
 
 	// 创建 MQTT 客户端连接配置
 	opts := mqtt.NewClientOptions().AddBroker(server).SetClientID(clientID)
@@ -24,17 +25,28 @@ func main() {
 		log.Fatal(token.Error())
 	}
 
-	// 生成要发布的消息
-	messagePayload := "Hello, MQTT!"
+	// 定义消息回调处理函数
+	messageHandler := func(client mqtt.Client, msg mqtt.Message) {
+		fmt.Printf("Received message on topic: %s\n", msg.Topic())
+		fmt.Printf("Message: %s\n", msg.Payload())
+	}
 
-	// 发布消息到指定主题
-	token := client.Publish(topic, 1, true, messagePayload)
+	// 订阅主题，并指定消息回调函数
+	token := client.Subscribe(topic, 1, messageHandler)
 	token.Wait()
 	if token.Error() != nil {
 		log.Fatal(token.Error())
 	}
 
-	fmt.Println("Published message:", messagePayload)
+	// 等待接收消息
+	time.Sleep(30 * time.Second)
+
+	// 取消订阅主题
+	token = client.Unsubscribe(topic)
+	token.Wait()
+	if token.Error() != nil {
+		log.Fatal(token.Error())
+	}
 
 	// 断开 MQTT 客户端连接
 	client.Disconnect(250)
