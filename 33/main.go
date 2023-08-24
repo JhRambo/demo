@@ -8,9 +8,11 @@ import (
 // 类型转换
 func main() {
 	// 1、int转成string
-	a := 10
-	b := strconv.Itoa(a)
-	fmt.Printf("%v--%T--%p--%p\n", b, b, &a, &b) //10--string--0xc00000e088--0xc000042050
+	a := int64(481393498939985920)
+	// b := strconv.Itoa(a)
+	b2 := strconv.FormatInt(a, 10)
+	// fmt.Printf("%v--%T--%p--%p\n", b, b, &a, &b)    //10--string--0xc00000e088--0xc000042050
+	fmt.Printf("%v--%T--%p--%p\n", b2, b2, &a, &b2) //10--string--0xc00000e088--0xc000042050
 
 	// 2、string转成int：
 	c := "123456"

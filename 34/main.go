@@ -7,7 +7,7 @@ import (
 
 func firstRoutine(ch chan int) {
 	// 模拟耗时操作
-	time.Sleep(time.Second * 2)
+	time.Sleep(time.Second * 1)
 
 	result := 100
 
@@ -26,7 +26,7 @@ func secondRoutine(ch chan int) {
 }
 
 func thirdRoutine(ch1, ch2 chan int) {
-	// 使用select语句从两个通道中接收结果
+	// 使用select语句从两个通道中接收结果，只会输出一个case，如果需要输出所有的case，则需要for循环来实现，参考demo50
 	select {
 	case result1 := <-ch1:
 		fmt.Println("Third routine received from first:", result1)
@@ -53,5 +53,5 @@ func main() {
 	go thirdRoutine(ch1, ch2)
 
 	// 主协程等待一段时间，以便观察输出结果
-	time.Sleep(time.Second * 3)
+	time.Sleep(time.Second * 2)
 }
