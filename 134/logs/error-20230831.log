@@ -1,0 +1,30 @@
+2023/08/31 14:45:02 Timestamp: 2023-08-31 14:45:02
+2023/08/31 14:45:02 Status: 500
+2023/08/31 14:45:02 Method: GET
+2023/08/31 14:45:02 Path: /hello
+2023/08/31 14:45:02 Error Message: Error #01: Internal Server Error
+2023/08/31 14:46:26 Timestamp: 2023-08-31 14:46:26
+2023/08/31 14:46:26 Status: 500
+2023/08/31 14:46:26 Method: GET
+2023/08/31 14:46:26 Path: /hello
+2023/08/31 14:46:26 Error Message: Error #01: Internal Server Error
+2023/08/31 14:48:01 Timestamp: 2023-08-31 14:48:01
+2023/08/31 14:48:01 Status: 500
+2023/08/31 14:48:01 Method: GET
+2023/08/31 14:48:01 Path: /hello
+2023/08/31 14:48:01 Error Message: Error #01: Internal Server Error
+2023/08/31 14:48:35 Timestamp: 2023-08-31 14:48:35
+2023/08/31 14:48:35 Status: 500
+2023/08/31 14:48:35 Method: GET
+2023/08/31 14:48:35 Path: /hello
+2023/08/31 14:48:35 Error Message: Error #01: Internal Server Error
+2023/08/31 14:48:40 Timestamp: 2023-08-31 14:48:40
+2023/08/31 14:48:40 Status: 500
+2023/08/31 14:48:40 Method: GET
+2023/08/31 14:48:40 Path: /hello
+2023/08/31 14:48:40 Error Message: Error #01: Internal Server Error
+2023/08/31 15:59:23 Timestamp: 2023-08-31 15:59:23
+2023/08/31 15:59:23 Status: 500
+2023/08/31 15:59:23 Method: GET
+2023/08/31 15:59:23 Path: /hello
+2023/08/31 15:59:23 Error Message: Error #01: Internal Server Error
