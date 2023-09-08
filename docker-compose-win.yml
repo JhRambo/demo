@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  com.demo.docker:
+    build: ./docker
+    restart: always
+    container_name: com.demo.docker
+    ports:
+      - 8088:8088
+    volumes:
+      - D:\code\demo\win-compose\data\:/data
+      - D:\code\demo\win-compose\logs\:/app/demo/logs

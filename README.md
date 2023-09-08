@@ -71,3 +71,7 @@ protoc --go_out=. --go-grpc_out=. --grpc-gateway_out=. hello.proto  一次性生
 --go_out 		        生成 .pb.go			    需要安装：go install github.com/golang/protobuf/protoc-gen-go@latest
 --go-grpc_out 	        生成 _grpc.pb.go		需要安装：go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 --grpc-gateway_out      生成 pb.gw.go			需要安装：go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@latest
+
+
+创建容器命令：在根目录执行：
+docker-compose -f docker-compose-win.yml up -d --build
