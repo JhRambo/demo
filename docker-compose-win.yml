@@ -8,5 +8,5 @@ services:
     ports:
       - 8088:8088
     volumes:
-      - D:\code\demo\win-compose\data\:/data
-      - D:\code\demo\win-compose\logs\:/app/demo/logs
+      - D:\code\demo\win-compose\data\:/app/data
+      - D:\code\demo\docker\logs\:/app/demo/logs
