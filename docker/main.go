@@ -2,23 +2,31 @@ package main
 
 import (
 	"demo/docker/middlewares"
-	"demo/docker/utils"
 	"demo/logs"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	r := gin.Default()
-	// 跨域处理
-	r.Use(middlewares.ErrorLogger)
+	// 错误日志中间件
+	r.Use(middlewares.ErrorLogger, middlewares.Rate, middlewares.Timeout)
 
-	r.POST("/logs", func(ctx *gin.Context) {
-		utils.CreateDir("logs")
-		ctx.Error(fmt.Errorf("测试运行过程中，出错记录日志，如果是在容器中运行，则日志只会记录到容器中，不会同步到宿主机，不过可以通过挂载路径实现同步"))
-		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "POST Resource"})
+	r.POST("/docker/info", func(ctx *gin.Context) {
+		time.Sleep(2 * time.Second)
+		ctx.JSON(http.StatusOK, gin.H{
+			"code":    0,
+			"message": "ok",
+		})
+
+		// ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Bad request"})
+		// return
+
+		// // 这里的代码不会被执行
+		// ctx.JSON(http.StatusOK, gin.H{"message": "Success"})
 	})
 
 	// 启动网关

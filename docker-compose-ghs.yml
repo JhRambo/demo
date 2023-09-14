@@ -1,0 +1,83 @@
+version: "3.8"
+
+services:
+  consul:
+    image: consul:1.15.2
+    container_name: star-consul
+    restart: always
+    command: agent -server -bootstrap -ui -bind=0.0.0.0 -client=0.0.0.0 -config-dir=/consul/config-dir -data-dir=/consul/data
+    ports:
+      - 38500:8500
+    volumes:
+      - D:\code\Starverse\win-compose\config\consul\config-dir:/consul/config-dir
+      - D:\code\Starverse\win-compose\config\consul\data:/consul/data
+
+  redis:
+    image: redis:latest
+    container_name: star-redis
+    restart: always
+    command: /bin/bash -c "redis-server /usr/local/etc/redis/redis.conf"
+    ports:
+      - 36379:6379
+    volumes:
+      - D:\code\Starverse\win-compose\config\redis\redis.conf:/usr/local/etc/redis/redis.conf:rw
+      - D:\code\Starverse\win-compose\config\redis\data:/data:rw
+    depends_on:
+      - consul
+
+  com.ghs.gateway:
+    build: ./com.ghs.gateway
+    restart: always
+    container_name: com.ghs.gateway
+    ports:
+      - 38101:38101
+    volumes:
+      - D:\code\Starverse\win-compose\data\:/app/data
+      - D:\code\Starverse\com.ghs.gateway\logs\:/app/starverse/logs
+    depends_on:
+      - com.ghs.server
+
+  com.ghs.server:
+    build: ./com.ghs.server
+    restart: always
+    container_name: com.ghs.server
+    ports:
+      - 38201:38201
+    volumes:
+      - D:\code\Starverse\win-compose\data\:/app/data
+    depends_on:
+      - com.ghs.db
+
+  com.ghs.db:
+    build: ./com.ghs.db
+    restart: always
+    container_name: com.ghs.db
+    ports:
+      - 38301:38301
+    volumes:
+      - D:\code\Starverse\win-compose\data\:/app/data
+    depends_on:
+      - redis
+
+  com.ghs.sync:
+    build: ./com.ghs.sync
+    restart: always
+    container_name: com.ghs.sync
+    ports:
+      - 38901:38901
+      - 38902:38902
+    volumes:
+      - D:\code\Starverse\win-compose\data\:/app/data
+    depends_on:
+      - com.ghs.db
+      
+  com.ghs.alarm:
+    build: ./com.ghs.alarm
+    restart: always
+    container_name: com.ghs.alarm
+    ports:
+      - 38801:38801
+    volumes:
+      - D:\code\Starverse\win-compose\data\:/app/data
+    depends_on:
+      - redis
