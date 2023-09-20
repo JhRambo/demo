@@ -1,0 +1,379 @@
+设置网络：
+docker network create --subnet=172.18.0.0/24 docker-br0		#默认--driver=bridge
+等价于：docker network create --driver=bridge --subnet=172.18.0.0/24 docker-br0
+
+删除网络：
+docker network rm docker-br0
+
+查看容器IP：
+docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' docker-mysql-33060
+
+进入容器：
+docker exec -it docker-mysql-33060 /bin/bash
+
+一、创建mysql5.7容器
+1.创建docker-mysql-33060路径：
+mkdir /docker/mysql/docker-mysql-33060 -p
+2.先临时运行一个mysql容器：
+docker run -d -p 33060:3306 --name docker-mysql-33060 -e MYSQL_ROOT_PASSWORD=root mysql:5.7
+3.复制容器内的配置文件至宿主机：
+docker cp docker-mysql-33060:/etc/mysql /docker/mysql/docker-mysql-33060
+4.删除第2步创建的临时容器：
+docker rm -f docker-mysql-33060
+5.正式运行容器，启动mysql容器，并自定义挂载数据卷：（指定IP）
+docker run -d --name docker-mysql-33060 --restart always --privileged=true -p 33060:3306 -e MYSQL_ROOT_PASSWORD=root --net docker-br0 --ip 172.18.0.30 -v /docker/mysql/docker-mysql-33060/mysql:/etc/mysql -v /docker/mysql/docker-mysql-33060/logs:/var/logs/mysql -v /docker/mysql/docker-mysql-33060/data:/var/lib/mysql mysql:5.7
+6.删除容器：
+docker rm -f docker-mysql-33060
+rm -rf /docker/mysql/docker-mysql-33060/mysql/ /docker/mysql/docker-mysql-33060/data/ /docker/mysql/docker-mysql-33060/logs/
+7.可以一次全量复制执行：（附）
+mkdir /docker/mysql/docker-mysql-33060 -p
+docker run -d -p 33060:3306 --name docker-mysql-33060 -e MYSQL_ROOT_PASSWORD=root mysql:5.7
+docker cp docker-mysql-33060:/etc/mysql /docker/mysql/docker-mysql-33060
+docker rm -f docker-mysql-33060
+docker run -d --name docker-mysql-33060 --restart always --privileged=true -p 33060:3306 -e MYSQL_ROOT_PASSWORD=root --net docker-br0 --ip 172.18.0.30 -v /docker/mysql/docker-mysql-33060/mysql:/etc/mysql -v /docker/mysql/docker-mysql-33060/logs:/var/logs/mysql -v /docker/mysql/docker-mysql-33060/data:/var/lib/mysql mysql:5.7
+
+二、创建redis容器
+重启容器：docker restart docker-redis-63790 docker-redis-63791 docker-redis-63792 docker-sentinel-16379 docker-sentinel-26379 docker-sentinel-36379
+删除容器：docker rm -f docker-redis-63790 docker-redis-63791 docker-redis-63792 docker-sentinel-16379 docker-sentinel-26379 docker-sentinel-36379
+查看容器IP：docker inspect --format='{{.NetworkSettings.IPAddress}}' docker-redis-63790
+
+1.创建目录：
+mkdir /docker/redis -p
+2.进入第1步创建的目录：
+cd /docker/redis
+3.创建目录：
+mkdir redis-63790-data redis-63791-data redis-63792-data sentinel-16379-data sentinel-26379-data sentinel-36379-data
+4.创建配置文件：
+	4.1 vim /docker/redis/redis-63790.conf  （master）
+	内容：
+	port 6379
+	logfile "redis-6379.log"
+	dir /data
+	appendonly yes
+	appendfilename appendonly.aof
+	requirepass 123
+	masterauth 123
+
+	4.2 vim /docker/redis/redis-63791.conf	（slave1）
+	内容：
+	port 6379
+	logfile "redis-6379.log"
+	dir /data
+	appendonly yes
+	appendfilename appendonly.aof
+	slaveof 172.18.0.10 6379
+	requirepass 123
+	masterauth 123
+	
+	4.3 vim /docker/redis/redis-63792.conf	（slave2）
+	内容：
+	port 6379
+	logfile "redis-6379.log"
+	dir /data
+	appendonly yes
+	appendfilename appendonly.aof
+	slaveof 172.18.0.10 6379
+	requirepass 123
+	masterauth 123
+
+5.运行redis主从容器：（指定IP）
+docker run -p 63790:6379 --restart=always --name docker-redis-63790 --net docker-br0 --ip 172.18.0.10 -v /docker/redis/redis-63790.conf:/etc/redis/redis-6379.conf -v /docker/redis/redis-63790-data:/data -d redis redis-server /etc/redis/redis-6379.conf
+docker run -p 63791:6379 --restart=always --name docker-redis-63791 --net docker-br0 --ip 172.18.0.11 -v /docker/redis/redis-63791.conf:/etc/redis/redis-6379.conf -v /docker/redis/redis-63791-data:/data -d redis redis-server /etc/redis/redis-6379.conf
+docker run -p 63792:6379 --restart=always --name docker-redis-63792 --net docker-br0 --ip 172.18.0.12 -v /docker/redis/redis-63792.conf:/etc/redis/redis-6379.conf -v /docker/redis/redis-63792-data:/data -d redis redis-server /etc/redis/redis-6379.conf
+
+6.创建哨兵文件：
+	6.1 vim /docker/redis/sentinel-16379.conf
+	内容：
+	port 26379
+	dir /data
+	logfile "sentinel-26379.log"
+	sentinel monitor mymaster 172.18.0.10 6379 2
+	sentinel down-after-milliseconds mymaster 15000
+	sentinel failover-timeout mymaster 10000
+	sentinel auth-pass mymaster 123
+	
+	6.2 vim /docker/redis/sentinel-26379.conf
+	内容：
+	port 26379
+	dir /data
+	logfile "sentinel-26379.log"
+	sentinel monitor mymaster 172.18.0.10 6379 2
+	sentinel down-after-milliseconds mymaster 15000
+	sentinel failover-timeout mymaster 10000
+	sentinel auth-pass mymaster 123
+	
+	6.3 vim /docker/redis/sentinel-36379.conf
+	内容：
+	port 26379
+	dir /data
+	logfile "sentinel-26379.log"
+	sentinel monitor mymaster 172.18.0.10 6379 2
+	sentinel down-after-milliseconds mymaster 15000
+	sentinel failover-timeout mymaster 10000
+	sentinel auth-pass mymaster 123
+7.启动哨兵容器：（指定IP）
+docker run -p 16379:26379 --restart=always --name docker-sentinel-16379 --net docker-br0 --ip 172.18.0.21 -v /docker/redis/sentinel-16379.conf:/etc/redis/sentinel-26379.conf -v /docker/redis/sentinel-16379-data:/data -d redis redis-sentinel /etc/redis/sentinel-26379.conf
+docker run -p 26379:26379 --restart=always --name docker-sentinel-26379 --net docker-br0 --ip 172.18.0.22 -v /docker/redis/sentinel-26379.conf:/etc/redis/sentinel-26379.conf -v /docker/redis/sentinel-26379-data:/data -d redis redis-sentinel /etc/redis/sentinel-26379.conf
+docker run -p 36379:26379 --restart=always --name docker-sentinel-36379 --net docker-br0 --ip 172.18.0.23 -v /docker/redis/sentinel-36379.conf:/etc/redis/sentinel-26379.conf -v /docker/redis/sentinel-36379-data:/data -d redis redis-sentinel /etc/redis/sentinel-26379.conf
+
+三、创建mongo容器
+启动mongo容器，并自定义挂载数据卷：
+1.运行容器：
+docker run -d --name docker-mongo-27027 --restart always --privileged=true  -v /docker/mongo:/data/db -p 27027:27017 mongo
+
+四、创建jenkins容器
+启动Jenkins容器，并自定义挂载数据卷
+1.创建挂载目录：
+mkdir /docker/jenkins
+2.设置挂载目录权限：
+chown -R 1000 /docker/jenkins/
+3.运行容器：（指定IP）
+docker run -d --name docker-jenkins-8081 --restart always --privileged=true -p 8081:8080 --net docker-br0 --ip 172.18.0.51 -v /docker/jenkins:/var/jenkins_home jenkins/jenkins
+4.进入jenkins
+http://120.48.120.116:8081
+5.输入初始化管理员密码：
+查看路径：cat /docker/jenkins/secrets/initialAdminPassword
+6.初始化之后可设置登录账号密码：
+admin/123456
+
+五、创建Nginx容器
+1.创建目录：
+mkdir /docker/nginx/nginx-81 -p
+2.启动临时容器：
+docker run --name docker-nginx-81 -d -p 81:80 daocloud.io/library/nginx:1.13.0
+3.复制容器内的文件至宿主机：
+docker cp docker-nginx-81:/etc/nginx /docker/nginx/nginx-81/conf
+docker cp docker-nginx-81:/usr/share/nginx/html /docker/nginx/nginx-81/html
+docker cp docker-nginx-81:/var/log/nginx /docker/nginx/nginx-81/logs
+4.删除临时容器：
+docker rm -f docker-nginx-81
+5.启动正式容器：
+docker run -d --name docker-nginx-81 --restart always --privileged=true -p 81:80 --net docker-br0 --ip 172.18.0.61 -v /docker/nginx/nginx-81/conf:/etc/nginx -v /docker/nginx/nginx-81/html:/usr/share/nginx/html -v /docker/nginx/nginx-81/logs:/var/log/nginx daocloud.io/library/nginx:1.13.0
+6.可以一次全量复制执行：（附）
+mkdir /docker/nginx/nginx-81 -p
+docker run --name docker-nginx-81 -d -p 81:80 daocloud.io/library/nginx:1.13.0
+docker cp docker-nginx-81:/etc/nginx /docker/nginx/nginx-81/conf
+docker cp docker-nginx-81:/usr/share/nginx/html /docker/nginx/nginx-81/html
+docker cp docker-nginx-81:/var/log/nginx /docker/nginx/nginx-81/logs
+docker rm -f docker-nginx-81
+docker run -d --name docker-nginx-81 --restart always --privileged=true -p 81:80 --net docker-br0 --ip 172.18.0.61 -v /docker/nginx/nginx-81/conf:/etc/nginx -v /docker/nginx/nginx-81/html:/usr/share/nginx/html -v /docker/nginx/nginx-81/logs:/var/log/nginx daocloud.io/library/nginx:1.13.0
+
+六、docker-nginx-81做负载均衡反向代理服务器
+1.编辑配置文件nginx.conf
+vim /docker/nginx/nginx-81/conf/nginx.conf
+内容：
+user  nginx;
+worker_processes  1;
+
+error_log  /var/log/nginx/error.log warn;
+pid        /var/run/nginx.pid;
+
+events {
+	worker_connections  1024;
+}
+
+http {
+	include       /etc/nginx/mime.types;
+	default_type  application/octet-stream;
+
+	log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+					  '$status $body_bytes_sent "$http_referer" '
+					  '"$http_user_agent" "$http_x_forwarded_for"';
+
+	access_log  /var/log/nginx/access.log  main;
+
+	sendfile        on;
+	#tcp_nopush     on;
+
+	keepalive_timeout  65;
+
+	#gzip  on;
+
+	#这里是新增的负载均衡配置
+	upstream myserver {
+		server 120.48.120.116:82 down;
+		server 120.48.120.116:83 backup;
+		server 120.48.120.116:84;
+	}
+
+	include /etc/nginx/conf.d/*.conf;
+}
+2.编辑配置文件default.conf
+vim /docker/nginx/nginx-81/conf/conf.d/default.conf
+内容：
+server {
+    listen       80;
+    server_name  localhost;
+
+    #charset koi8-r;
+    #access_log  /var/log/nginx/log/host.access.log  main;
+
+    location / {
+        proxy_pass http://myserver;	#这里是新增的负载均衡配置
+        root   /usr/share/nginx/html;
+        index  index.html index.htm;
+    }
+
+    #error_page  404              /404.html;
+
+    # redirect server error pages to the static page /50x.html
+    #
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+
+    # proxy the PHP scripts to Apache listening on 127.0.0.1:80
+    #
+    #location ~ \.php$ {
+    #    proxy_pass   http://127.0.0.1;
+    #}
+
+    # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+    #
+    #location ~ \.php$ {
+    #    root           html;
+    #    fastcgi_pass   127.0.0.1:9000;
+    #    fastcgi_index  index.php;
+    #    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+    #    include        fastcgi_params;
+    #}
+
+    # deny access to .htaccess files, if Apache's document root
+    # concurs with nginx's one
+    #
+    #location ~ /\.ht {
+    #    deny  all;
+    #}
+}
+
+七、创建php容器
+1.docker run -d --name docker-php-9002 --restart always --privileged=true -p 9002:9000 --net docker-br0 --ip 172.18.0.72 -v /docker/nginx/nginx-82/html/:/var/www/html php:7.4-fpm
+#注释1： /docker/nginx/nginx-82/html  =>  nginx对应的根目录
+#注释2： /var/www/html  =>  php容器对应的根目录
+2.修改配置文件：vim /docker/nginx/nginx-82/conf/conf.d/default.conf
+location ~ \.php$ {
+	root           /var/www/html;
+	fastcgi_pass   120.48.120.116:9002;	#宿主机ip:端口，前提：端口需要开放
+	fastcgi_index  index.php;
+	fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+	include        fastcgi_params;
+}
+#注释：作为负载均衡的反向代理服务器docker-nginx-81无需配置以上信息
+
+八、PHP安装swoole扩展
+1、进入容器docker-php-9001：
+docker exec -it docker-php-9001 /bin/bash
+2、创建目录：
+mkdir /softs/swoole -p
+3、宿主机新建vim /docker/doc/php.ini
+extension=swoole.so
+4、复制宿主机文件php.ini至容器：
+docker cp /docker/doc/php.ini docker-php-9001:/usr/local/etc/php/
+5、复制swoole包至容器：
+docker cp /root/swoole-4.4.15.tgz docker-php-9001:/softs/swoole
+6、进入容器，进入/softs/swoole，解压：
+tar -zxvf swoole-4.4.15.tgz
+7、cd swoole-4.4.15
+8、phpize
+9、./configure --with-php-config=/usr/local/php/bin/php-config
+10、make
+11、make install
+12、重启docker-php-9001：
+docker restart docker-php-9001
+
+九、创建rabbitmq容器
+1、拉取镜像：
+docker pull docker.io/macintoshplus/rabbitmq-management
+2、创建目录：
+mkdir /docker/rabbitmq
+3、启动容器：
+docker run -d --name docker-rabbitmq-5672 --restart always --privileged=true -p 5672:5672 -p 15672:15672 -v /docker/rabbitmq/data:/var/lib/rabbitmq --hostname myRabbit -e RABBITMQ_DEFAULT_VHOST=my_vhost  -e RABBITMQ_DEFAULT_USER=admin -e RABBITMQ_DEFAULT_PASS=123456 macintoshplus/rabbitmq-management:latest
+
+说明：
+-d 后台运行容器；
+--name 指定容器名；
+-p 指定服务运行的端口（5672：应用访问端口；15672：控制台Web端口号）；
+-v 映射目录或文件；
+--hostname  主机名（RabbitMQ的一个重要注意事项是它根据所谓的 “节点名称” 存储数据，默认为主机名）；
+-e 指定环境变量；（RABBITMQ_DEFAULT_VHOST：默认虚拟机名；RABBITMQ_DEFAULT_USER：默认的用户名；RABBITMQ_DEFAULT_PASS：默认用户名的密码）
+
+4、进入rabbitmq后台：
+http://Server-IP:15672
+
+5、安装AMQP扩展
+yum install -y librabbitmq-devel
+wget https://pecl.php.net/get/amqp-1.9.4.tgz
+tar -zvxf amqp-1.9.4.tgz
+cd amqp-1.9.4
+phpize
+./configure --with-php-config=/usr/bin/php-config
+make && make install
+编辑 php.ini 添加extension=amqp.so
+
+十、docker-compose创建nginx+php容器
+1、创建目录：
+mkdir /docker/nginx_php/nginx/conf.d /docker/nginx_php/www /docker/nginx_php/nginx/log /docker/nginx_php/docker-compose -p
+2、编写docker-compose.yml文件：
+vim /docker/nginx_php/docker-compose/docker-compose.yml
+内容：
+version: "3"
+services:
+	nginx:
+		image: nginx:latest
+		container_name: "compose-nginx"
+		restart: always
+		ports:
+			- "8080:80"
+			- "443:443"
+		environment:
+		   - TZ=Asia/Shanghai
+		depends_on:
+		   - "php"
+		volumes:
+		   - "/docker/nginx_php/nginx/conf.d:/etc/nginx/conf.d"
+		   - "/docker/nginx_php/www:/usr/share/nginx/html"
+		   - "/docker/nginx_php/nginx/log:/var/log/nginx"
+		networks:
+		  - myweb
+	php:
+		image: php:7.4-fpm
+		container_name: "compose-php"
+		restart: always
+		ports:
+			- "9090:9000"
+		environment:
+			- TZ=Asia/Shanghai
+		volumes:
+			- "/docker/nginx_php/www:/usr/share/nginx/html"
+		networks:
+		  - myweb
+
+networks:
+	myweb:
+	  driver: bridge
+	  
+3、编写default.conf文件：
+vim /docker/nginx_php/nginx/conf.d/default.conf
+内容：
+	server {
+		listen  80 default_server;
+		server_name  localhost;
+
+		root  /usr/share/nginx/html;
+		location / {
+			index index.html index.htm index.php;
+		}
+
+		location ~ \.php$ {
+			fastcgi_pass   php:9000;
+			fastcgi_index  index.php;
+			fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+			include        fastcgi_params;
+		}
+	}
+4、进入docker-compose目录，启动容器：
+cd /docker/nginx_php/docker-compose/
+docker-compose up -d
+5、查看docker-compose管理的容器：
+docker-compose ps

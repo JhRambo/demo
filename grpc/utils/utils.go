@@ -19,7 +19,7 @@ func Logs(mp map[string]interface{}) error {
 	创建表，每个月创建一张表
 
 每次创建的是下个月的表结构
-定时任务：每月执行一次即可
+定时器任务：每月执行一次即可
 */
 func CreateTable() (string, error) {
 	ym := ""

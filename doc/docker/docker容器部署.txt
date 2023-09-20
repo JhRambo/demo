@@ -1,0 +1,48 @@
+【D3PlanetServer】
+1.启动centos容器：
+看，docker.bat脚本，以管理员身份启动
+@echo off
+docker stop my-centos
+docker run -it --rm --name my-centos --privileged=true -v D:\code:/code  my-centos:v0.1 /bin/bash
+
+
+2.每次启动centos容器后，都需要执行：
+source ~/.bash_profile
+
+
+3.在容器docker-centos环境下，执行d3protoc
+d3protoc
+
+
+4.在容器docker-centos环境下，执行sh，目的是为了生成可执行的镜像，用于运行容器集群，每次修改完代码，需要重新执行build操作，可不用执行所有，只要执行修改的就行，然后再执行第5点
+cd /code/D3PlanetServer/
+sh build.sh
+
+
+5.在windows环境下的D:\code\D3PlanetServer目录下，运行集群容器：
+docker-compose -f docker-compose-win.yml up -d --build
+
+
+【Starverse】
+1.启动centos容器：
+看，docker.bat脚本，以管理员身份启动
+@echo off
+docker stop my-centos
+docker run -it --rm --name my-centos --privileged=true -v D:\code:/code  my-centos:v0.1 /bin/bash
+
+
+2.每次启动centos容器后，都需要执行：
+source ~/.bash_profile
+
+
+3.在容器docker-centos环境下，执行d3protoc2
+d3protoc2
+
+
+4.在容器docker-centos环境下，执行sh，目的是为了生成可执行的镜像，用于运行容器集群，每次修改完代码，需要重新执行build操作，可不用执行所有，只要执行修改的就行，然后再执行第5点
+cd /code/Starverse/
+sh build.sh
+
+
+5.在windows环境下的D:\code\Starverse，运行集群容器：
+docker-compose -f docker-compose-win.yml up -d --build

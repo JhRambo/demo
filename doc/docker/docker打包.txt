@@ -1,0 +1,5 @@
+1.容器打包成镜像：
+docker commit 容器ID 镜像名称
+
+2.导出镜像：
+docker save -o 自定义名称.tar 镜像名称

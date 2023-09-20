@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// 定时任务每月执行一次
+// 定时器任务每月执行一次
 func main() {
 	ticker := time.NewTicker(time.Second * 10)
 	// ticker := time.NewTicker(time.Hour * 24 * 31)

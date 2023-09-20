@@ -16,7 +16,7 @@ func fibonacci(n int) int {
 
 func main() {
 	go func() {
-		log.Println(http.ListenAndServe("localhost:6060", nil))
+		log.Println(http.ListenAndServe("localhost:8080", nil))
 	}()
 
 	// 故意创建一个 CPU 密集型任务
