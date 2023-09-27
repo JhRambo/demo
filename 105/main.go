@@ -5,11 +5,13 @@ import (
 	"sync"
 )
 
+// 定义结构体
 type VoteBox struct {
 	votes map[string]int
-	lock  sync.RWMutex
+	lock  sync.RWMutex //读写互斥锁，写独占，读共享
 }
 
+// 实例化结构体
 func NewVoteBox() *VoteBox {
 	return &VoteBox{
 		votes: make(map[string]int),
