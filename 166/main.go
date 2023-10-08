@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+// 结构体嵌套
 type Content struct {
 	Content struct {
 		Text string `json:"text"`
