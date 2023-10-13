@@ -22,8 +22,6 @@ services:
     volumes:
       - D:\code\Starverse\win-compose\config\redis\redis.conf:/usr/local/etc/redis/redis.conf:rw
       - D:\code\Starverse\win-compose\config\redis\data:/data:rw
-    depends_on:
-      - consul
 
   com.ghs.gateway:
     build: ./com.ghs.gateway
@@ -36,7 +34,7 @@ services:
       - D:\code\Starverse\com.ghs.gateway\logs\:/app/starverse/logs
     depends_on:
       - com.ghs.server
-
+  
   com.ghs.server:
     build: ./com.ghs.server
     restart: always
@@ -47,7 +45,7 @@ services:
       - D:\code\Starverse\win-compose\data\:/app/data
     depends_on:
       - com.ghs.db
-
+  
   com.ghs.db:
     build: ./com.ghs.db
     restart: always
@@ -58,7 +56,7 @@ services:
       - D:\code\Starverse\win-compose\data\:/app/data
     depends_on:
       - consul
-
+  
   com.ghs.sync:
     build: ./com.ghs.sync
     restart: always
@@ -76,7 +74,7 @@ services:
     restart: always
     container_name: com.ghs.alarm
     ports:
-      - 38801:38801
+      - 38401:38401
     volumes:
       - D:\code\Starverse\win-compose\data\:/app/data
     depends_on:
