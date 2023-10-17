@@ -1,20 +1,31 @@
 global:
   resolve_timeout: 5m   # 告警解除的超时时间
-  smtp_smarthost: 'smtp.feishu.cn:465'
-  smtp_from: 'auth@3dxr.com'
-  smtp_auth_username: 'auth@3dxr.com'
-  smtp_auth_password: 'zQp8Jf8S7CxMQ1nT'
-  smtp_require_tls: false
+  #smtp_smarthost: 'smtp.feishu.cn:465'
+  #smtp_from: 'auth@3dxr.com'
+  #smtp_auth_username: 'auth@3dxr.com'
+  #smtp_auth_password: 'zQp8Jf8S7CxMQ1nT'
+  #smtp_require_tls: false
   
 templates:
   - '/etc/prometheus/template/*.tmpl'
   
 route:
   group_by: ['alertname', 'job', 'severity']
-  group_wait: 30s     # 同组内，xx时间内出现报警，在一个组内发出
-  group_interval: 2m  # 在发送新的报警信息时，等待多长时间
-  repeat_interval: 3m # 如果已经发送报警信息，再次发送的时间间隔，最终间隔时间：group_interval+repeat_interval
-  receiver: feishu-webhook
+  group_wait: 1m     # 等待相同告警组内出现新告警的时间
+  group_interval: 2m  # 等待不同告警组间出现新告警的时间
+  #repeat_interval: 5m # 告警间隔时间
+  receiver: feishu-webhook # 默认接收者
+  routes:
+    - receiver: feishu-webhook
+      match:
+        severity: warning
+    - receiver: email-webhook
+      match:
+        severity: critical
+    - receiver: sms-webhook
+      match:
+        severity: page
+      repeat_interval: 5m # 告警间隔时间
 
 receivers:
   - name: 'feishu-webhook'
@@ -22,12 +33,22 @@ receivers:
       - url: 'http://192.168.10.103:38401/feishu/notify666'
         send_resolved: true
         
-  - name: 'email'
-    email_configs:
-      - to: '237230999@qq.com'
-        html: '{{ template "alert" . }}'
-        headers: { Subject: "[WARNING]Prometheus告警邮件" }
+  - name: 'email-webhook'
+    webhook_configs:
+      - url: 'http://192.168.10.103:38401/email/notify666'
         send_resolved: true
+        
+  - name: 'sms-webhook'
+    webhook_configs:
+      - url: 'http://192.168.10.103:38401/sms/notify666'
+        send_resolved: true
+        
+  #- name: 'email'
+  #  email_configs:
+  #    - to: '237230999@qq.com'
+  #      html: '{{ template "alert" . }}'
+  #      headers: { Subject: "[WARNING]Prometheus告警邮件" }
+  #      send_resolved: true
 
   #- name: 'jenkins-webhook'
   #  webhook_configs:
