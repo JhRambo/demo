@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"demo/docker/config"
+	"demo/logs"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/time/rate"
@@ -22,7 +23,7 @@ func Rate(ctx *gin.Context) {
 			Code:    -10002,
 			Message: "服务器繁忙",
 		}
-		ctx.Error(fmt.Errorf(resp.Message))
+		ctx.Error(fmt.Errorf(logs.GetErrorLocation(resp.Message))) //记录错误发生的位置
 		ctx.AbortWithStatusJSON(http.StatusServiceUnavailable, resp)
 		return
 	}

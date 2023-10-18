@@ -13,7 +13,6 @@ route:
   group_by: ['alertname', 'job', 'severity']
   group_wait: 1m     # 等待相同告警组内出现新告警的时间
   group_interval: 2m  # 等待不同告警组间出现新告警的时间
-  #repeat_interval: 5m # 告警间隔时间
   receiver: feishu-webhook # 默认接收者
   routes:
     - receiver: feishu-webhook
