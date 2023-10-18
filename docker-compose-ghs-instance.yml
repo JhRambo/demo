@@ -77,5 +77,6 @@ services:
       - 38401:38401
     volumes:
       - D:\code\Starverse\win-compose\data\:/app/data
+      - D:\code\Starverse\com.ghs.alarm\logs\:/app/starverse/logs
     depends_on:
       - consul
