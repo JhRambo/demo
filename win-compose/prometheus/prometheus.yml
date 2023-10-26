@@ -2,19 +2,34 @@ global:
   scrape_interval: 60s
   
 scrape_configs:
-  - job_name: "com.ghs.gateway"
+  - job_name: 'com.ghs.gateway'
     static_configs:
-      - targets: ["192.168.10.103:38101"]
-      
-  #- job_name: "com.ghs.alarm"
+      - targets: ['192.168.10.103:38101']
+  
+  #- job_name: 'com.ghs.server'
   #  static_configs:
-  #    - targets: ["192.168.10.103:38401"]
+  #    - targets: ['192.168.10.103:38202']
+  
+  #- job_name: 'com.ghs.db'
+  #  static_configs:
+  #    - targets: ['192.168.10.103:38302']
+  
+  #- job_name: 'node-exporter'
+  #  static_configs:
+  #    - targets: ['192.168.10.103:9100']
+  
+  #- job_name: 'com.ghs.gateway'
+  #  consul_sd_configs:
+  #    - server: '192.168.10.103:38500'
+  #      token: '123456'
+  #      services:
+  #        - 'gateway'
       
 rule_files:
   # 引入告警规则文件
-  - "/etc/prometheus/rules/rules.yml"
+  - '/etc/prometheus/rules/*.yml'
 
 alerting:
   alertmanagers:
     - static_configs:
-        - targets: ["192.168.10.103:9093"]
+        - targets: ['192.168.10.103:9093']

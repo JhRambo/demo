@@ -1,5 +1,6 @@
 groups:
-- name: alarm-rules
+# 服务
+- name: server-rules
   rules:
   - alert: ServiceDown
     expr: up == 0
@@ -7,10 +8,10 @@ groups:
     labels:
       severity: warning
     annotations:
-      summary: 'Service {{$labels.instance}} of job {{$labels.job}} is down'
-      description: 'The service {{$labels.instance}} of job {{$labels.job}} has been down for more than 1 minute'
-      resolved_summary: 'Service {{$labels.instance}} of job {{$labels.job}} is up'
-      resolved_description: 'The service {{$labels.instance}} of job {{$labels.job}} has been up'
+      summary: 'Service {{$labels.instance}} is down'
+      description: 'The service {{$labels.instance}} has been down for more than 1 minute'
+      resolved_summary: 'Service {{$labels.instance}} is up'
+      resolved_description: 'The service {{$labels.instance}} has been up'
       
   - alert: ServiceDown
     expr: up == 0
@@ -18,10 +19,10 @@ groups:
     labels:
       severity: critical
     annotations:
-      summary: 'Service {{$labels.instance}} of job {{$labels.job}} is down'
-      description: 'The service {{$labels.instance}} of job {{$labels.job}} has been down for more than 5 minute'
-      resolved_summary: 'Service {{$labels.instance}} of job {{$labels.job}} is up'
-      resolved_description: 'The service {{$labels.instance}} of job {{$labels.job}} has been up'
+      summary: 'Service {{$labels.instance}} is down'
+      description: 'The service {{$labels.instance}} has been down for more than 5 minute'
+      resolved_summary: 'Service {{$labels.instance}} is up'
+      resolved_description: 'The service {{$labels.instance}} has been up'
       
   - alert: ServiceDown
     expr: up == 0
@@ -29,7 +30,35 @@ groups:
     labels:
       severity: page
     annotations:
-      summary: 'Service {{$labels.instance}} of job {{$labels.job}} is down'
-      description: 'The service {{$labels.instance}} of job {{$labels.job}} has been down for more than 10 minute'
-      resolved_summary: 'Service {{$labels.instance}} of job {{$labels.job}} is up'
-      resolved_description: 'The service {{$labels.instance}} of job {{$labels.job}} has been up'
+      summary: 'Service {{$labels.instance}} is down'
+      description: 'The service {{$labels.instance}} has been down for more than 10 minute'
+      resolved_summary: 'Service {{$labels.instance}} is up'
+      resolved_description: 'The service {{$labels.instance}} has been up'
+ 
+## 磁盘
+#- name: disk-rules
+#  rules:
+#  - alert: HighDiskUsage
+#    expr: 100 * (1 - node_filesystem_free_bytes / node_filesystem_size_bytes) > 80
+#    for: 5m
+#    labels:
+#      severity: warning
+#    annotations:
+#      summary: 'Service {{ $labels.instance }} High disk usage'
+#      description: 'The service {{ $labels.instance }} Disk usage is above 80%'
+#      resolved_summary: 'Service {{$labels.instance}} Disk usage is recovery'
+#      resolved_description: 'The service {{$labels.instance}} Disk usage has been recovery'
+#    
+## 内存
+#- name: memory-rules
+#  rules:
+#  - alert: HighMemoryUsage
+#    expr: (node_memory_Active_bytes / node_memory_MemTotal_bytes * 100) > 80
+#    for: 5m
+#    labels:
+#      severity: warning
+#    annotations:
+#      summary: 'Service {{ $labels.instance }} High memory usage'
+#      description: 'The service {{ $labels.instance }} Memory usage is above 80%'
+#      resolved_summary: 'Service {{$labels.instance}} Memory usage is recovery'
+#      resolved_description: 'The service {{$labels.instance}} Memory usage has been recovery'

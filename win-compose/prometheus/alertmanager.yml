@@ -6,8 +6,8 @@ global:
   #smtp_auth_password: 'zQp8Jf8S7CxMQ1nT'
   #smtp_require_tls: false
   
-templates:
-  - '/etc/prometheus/template/*.tmpl'
+#templates:
+#  - '/etc/prometheus/template/*.tmpl'
   
 route:
   group_by: ['alertname', 'job', 'severity']
@@ -17,12 +17,20 @@ route:
   routes:
     - receiver: feishu-webhook
       match:
+        alertname: ServiceDown
         severity: warning
+      continue: true
+    #- receiver: jenkins-webhook
+    #  match:
+    #    alertname: ServiceDown
+    #    severity: warning
     - receiver: email-webhook
       match:
+        alertname: ServiceDown
         severity: critical
     - receiver: sms-webhook
       match:
+        alertname: ServiceDown
         severity: page
       repeat_interval: 5m # 告警间隔时间
 
@@ -34,13 +42,17 @@ receivers:
         
   - name: 'email-webhook'
     webhook_configs:
-      - url: 'http://192.168.10.103:38401/email/notify666'
+      - url: 'http://192.168.10.103:38401/email/notify'
         send_resolved: true
         
   - name: 'sms-webhook'
     webhook_configs:
-      - url: 'http://192.168.10.103:38401/sms/notify666'
+      - url: 'http://192.168.10.103:38401/sms/notify'
         send_resolved: true
+        
+  - name: 'jenkins-webhook'
+    webhook_configs:
+      - url: 'http://jenkins.3dxr.com/generic-webhook-trigger/invoke?token=123456'
         
   #- name: 'email'
   #  email_configs:
@@ -48,7 +60,3 @@ receivers:
   #      html: '{{ template "alert" . }}'
   #      headers: { Subject: "[WARNING]Prometheus告警邮件" }
   #      send_resolved: true
-
-  #- name: 'jenkins-webhook'
-  #  webhook_configs:
-  #    - url: "http://jenkins.3dxr.com/generic-webhook-trigger/invoke?token=123456"
