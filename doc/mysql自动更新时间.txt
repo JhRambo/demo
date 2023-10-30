@@ -1,0 +1,21 @@
+在 MySQL 中，你可以使用 DATETIME 或 TIMESTAMP类型的字段，并利用默认值和on update CURRENT_TIMESTAMP来使得create_time和update_time字段自动更新。
+
+创建表：
+sql
+CREATE TABLE `my_table` (
+    `id` INT(11) NOT NULL AUTO_INCREMENT,
+    `create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `update_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`)
+);
+这样，在插入新的数据行时：
+
+create_time 会自动设置为创建行的当前时间；
+update_time 也会自动设置为创建行的当前时间。
+当进行更新操作时：
+
+update_time将会自动设置为当前时间；
+create_time不会被改变。
+注：CREATE TABLE语句需要根据你的实际表结构进行修改。
+
+这样你就实现了自动更新create_time和update_time字段的功能，请从现有的业务进行推断，将这部分逻辑合适地融入到你的业务中。
