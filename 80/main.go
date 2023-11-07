@@ -2,13 +2,17 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"time"
 )
 
 // 计算两个日期的相差天数
 func main() {
-	start, _ := time.Parse("2006-01-02", "2023-02-15")
-	end, _ := time.Parse("2006-01-02", "2023-02-28")
-	d := end.Sub(start)
-	fmt.Println(d.Hours() / 24)
+	layout := "2006-01-02"
+	start, _ := time.Parse(layout, "2023-02-15")
+	end, _ := time.Parse(layout, "2023-02-28")
+	diff := end.Sub(start)
+	// days :=int(diff.Hours() / 24)
+	days := int(math.Ceil(diff.Hours() / 24.0)) //向上取整
+	fmt.Println(days)
 }
