@@ -10,9 +10,14 @@ import (
 func main() {
 	layout := "2006-01-02"
 	start, _ := time.Parse(layout, "2023-02-15")
-	end, _ := time.Parse(layout, "2023-02-28")
+	end, _ := time.Parse(layout, "2023-02-24")
 	diff := end.Sub(start)
 	// days :=int(diff.Hours() / 24)
 	days := int(math.Ceil(diff.Hours() / 24.0)) //向上取整
 	fmt.Println(days)
+
+	var v float64
+	v = 0.01
+	vi := int(math.Ceil(v))
+	fmt.Println(vi)
 }
