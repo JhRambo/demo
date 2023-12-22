@@ -2,21 +2,24 @@ package main
 
 import "fmt"
 
-// 接口
+// 接口1
 type Usb interface {
 	start()
 	end()
 	Writer //接口嵌套
 }
 
+// 接口2
 type Writer interface {
 	php()
 	golang()
 }
 
+// 空结构体
 type Computer struct {
 }
 
+// 结构体1
 type Phone struct {
 	Name string
 }

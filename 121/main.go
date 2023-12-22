@@ -7,6 +7,7 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
+// MQTT 发布者示例
 func main() {
 	// 设置 MQTT 服务器地址
 	server := "tcp://127.0.0.1:1883"
@@ -25,7 +26,7 @@ func main() {
 	}
 
 	// 生成要发布的消息
-	messagePayload := "Hello, MQTT!"
+	messagePayload := "Hello, MQTT!!!!!!12345679"
 
 	// 发布消息到指定主题
 	token := client.Publish(topic, 1, true, messagePayload)

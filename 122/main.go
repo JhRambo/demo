@@ -3,15 +3,15 @@ package main
 import (
 	"fmt"
 	"log"
-	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
+// MQTT 订阅者示例
 func main() {
 	// 设置 MQTT 服务器地址
 	server := "tcp://127.0.0.1:1883"
-	// 设置客户端ID
+	// 设置客户端ID唯一值
 	clientID := "subscriber-client"
 	// 设置要订阅的主题
 	topic := "mytopic"
@@ -38,17 +38,29 @@ func main() {
 		log.Fatal(token.Error())
 	}
 
-	// 等待接收消息
-	time.Sleep(30 * time.Second)
+	// // 等待接收消息
+	// time.Sleep(30 * time.Second)
 
-	// 取消订阅主题
-	token = client.Unsubscribe(topic)
-	token.Wait()
-	if token.Error() != nil {
-		log.Fatal(token.Error())
-	}
+	// // 取消订阅主题
+	// token = client.Unsubscribe(topic)
+	// token.Wait()
+	// if token.Error() != nil {
+	// 	log.Fatal(token.Error())
+	// }
 
-	// 断开 MQTT 客户端连接
-	client.Disconnect(250)
-	fmt.Println("Disconnected")
+	// // 断开 MQTT 客户端连接
+	// client.Disconnect(250)
+	// fmt.Println("Disconnected")
+
+	// 1.持续运行，等待接收消息
+	// select {}
+
+	// // 2.持续运行，等待接收消息
+	// for {
+
+	// }
+
+	// 3.使用通道阻塞：
+	blockChan := make(chan struct{}, 1)
+	<-blockChan
 }
