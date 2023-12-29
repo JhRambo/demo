@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"strings"
@@ -17,6 +18,7 @@ func main() {
 			City:   "Beijing",
 			Detail: "1001街道",
 		},
+		NodeList: []string{"{\"id\":\"111\"}"},
 	}
 
 	fmt.Println("原始结构：", person)
@@ -37,6 +39,12 @@ func main() {
 		fmt.Println("更新 Job.Work 字段失败：", err)
 	}
 
+	nodeList := []string{"{\"id\":\"222\"}", "{\"id\":\"333\"}"}
+	err = UpdateFieldValue(person, "NodeList", nodeList)
+	if err != nil {
+		fmt.Println("更新 NodeList 字段失败：", err)
+	}
+
 	fmt.Println("更新后的结构：", person)
 
 	//2.根据path获取value
@@ -45,7 +53,7 @@ func main() {
 		fmt.Println("获取字段值失败：", err)
 		return
 	}
-	fmt.Println("字段值：", value)
+	fmt.Println("Address字段值：", value)
 
 	//3.根据path删除value
 	err = DeleteFieldValue(person, "Address.City")
@@ -54,6 +62,7 @@ func main() {
 		return
 	}
 	fmt.Println("删除后的结构：", person)
+	fmt.Println(person.Address)
 }
 
 // UpdateFieldValue 更新 Protocol Buffers 消息的字段值
@@ -92,11 +101,20 @@ func UpdateFieldValue(msg proto.Message, fieldPath string, newValue interface{})
 	}
 
 	// 设置新的字段值
-	newValueReflect := reflect.ValueOf(newValue)
-	if newValueReflect.Type() != v.Type() {
-		return fmt.Errorf("字段类型不匹配")
+	switch v.Interface().(type) {
+	case []string:
+		newValueSlice, ok := newValue.([]string)
+		if !ok {
+			return errors.New("新值类型不匹配")
+		}
+		v.Set(reflect.AppendSlice(v, reflect.ValueOf(newValueSlice)))
+	default:
+		newValueReflect := reflect.ValueOf(newValue)
+		if newValueReflect.Type() != v.Type() {
+			return fmt.Errorf("字段类型不匹配")
+		}
+		v.Set(newValueReflect)
 	}
-	v.Set(newValueReflect)
 
 	return nil
 }

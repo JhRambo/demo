@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+option go_package = "../utils/proto/student";
+
+message Student {
+    string name = 1;
+    int32 id = 2;
+    string email = 3;
+  }

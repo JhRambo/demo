@@ -6,6 +6,7 @@ message Person {
     string name = 1;
     Address address = 2;
     Job job = 3;
+    repeated string nodeList = 4;
 }
 
 message Address {
