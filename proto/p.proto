@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+import "google/protobuf/field_mask.proto";
+ 
+option go_package = "../utils/proto/p";
+
+enum MethodId {
+	DATA_INIT = 0;
+	DATA_GET = 1;
+	DATA_UPDATE = 2;
+}
+
+message WsData {
+	MethodId methodId = 1;
+	string path = 2;
+	google.protobuf.FieldMask fieldMask = 3;
+    oneof data {
+		int32 int32Data = 4;
+		float floatData = 5;
+		string stringData = 6;
+		bool boolData = 7;
+		bytes bytesData = 8;
+	};
+	xInfo x = 9;
+}
+
+message xInfo {
+	string name = 1;
+	int32 code = 3;
+}

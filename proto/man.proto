@@ -1,0 +1,16 @@
+syntax = "proto3";
+ 
+option go_package = "../utils/proto/man";
+
+message Man  {
+	string name = 1;
+	int32 age = 2;
+	Address address = 3;
+}
+
+// Address 是一个地址消息
+message Address {
+	string city = 1;
+	string state = 2;
+	string zip = 3;
+}

@@ -1,0 +1,169 @@
+syntax = "proto3";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/descriptor.proto";
+option go_package = "../utils/proto/nodestruct";
+
+extend google.protobuf.MessageOptions {
+  optional MessageId msgId = 50000;
+  repeated string condition = 50001;
+}
+
+message CommonData {
+  oneof data  {
+    string stringData = 1;
+    int32 int32Data = 2;
+    float floatData = 3;
+    bytes bytesData = 4;
+  }
+}
+
+// 定义泛型结构体
+message Payload{
+  MessageId msgId = 1;// 指向message option msgId
+  string path = 2;
+  google.protobuf.FieldMask fieldMask = 3;// 对于data的字段掩码
+  bytes data = 4;
+}
+message Scene{
+  option (msgId) = MSG_SCENE;
+  map<int32, Payload> nodeList = 1;
+  // repeated Payload nodeList = 1;
+}
+
+// 资源类型
+enum ResourceType{
+  RESOURCE_TYPE_DEFAULT = 0;
+  RESOURCE_TYPE_MUSIC = 1;// 音频
+  RESOURCE_TYPE_VIDEO = 2;// 视频
+}
+
+// 测试字段
+enum Test{
+  TEST_DEFAULT = 0;
+  TEST_T = 1;// 你好
+}
+
+enum MessageId{
+  MSG_SCENE = 0;
+  MSG_VECTOR = 1;
+  MSG_TEST_NODE = 2;
+  MSG_MODEL_MODULE = 3;
+  MSG_RESOURCE = 4;
+  MSG_RESOURCE_FILE_INFO_EXTEND0 = 5;
+  MSG_RESOURCE_FILE_INFO_EXTEND1 = 6;
+  MSG_TRANSFORM = 7;
+  MSG_FILE_INFO = 8;
+  MSG_FILE_INFO_EXTEND0 = 9;
+  MSG_FILE_INFO_EXTEND1 = 10;
+  MSG_TRANSFORM_INFO = 11;
+}
+
+message Vector{
+  option (msgId) = MSG_VECTOR;
+  float x = 1;
+  float y = 2;
+  float z = 3;
+}
+
+message TestNode{
+  option (msgId) = MSG_TEST_NODE;
+  Resource Resource = 1;
+  TransformInfo TransformInfo = 2;
+  Vector Vector = 3;
+}
+
+message ModelModule{
+  option (msgId) = MSG_MODEL_MODULE;
+  TransformInfo TransformInfo = 1;
+}
+
+message Resource{
+  option (msgId) = MSG_RESOURCE;
+  FileInfo FileInfo = 1;
+  bool visible = 2;
+}
+
+message ResourceFileInfoExtend0{
+  option (msgId) = MSG_RESOURCE_FILE_INFO_EXTEND0;
+  option (condition) = "[{\"key\":\"ContentType\",\"value\":\"1\"}]";
+  string speed = 1;
+}
+
+message ResourceFileInfoExtend1{
+  option (msgId) = MSG_RESOURCE_FILE_INFO_EXTEND1;
+  option (condition) = "[{\"key\":\"ContentType\",\"value\":\"2\"}]";
+  TransformInfo TransformInfo = 1;
+}
+
+message Transform{
+  option (msgId) = MSG_TRANSFORM;
+  string position = 1;
+}
+
+message FileInfo{
+  option (msgId) = MSG_FILE_INFO;
+  string Fid = 1;
+  string FullPath = 2;
+  ResourceType ContentType = 3;
+  Payload extend = 5;
+}
+
+message FileInfoExtend0{
+  option (msgId) = MSG_FILE_INFO_EXTEND0;
+  option (condition) = "[{\"key\":\"ContentType\",\"value\":\"1\"}]";
+  string speed = 1;
+  Transform Transform = 2;
+}
+
+message FileInfoExtend1{
+  option (msgId) = MSG_FILE_INFO_EXTEND1;
+  option (condition) = "[{\"key\":\"ContentType\",\"value\":\"0\"}]";
+  string t321 = 1;
+}
+
+message TransformInfo{
+  option (msgId) = MSG_TRANSFORM_INFO;
+  Vector Location = 1;
+  Vector Rotator = 2;
+  Vector Scale = 3;
+}
+
+// router
+// 方法相关
+enum MethodId{
+    RESPONSE = 0;// 消息返回
+    SCENE_INIT = 1;// 场景初始化（无需params
+    SCENE_UPDATE = 2;// 场景数据更新
+    ARRAY_ADD = 3;// 数组数据添加
+    MAP_ADD = 4;// Map数据添加
+    ARRAY_INSERT = 5;// 数组插入或某项移动
+    ARRAY_DELETE = 6;// 数组删除
+    MAP_DELETE = 7;//
+    // vote_start = 7;// 投票开始
+    //.....其它的业务方法
+  }
+  
+  message ResponseParams{
+    int32 code = 1;
+    string message = 2;
+  }
+  
+  message ArrayInsertParams{
+    int32 from = 1;// 下标 如果是move则填-1
+    int32 to = 2;// 下标
+  }
+  
+  message ArrayDeleteParams{
+    repeated int32 indexs = 1;// 下标组
+  }
+  
+  message WsData {
+    int32 uniquenessId = 1;// 消息实例Id,由客户端自增
+    MethodId methodId = 2;// 方法Id
+    oneof params {
+      ResponseParams responseParams = 100;
+      ArrayInsertParams arrayInsertParams = 101;
+      ArrayDeleteParams arrayDeleteParams = 102;
+    }
+    Payload data = 3;// 具体内容
+  }
