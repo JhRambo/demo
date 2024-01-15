@@ -59,7 +59,7 @@ func (ds *DataStore) AddProtoMessage(message protoreflect.Message, path string, 
 			if list == nil {
 				return fmt.Errorf("failed to create list for field %s", fieldName)
 			}
-			if len(fieldNames) > 0 {
+			if len(fieldNames) == 2 {
 				index, err := strconv.Atoi(fieldNames[1]) // 数组索引
 				if err != nil {
 					return fmt.Errorf("Failed to convert string to int: %v", err)
@@ -81,6 +81,10 @@ func (ds *DataStore) AddProtoMessage(message protoreflect.Message, path string, 
 						return err
 					}
 				}
+				nField := message.Descriptor().Fields().ByName(protoreflect.Name(fieldNames[0]))
+				if message.Has(nField) {
+					return nil // 设置完成后直接返回
+				}
 			} else {
 				list.Append(protoreflect.ValueOf(data))
 			}
@@ -95,11 +99,11 @@ func (ds *DataStore) AddProtoMessage(message protoreflect.Message, path string, 
 // 更新message
 func (ds *DataStore) UpdateProtoMessage(message protoreflect.Message, path string, data interface{}) error {
 	paths := ParsePath1(path)
-	targetFieldName := paths[len(paths)-1] //最后一个元素即目标字段
+	targetFieldName := paths[len(paths)-1] //目标字段
 	// 遍历每个路径
 	for i := 0; i < len(paths); i++ {
 		fieldName := paths[i]
-		var field protoreflect.FieldDescriptor
+		var field protoreflect.FieldDescriptor //字段描述符
 		var fieldNames []string
 		if strings.Contains(fieldName, "[") { //数组
 			// 先获取数组字段名称
@@ -131,7 +135,7 @@ func (ds *DataStore) UpdateProtoMessage(message protoreflect.Message, path strin
 				// 最后一个字段为数组元素，直接设置
 				t := reflect.TypeOf(data)
 				if t.Kind() == reflect.Ptr {
-					list.Set(index, protoreflect.ValueOf(data)) //直接替换当前索引值
+					list.Set(index, protoreflect.ValueOf(data)) //直接替换当前索引[x]的值
 				} else {
 					aField := listIndexMessage.Descriptor().Fields().ByName(protoreflect.Name(fieldNames[0]))
 					if aField == nil {
@@ -141,13 +145,17 @@ func (ds *DataStore) UpdateProtoMessage(message protoreflect.Message, path strin
 					}
 				}
 			} else {
-				// 最后一个字段为数组元素的子字段，递归处理
+				// 非最后一个字段为数组元素的子字段，递归处理
 				if !listIndexMessage.IsValid() {
 					return fmt.Errorf("invalid sub-message at %s[%d]", fieldName, index)
 				}
 				if err := ds.UpdateProtoMessage(listIndexMessage, strings.Join(paths[i+1:], "."), data); err != nil {
 					return err
 				}
+			}
+			nField := message.Descriptor().Fields().ByName(protoreflect.Name(fieldNames[0]))
+			if message.Has(nField) {
+				return nil // 设置完成后直接返回
 			}
 		} else {
 			switch field.Kind() { // 字段类型
@@ -210,20 +218,20 @@ func ParsePath2(path string) []string {
 }
 
 func main() {
-	// 1.INIT
-	info1 := []*pb.ExtendInfo{}
-	info2 := []*pb.ExtendInfo{}
-	info1 = append(info1, &pb.ExtendInfo{
-		Name: "拓展信息1",
-	}, &pb.ExtendInfo{
-		Name: "拓展信息2",
-	})
-	info2 = append(info2, &pb.ExtendInfo{
-		Name: "拓展信息1111",
-	}, &pb.ExtendInfo{
-		Name: "拓展信息2222",
-	})
-	list := []*pb.List{}
+	// // 1.INIT 初始化
+	// info1 := []*pb.ExtendInfo{}
+	// info2 := []*pb.ExtendInfo{}
+	// info1 = append(info1, &pb.ExtendInfo{
+	// 	Name: "拓展信息1",
+	// }, &pb.ExtendInfo{
+	// 	Name: "拓展信息2",
+	// })
+	// info2 = append(info2, &pb.ExtendInfo{
+	// 	Name: "拓展信息1111",
+	// }, &pb.ExtendInfo{
+	// 	Name: "拓展信息2222",
+	// })
+	// list := []*pb.List{}
 	// list = append(list, &pb.List{
 	// 	Name:       "节点1",
 	// 	Desc:       "节点1描述",
@@ -233,15 +241,6 @@ func main() {
 	// 	Desc:       "节点2描述",
 	// 	ExtendInfo: info2,
 	// })
-	// dataInit := &pb.Node{
-	// 	Data: list,
-	// }
-
-	list = append(list, &pb.List{
-		Name:       "节点1",
-		Desc:       "节点1描述",
-		ExtendInfo: info1,
-	})
 	dataInit := &pb.Node{
 		// Data: list,
 	}
@@ -262,32 +261,40 @@ func main() {
 		fmt.Printf("err: %v", err)
 		return
 	}
-
 	ds := NewDataStore(newMsg)
 	MemoryData = map[string]*DataStore{}
 	MemoryData["space_1"] = ds
+	// // 获取message
+	// proto.Unmarshal(ds.GetProtoMessage("space_1"), newMsg)
+	// fmt.Println(newMsg)
+
 	// // 更新message
-	// // 1.值类型
-	// ds.UpdateProtoMessage(MemoryData["space_1"].data.ProtoReflect(), "data[0].extendInfo[1].name", "xxxxxx")
-	// // 2.引用类型
+	// // 1.值类型 OK
+	// ds.UpdateProtoMessage(MemoryData["space_1"].data.ProtoReflect(), "data[0].extendInfo[0].name", "xxxxxx")
+	// // 2.引用类型 OK
 	// extendInfo := &pb.ExtendInfo{
 	// 	Name: "1234566666666666666666666",
 	// }
 	// ds.UpdateProtoMessage(MemoryData["space_1"].data.ProtoReflect(), "data[0].extendInfo[0]", extendInfo.ProtoReflect())
 
-	// // 3.动态新增message
+	// // 3.动态新增message OK
 	// extendInfo := &pb.ExtendInfo{
 	// 	Name: "1234566666666666666666666",
 	// }
 	// ds.AddProtoMessage(MemoryData["space_1"].data.ProtoReflect(), "data[0].extendInfo", extendInfo.ProtoReflect())
 
-	// 4.动态新增message
+	// 4.动态新增message OK
 	nodeInfo1 := []*pb.ExtendInfo{}
 	nodeInfo2 := []*pb.ExtendInfo{}
 	nodeInfo1 = append(nodeInfo1, &pb.ExtendInfo{
 		Name: "动态node拓展信息1",
 	}, &pb.ExtendInfo{
 		Name: "动态node拓展信息2",
+	})
+	nodeInfo2 = append(nodeInfo2, &pb.ExtendInfo{
+		Name: "动态node拓展信息O",
+	}, &pb.ExtendInfo{
+		Name: "动态node拓展信息X",
 	})
 	node1 := &pb.List{
 		Name:       "动态node",
@@ -301,23 +308,11 @@ func main() {
 		ExtendInfo: nodeInfo2,
 	}
 	ds.AddProtoMessage(MemoryData["space_1"].data.ProtoReflect(), "data", node2.ProtoReflect())
+
 	// 获取message
 	proto.Unmarshal(ds.GetProtoMessage("space_1"), newMsg)
 	fmt.Println(newMsg)
 }
-
-// func CreateNewMessage(data []byte, messageType reflect.Type) (proto.Message, error) {
-// 	// 创建新的空消息对象
-// 	newMsg := reflect.New(messageType).Interface().(proto.Message)
-
-// 	// 反序列化数据到新的消息对象
-// 	err := proto.Unmarshal(data, newMsg)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return newMsg, nil
-// }
 
 func CreateNewMessage(data []byte, desc protoreflect.MessageDescriptor) (proto.Message, error) {
 	if desc == nil {
