@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+import "google/protobuf/field_mask.proto";
+ 
+option go_package = "../utils/proto/p2";
+
+// 定义泛型结构体
+message Payload{
+	
+}
+
+message CommonData {
+	oneof data  {
+	  string stringData = 1;
+	  int32 int32Data = 2;
+	  float floatData = 3;
+	  bytes bytesData = 4;
+	}
+}
+
+message WsData {
+    string path = 2;
+	google.protobuf.FieldMask fieldMask = 3;
+	bytes data = 4;
+}
+
+message Node {
+	repeated List data = 1; 
+}
+
+message List {
+	string name = 1;
+	string desc = 2;
+	repeated ExtendInfo extendInfo = 3;
+}
+
+message ExtendInfo {
+	string name = 1;
+}
